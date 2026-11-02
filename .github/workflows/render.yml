@@ -29,7 +29,7 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq libxi6 libxfixes3 libxrender1 libgl1 libxkbcommon0 libsm6 libxxf86vm1 libegl1 libxext6 >/dev/null
           cd /tmp && curl -sL -f --retry 3 -o b.tar.xz https://download.blender.org/release/Blender5.2/blender-5.2.3-linux-x64.tar.xz && tar xf b.tar.xz && mv blender-5.2.3-linux-x64 blender
-          S=$GITHUB_WORKSPACE/$(jq -r .scene run.json); cd $S && cat blend.part* > RIVON_film2_scene.blend
+          S=$GITHUB_WORKSPACE/$(jq -r .scene $GITHUB_WORKSPACE/run.json); cd $S && cat blend.part* > RIVON_film2_scene.blend
           git config --global user.name ci; git config --global user.email ci@example.com
           nproc; free -g | head -2
       - name: Render part, push every chunk
