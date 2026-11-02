@@ -7,16 +7,16 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 HERE = os.path.dirname(os.path.abspath(__file__))
 class F:
-    FPS = 30; NFRAMES = 720
+    FPS = 30; NFRAMES = 840
     RAIN = (-9.0, -8.0); SNOW = (-9.0, -8.0)
-    TEXT_CUES = [{'kind': 'caption', 't0': 0.35, 't1': 2.9, 'line1': 'Piątek wieczorem'}, {'kind': 'caption', 't0': 3.5, 't1': 5.0, 'line1': 'Stopa montażowa'}, {'kind': 'caption', 't0': 5.6, 't1': 7.4, 'line1': 'Łącznik narożny'}, {'kind': 'clock', 't0': 3.4, 't1': 11.5, 'hold': 1.0, 'h0': 8, 'h1': 17, 'title': 'Sobota · altana w jeden dzień'}, {'kind': 'caption', 't0': 12.4, 't1': 20.6, 'line1': 'Niedziela – gotowe'}, {'kind': 'badge', 't0': 12.3, 't1': 20.6, 'text': 'Zbudowana w jeden dzień'}, {'kind': 'endcard', 't0': 21.0, 't1': 24.0, 'sub': 'Łączniki do konstrukcji drewnianych', 'tag': 'Altana w jeden dzień.'}]
+    TEXT_CUES = [{'kind': 'hook', 't0': 0.3, 't1': 3.7, 'lines': ['Altany nie postawisz', 'w jeden dzień.'], 't_b': 1.6, 'big': 'To mit.'}, {'kind': 'sub', 't0': 0.4, 't1': 3.6, 'text': 'Mówią, że altany w jeden dzień nie da się postawić.'}, {'kind': 'sub', 't0': 4.1, 't1': 7.6, 'text': 'Sobota, ósma rano. Zaczynamy od stóp i słupów.'}, {'kind': 'sub', 't0': 8.0, 't1': 11.0, 'text': 'Belki wsuwają się w łączniki RIVON.'}, {'kind': 'sub', 't0': 12.0, 't1': 14.7, 'text': 'Dokręcamy wkręty – i rama trzyma.'}, {'kind': 'sub', 't0': 15.1, 't1': 18.9, 'text': 'Na górze układamy krokwie, potem dach.'}, {'kind': 'sub', 't0': 19.8, 't1': 24.6, 'text': 'Niedziela rano – śniadanie już w nowej altanie.'}, {'kind': 'clock', 't0': 4.2, 't1': 19.0, 'hold': 0.9, 'h0': 8, 'h1': 17, 'title': 'Sobota · altana w jeden dzień'}, {'kind': 'badge', 't0': 19.7, 't1': 24.6, 'text': 'Zbudowana w jeden dzień'}, {'kind': 'endcard', 't0': 25.0, 't1': 28.0, 'sub': 'Łączniki do konstrukcji drewnianych', 'tag': 'Altana w jeden dzień.'}]
 ap = argparse.ArgumentParser(); ap.add_argument("frames", nargs="?"); ap.add_argument("out", nargs="?")
 ap.add_argument("--crf", type=int, default=16); ap.add_argument("--test", nargs=3, default=None); ap.add_argument("--audio", default=None)
 a = ap.parse_args()
 FD = os.path.join(HERE, "fonts") + os.sep
-def font(n, px):
+def font(n, px, wt="Light"):
     f = ImageFont.truetype(FD + n, px)
-    if n.startswith("Jost"): f.set_variation_by_name("Light")
+    if n.startswith("Jost"): f.set_variation_by_name(wt)
     return f
 def spaced(d, xy, text, fnt, fill, sp=1.5):
     x, y = xy
@@ -123,6 +123,40 @@ def overlay(im, t):
             pd.text((bx0, by + 14), "%02d:00" % c["h0"], font=fl, fill=(200, 205, 210, int(230 * al)))
             e_ = "%02d:00" % c["h1"]; pd.text((bx1 - pd.textlength(e_, font=fl), by + 14), e_, font=fl, fill=(200, 205, 210, int(230 * al)))
             lay.alpha_composite(pill, (px0, py0))
+        elif c["kind"] == "hook":
+            a1 = ease(env(t, c["t0"], c["t1"], 0.45, 0.4))
+            if a1 <= 0: continue
+            sc_ = d.rectangle  # dark scrim band behind the headline for legibility
+            band = Image.new("RGBA", (W, 900), (0, 0, 0, 0)); bd = ImageDraw.Draw(band)
+            for yy in range(900):
+                u = 1 - abs(yy - 450) / 450.0; bd.line([(0, yy), (W, yy)], fill=(6, 8, 10, int(150 * a1 * (u ** 0.8))))
+            lay.alpha_composite(band, (0, int(H * 0.36) - 450))
+            f1 = font("Jost.ttf", 86, "SemiBold"); y = int(H * 0.36) - 170 + int(14 * (1 - a1))
+            for ln in c["lines"]:
+                tw_ = d.textlength(ln, font=f1)
+                d.text(((W - tw_) / 2 + 3, y + 4), ln, font=f1, fill=(0, 0, 0, int(140 * a1)))
+                d.text(((W - tw_) / 2, y), ln, font=f1, fill=(255, 255, 255, int(255 * a1))); y += 104
+            a2 = ease(np.clip((t - c["t_b"]) / 0.35, 0, 1)) * min(a1 * 1.0, 1.0)
+            if a2 > 0:
+                f2 = font("Jost.ttf", 190, "Bold"); tb = c["big"]; tw2 = d.textlength(tb, font=f2); k = 0.94 + 0.06 * a2
+                d.text(((W - tw2) / 2 + 4, y + 36 + 5), tb, font=f2, fill=(0, 0, 0, int(150 * a2)))
+                d.text(((W - tw2) / 2, y + 36), tb, font=f2, fill=(255, 255, 255, int(255 * a2)))
+                d.rectangle([W / 2 - 70, y + 36 + 262, W / 2 + 70, y + 36 + 268], fill=(255, 255, 255, int(235 * a2)))
+        elif c["kind"] == "sub":
+            al = ease(env(t, c["t0"], c["t1"], 0.18, 0.18))
+            if al <= 0: continue
+            fs_ = font("Jost.ttf", 46, "Medium"); words = c["text"].split(" "); lines = []; cur = ""
+            for w_ in words:
+                trial = (cur + " " + w_).strip()
+                if d.textlength(trial, font=fs_) > W - 110 and cur: lines.append(cur); cur = w_
+                else: cur = trial
+            lines.append(cur)
+            lh = 62; bh = lh * len(lines) + 30; bw = int(max(d.textlength(l, font=fs_) for l in lines)) + 64
+            bx = (W - bw) // 2; by = int(H * 0.775) - bh // 2
+            d.rounded_rectangle([bx, by, bx + bw, by + bh], radius=22, fill=(6, 8, 10, int(150 * al)))
+            for i_, l in enumerate(lines):
+                tw_ = d.textlength(l, font=fs_)
+                d.text(((W - tw_) / 2, by + 15 + i_ * lh), l, font=fs_, fill=(255, 255, 255, int(255 * al)))
         elif c["kind"] == "badge":
             al = ease(env(t, c["t0"], c["t1"]))
             if al <= 0: continue
