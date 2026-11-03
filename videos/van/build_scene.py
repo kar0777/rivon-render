@@ -500,9 +500,7 @@ SHOTS = [  # frame, cam xyz, target xyz   (None target = follow the van)
     (130, (13.6, 19.6, 1.7),  None),
     (192, (13.6, 19.6, 1.7),  (9.25, 14.4, 1.6)),
     (231, (13.6, 19.6, 1.8),  (9.0, 15.2, 1.9)),
-    (255, (13.6, 19.6, 2.0),  (8.0, 15.0, 3.0)),
-    (275, (13.6, 19.6, 2.1),  (4.5, 11.0, 3.0)),
-    (300, (13.6, 19.6, 2.2),  (1.0, 6.0, 2.5)),
+    (300, (13.6, 19.6, 2.3),  None),
     (301, (4.5, 2.0, 1.9),    (-3.0, 0.8, 1.2)),
     (343, (4.5, 2.0, 1.9),    (-3.5, 0.0, 0.9)),
     (344, (3.4, -3.9, 2.0),   (-3.2, 1.0, 1.2)),
@@ -517,6 +515,17 @@ SHOTS = [  # frame, cam xyz, target xyz   (None target = follow the van)
 CUTS = (130, 301, 344)     # hard cuts: previous key holds, new shot starts on the frame
 for f in range(1, 193):
     if f in VAN_POS: key(tgt, f, loc=VAN_POS[f] + Vector((0, 0, 1.1 if f >= 130 else 2.3)))
+# frames 232..300: the camera target rides with the carton that is currently flying out of the van (smoothed)
+_CART = [it for it in ITEMS if it.o.name.startswith("carton")]
+def _cart_pos(f):
+    act = [it for it in _CART if it.f0 <= f <= it.f0 + it.dur]
+    it = max(act, key=lambda i: i.f0) if act else _CART[0]
+    return it.pose(f)[0]
+for f in range(232, 301):
+    acc = Vector((0, 0, 0)); n_ = 0
+    for k in range(-6, 7):
+        acc += _cart_pos(min(max(f + k, 232), 320)); n_ += 1
+    key(tgt, f, loc=acc / n_ + Vector((0, 0, 0.2)))
 for f, c_, t_ in SHOTS:
     key(cam, f, loc=c_)
     if t_ is not None: key(tgt, f, loc=t_)
