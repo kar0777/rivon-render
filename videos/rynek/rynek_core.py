@@ -490,44 +490,32 @@ def procedural(name, c1, c2, scale=40.0, rough=0.8, bump=0.25, bevel=0.0, c3=Non
     return m
 
 
-def cobble_material():
-    """procedural granite sett paving: Voronoi cells = individual stones (random tone per stone), dark joints with grit,
-    stone-by-stone height for bump, big-scale wear patches. Object-space coordinates so it never tiles visibly."""
-    m, nt, bsdf = mat_new("cobble")
+def cobble_material(name="cobble", bw=0.2, bh=0.1, c1=(0.3, 0.26, 0.25), c2=(0.64, 0.5, 0.44), mortar=(0.07, 0.065, 0.06), msize=0.012,
+                    offset=0.5, rough=0.72):
+    """granite setts laid in running bond (like the real Rynek): per-sett tone, dark joints, dirt patches, bump per sett"""
+    m, nt, bsdf = mat_new(name)
     L = nt.links
     tc = nt.nodes.new('ShaderNodeTexCoord')
-    mp = nt.nodes.new('ShaderNodeMapping'); mp.inputs['Scale'].default_value = (1.0, 1.0, 1.0)
-    L.new(tc.outputs['Object'], mp.inputs['Vector'])
-    # stretch cells a little (setts are rectangular-ish): scale x 9, y 7
-    mp.inputs['Scale'].default_value = (15.0, 10.5, 1.0)
-    v1 = nt.nodes.new('ShaderNodeTexVoronoi'); v1.voronoi_dimensions = '3D'; v1.feature = 'F1'
-    v1.inputs['Scale'].default_value = 1.0; v1.inputs['Randomness'].default_value = 0.75
-    L.new(mp.outputs['Vector'], v1.inputs['Vector'])
-    v2 = nt.nodes.new('ShaderNodeTexVoronoi'); v2.voronoi_dimensions = '3D'; v2.feature = 'DISTANCE_TO_EDGE'
-    v2.inputs['Scale'].default_value = 1.0; v2.inputs['Randomness'].default_value = 0.75
-    L.new(mp.outputs['Vector'], v2.inputs['Vector'])
-    bw = nt.nodes.new('ShaderNodeRGBToBW'); L.new(v1.outputs['Color'], bw.inputs['Color'])
-    tone = _ramp(nt, bw.outputs['Val'], [(0.0, (0.2, 0.19, 0.19)), (0.3, (0.36, 0.33, 0.3)), (0.55, (0.5, 0.45, 0.38)),
-                                          (0.8, (0.56, 0.42, 0.34)), (1.0, (0.3, 0.29, 0.3))])
-    edge = v2.outputs['Distance']
-    joint = nt.nodes.new('ShaderNodeMapRange'); joint.inputs['From Min'].default_value = 0.03; joint.inputs['From Max'].default_value = 0.11
-    L.new(edge, joint.inputs['Value'])
-    grit = _noise(nt, tc.outputs['Object'], 90.0, 4, 0.7)
-    gcol = _ramp(nt, grit, [(0.3, (0.55, 0.55, 0.55)), (0.7, (1.0, 1.0, 1.0))])
-    col = _mix(nt, tone, gcol, 1.0, 'MULTIPLY')
-    dirt = _ramp(nt, _noise(nt, tc.outputs['Object'], 0.45, 6), [(0.35, (1.0, 1.0, 1.0)), (0.7, (0.62, 0.58, 0.52))])
+    br = nt.nodes.new('ShaderNodeTexBrick')
+    br.offset = offset; br.offset_frequency = 2
+    br.inputs['Scale'].default_value = 1.0
+    br.inputs['Brick Width'].default_value = bw; br.inputs['Row Height'].default_value = bh
+    br.inputs['Mortar Size'].default_value = msize; br.inputs['Mortar Smooth'].default_value = 0.3
+    br.inputs['Color1'].default_value = (*c1, 1); br.inputs['Color2'].default_value = (*c2, 1); br.inputs['Mortar'].default_value = (*mortar, 1)
+    br.inputs['Bias'].default_value = 0.0
+    L.new(tc.outputs['Object'], br.inputs['Vector'])
+    grit = _noise(nt, tc.outputs['Object'], 120.0, 3, 0.7)
+    gcol = _ramp(nt, grit, [(0.3, (0.7, 0.7, 0.7)), (0.7, (1.0, 1.0, 1.0))])
+    col = _mix(nt, br.outputs['Color'], gcol, 1.0, 'MULTIPLY')
+    dirt = _ramp(nt, _noise(nt, tc.outputs['Object'], 0.5, 6), [(0.35, (1.0, 1.0, 1.0)), (0.7, (0.66, 0.62, 0.56))])
     col = _mix(nt, col, dirt, 1.0, 'MULTIPLY')
-    col = _mix(nt, (0.06, 0.055, 0.05), col, joint.outputs['Result'])
     L.new(col, bsdf.inputs['Base Color'])
-    # height: dome per stone, deep joints
-    h = nt.nodes.new('ShaderNodeMapRange'); h.inputs['From Min'].default_value = 0.0; h.inputs['From Max'].default_value = 0.2
-    h.clamp = True; L.new(edge, h.inputs['Value'])
-    hn = _math(nt, 'MULTIPLY', h.outputs['Result'], _ramp_to_val(nt, grit))
-    bn = nt.nodes.new('ShaderNodeBump'); bn.inputs['Strength'].default_value = 1.0; bn.inputs['Distance'].default_value = 0.05
+    inv = _math(nt, 'SUBTRACT', 1.0, br.outputs['Fac'])
+    hn = _math(nt, 'MULTIPLY', br.outputs['Fac'], _ramp_to_val(nt, grit))
+    bn = nt.nodes.new('ShaderNodeBump'); bn.inputs['Strength'].default_value = 0.8; bn.inputs['Distance'].default_value = 0.03
     L.new(hn, bn.inputs['Height']); L.new(bn.outputs['Normal'], bsdf.inputs['Normal'])
-    rr = _math(nt, 'ADD', _math(nt, 'MULTIPLY', grit, 0.18), 0.68)
-    L.new(rr, bsdf.inputs['Roughness'])
-    bsdf.inputs['Specular IOR Level'].default_value = 0.45
+    L.new(_math(nt, 'ADD', _math(nt, 'MULTIPLY', grit, 0.2), rough - 0.1), bsdf.inputs['Roughness'])
+    bsdf.inputs['Specular IOR Level'].default_value = 0.4
     return m
 
 

@@ -13,8 +13,7 @@ WALLS = {"ochre": (0.93, 0.66, 0.3), "salmon": (0.9, 0.52, 0.45), "mint": (0.52,
 
 def build_materials_town():
     M['cobble'] = cobble_material()
-    M['slabs'] = pbr("terrace_slabs", (0.5, 0.5, 0.5), tex="stone_tiles_02_diff_2k.jpg", tex_rough="stone_tiles_02_rough_2k.exr",
-                     tex_bump="stone_tiles_02_disp_2k.png", bump=0.5, tile=3.0, mult=(1.5, 1.38, 1.15), grime=0.4, bevel=0.0)
+    M['slabs'] = cobble_material("terrace_slabs", bw=0.6, bh=0.4, c1=(0.45, 0.42, 0.4), c2=(0.66, 0.6, 0.54), mortar=(0.15, 0.14, 0.13), msize=0.01, rough=0.6)
     for k, c in WALLS.items():
         M['wall_' + k] = pbr("wall_" + k, (0.8, 0.8, 0.8), tex="beige_wall_002_diff_2k.jpg", tex_bump="beige_wall_002_disp_2k.png",
                              tint=c, rough=0.92, tile=2.2, bump=0.25, grime=0.55, streaks=0.5, bevel=0.012, vary=0.05)
@@ -488,3 +487,22 @@ def pigeon(x, y, yaw, r):
     ball("ph", 0.032, (0.11, 0, 0.17), M['pigeon'], parent=root, seg=8, rings=5)
     box("pt", (0.1, 0.05, 0.015), (-0.13, 0, 0.1), M['pigeon'], rot=(0, 0.2, 0), parent=root)
     return root
+
+
+STALLS = []
+
+
+def market_stalls():
+    """white-canopy market stalls on the square (as on the real Rynek), with goods"""
+    r = random.Random(31)
+    spots = [(14, -15), (22, -12), (30, -9.5), (44, -11), (46, -33), (30, -30), (20, -27), (10, -22), (72, -12), (80, -10), (40, -37), (8, -36)]
+    for k, (x, y) in enumerate(spots):
+        STALLS.append((x, y))
+        mb = MB(); mats = {'canvas': M['awn_cream'], 'pole': M['iron'], 'wood': M['wood_dark'], 'g1': M['flower_r'], 'g2': M['flower_y'], 'g3': M['leaf'], 'g4': M['flower_p']}
+        for (px, py) in ((1.7, 0), (-1.7, 0), (0, 1.7), (0, -1.7)):
+            mb.tube('pole', (px, py, 0), (px, py, 2.3), 0.03, 0.03, 6, caps=False)
+        _cone(mb, 'canvas', (0, 0, 2.3), 1.7, 0.7, 4)
+        mb.box('wood', (0, 0.9, 0.45), (2.6, 0.8, 0.9))
+        for _ in range(26):
+            mb.blob(r.choice(('g1', 'g2', 'g3', 'g4', 'g3')), (r.uniform(-1.1, 1.1), 0.9 + r.uniform(-0.3, 0.3), 1.0 + r.uniform(0, 0.15)), r.uniform(0.07, 0.13), 1)
+        mb.emit("stall%d" % k, mats, loc=(x, y, 0), rot=(0, 0, r.choice((0, math.pi / 2, math.pi, -math.pi / 2)) + r.uniform(-0.2, 0.2)))

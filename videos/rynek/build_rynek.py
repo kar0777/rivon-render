@@ -50,7 +50,7 @@ def build_camera():
 def build_town():
     T.build_materials_town()
     box("paving", (600, 600, 0.3), (60, -120, -0.15), M['cobble'], grain=False)
-    box("terrace", (80, 4.4, 0.03), (24, 2.75, 0.0), M['slabs'], grain=False)
+    box("terrace", (80, 4.6, 0.03), (24, 2.7, 0.0), M['slabs'], grain=False)
     # restaurant row, facing -Y (y = 5), x from -40 to 135
     row = [(-40, 8.0, 4, 'cream', 'ogee'), (-32, 6.6, 3, 'salmon', 'tri'), (-25.4, 7.4, 4, 'mint', 'step'), (-18, 7.0, 4, 'ochre', 'flat'),
            (-11, 6.2, 3, 'blue', 'tri'), (-4.8, 8.2, 4, 'rose', 'ogee'),
@@ -75,31 +75,32 @@ def build_town():
     T.fountain(36.0, -17.0); T.pillory(50.0, -24.0)
     for x in (10, 24, 38, 52):
         T.lamp_post(x, -5.0)
-    for x in (14.7, 20.1, 25.5, 30.9, 36.3):
-        T.planter_tree(x, 2.85)
+    T.market_stalls()
 
-GAZ_X = [12.0, 17.4, 22.8, 28.2, 33.6]
-GAZ_Y = 2.85
-UMB_T0, UMB_STEP = 84, 12
-G0_ASM, G0_DIS = 152, 318
-RE_ASM, RE_STEP, RE_SPEED = 420, 13, 0.7
+NMOD = 9
+MOD_X0 = 11.0
+MOD_Y = 2.5
+MOD_X = [MOD_X0 + c * Z.PITCH for c in range(NMOD)]
+UMB_T0, UMB_STEP = 70, 8
+ASSEM = [(186, 0.9, 10), (565, 0.5, 4)]          # (start, speed, stagger per module)
+DISM = (440, 5)                                   # quick take-down (start, stagger)
 
 CAM_KEYS = [  # frame, camera location, look-at target, f-stop
-    (0,   (2.5, -2.4, 1.6),   (16.0, 3.0, 2.2), 4.0),
-    (120, (5.5, -2.2, 1.6),   (15.0, 3.0, 1.9), 4.0),
-    (156, (7.6, -0.8, 1.2),   (11.0, 2.0, 0.8), 3.0),
-    (186, (9.0, 0.45, 0.62),  (10.45, 1.40, 0.28), 1.8),
-    (214, (9.2, 0.60, 1.05),  (10.45, 1.40, 1.30), 1.8),
-    (244, (9.0, 0.45, 1.75),  (10.55, 1.45, 2.30), 1.8),
-    (272, (8.5, 0.60, 1.95),  (11.30, 1.50, 2.30), 1.8),
-    (300, (6.8, -2.6, 2.20),  (12.0, 2.85, 2.40), 3.2),
-    (320, (6.6, -3.0, 2.0),   (12.0, 2.85, 2.5), 3.2),
-    (360, (8.0, -3.4, 2.4),   (12.5, 2.85, 2.2), 3.2),
-    (415, (3.0, -4.0, 2.4),   (14.0, 2.85, 2.2), 3.4),
-    (500, (8.0, -4.3, 2.7),   (22.0, 2.85, 2.1), 3.4),
-    (600, (14.5, -3.9, 2.1),  (26.0, 2.85, 1.7), 3.4),
-    (720, (20.0, -3.7, 1.9),  (30.0, 3.0, 1.7), 3.4),
-    (839, (28.0, -3.5, 1.9),  (50.0, -10.0, 4.5), 4.0),
+    (0,   (3.0, -2.6, 1.6),   (17.0, 3.0, 2.2), 4.0),
+    (110, (6.0, -2.4, 1.6),   (17.0, 3.0, 1.9), 4.0),
+    (172, (7.6, -1.0, 1.2),   (10.5, 1.0, 0.7), 3.0),
+    (196, (8.1, -0.55, 0.62), (9.5, 0.65, 0.28), 1.8),
+    (226, (8.3, -0.35, 1.05), (9.5, 0.65, 1.30), 1.8),
+    (258, (8.2, -0.45, 1.8),  (9.6, 0.70, 2.30), 1.8),
+    (292, (7.8, -0.2, 1.95),  (11.0, 0.70, 2.30), 1.8),
+    (330, (5.5, -4.5, 2.6),   (14.0, 2.5, 2.4), 3.4),
+    (400, (12.0, -7.5, 4.2),  (22.0, 2.5, 2.2), 4.5),
+    (440, (14.0, -6.8, 3.4),  (24.0, 2.5, 2.0), 4.5),
+    (520, (18.0, -7.0, 4.6),  (24.0, 2.5, 2.2), 4.5),
+    (580, (6.0, -5.5, 3.0),   (16.0, 2.5, 2.2), 4.0),
+    (670, (10.0, -4.2, 2.0),  (24.0, 2.5, 1.7), 3.6),
+    (760, (22.0, -4.0, 1.9),  (36.0, 2.5, 1.7), 3.6),
+    (839, (34.0, -4.4, 2.0),  (60.0, -14.0, 6.0), 4.0),
 ]
 
 
@@ -113,17 +114,64 @@ def animate_camera(co, tgt):
 def build_restaurant():
     P.build_materials_people(); Z.build_materials_gaz()
     rr = random.Random(5)
-    for g, cx in enumerate(GAZ_X):
-        ppl, troot = P.table_group(g, cx, GAZ_Y, guests=(g != 0))
-        P.animate_guests(ppl, 0, NFR, rr)
-        fabric = M['canopy_a'] if g % 2 == 0 else M['canopy_b']
-        ob, parts, clo = Z.parasol(cx, GAZ_Y, fabric)
-        Z.animate_parasol(ob, parts, clo, UMB_T0 + g * UMB_STEP)
-        if g == 0: Z.gazebo(g, cx, GAZ_Y, [(G0_ASM, 1.0), (RE_ASM, RE_SPEED)], dismantle=G0_DIS)
-        else: Z.gazebo(g, cx, GAZ_Y, [(RE_ASM + g * RE_STEP, RE_SPEED)])
-    # pigeons on the cobbles
-    for i in range(9):
-        T.pigeon(rr.uniform(4, 40), rr.uniform(-3.5, -0.2), rr.uniform(0, 6.28), rr)
+    for c, cx in enumerate(MOD_X):
+        if c == 0:
+            service_bay(cx)
+        else:
+            ppl, troot = P.table_group(c, cx, MOD_Y, guests=True)
+            P.animate_guests(ppl, 0, NFR, rr)
+        fabric = M['canopy_a'] if c % 2 == 0 else M['canopy_b']
+        ob, parts, clo = Z.parasol(cx, MOD_Y, fabric)
+        Z.animate_parasol(ob, parts, clo, UMB_T0 + c * UMB_STEP)
+        Z.module(c, cx, MOD_Y, NMOD, ASSEM, DISM)
+    for i in range(14):
+        T.pigeon(rr.uniform(4, 44), rr.uniform(-4.5, -0.3), rr.uniform(0, 6.28), rr)
+    crowd(rr)
+
+
+def service_bay(cx):
+    """first bay: flowers + service console (keeps the assembly close-ups free of faces)"""
+    mb = MB(); mats = {'wood': M['wood_dark'], 'leaf': M['leaf'], 'fr': M['flower_r'], 'fp': M['flower_p'], 'fw': M['flower_w'], 'zinc': M['zinc'], 'top': M['tabletop']}
+    r = random.Random(77)
+    mb.box('wood', (0, 0.9, 0.45), (2.2, 0.55, 0.9)); mb.box('top', (0, 0.9, 0.93), (2.3, 0.62, 0.05))
+    mb.box('zinc', (0.5, 0.9, 1.1), (0.4, 0.3, 0.3))
+    for sx in (-1, 1):
+        mb.box('wood', (sx * 0.95, -0.6, 0.35), (0.9, 0.6, 0.7))
+        for _ in range(40):
+            mb.blob('leaf', (sx * 0.95 + r.uniform(-0.38, 0.38), -0.6 + r.uniform(-0.24, 0.24), 0.78 + r.uniform(0, 0.3)), r.uniform(0.07, 0.12), 1)
+        for _ in range(26):
+            mb.blob(r.choice(('fr', 'fr', 'fp', 'fw')), (sx * 0.95 + r.uniform(-0.38, 0.38), -0.6 + r.uniform(-0.24, 0.24), 1.0 + r.uniform(0, 0.25)), 0.04, 1)
+    mb.emit("service", mats, loc=(cx, MOD_Y, 0), smooth=False)
+
+
+def crowd(rr):
+    """people on the square: walkers on straight paths for the whole film, chatting groups, tourists"""
+    def free(x, y):
+        if 54 < x < 69.5 and -43 < y < -5: return False                  # Ratusz
+        if math.hypot(x - 36, y + 17) < 4.5 or math.hypot(x - 50, y + 24) < 2.5: return False
+        if 76 < x < 104 and -27 < y < -14: return False                  # Domki Budnicze
+        return True
+    n = 0; tries = 0
+    while n < 46 and tries < 900:
+        tries += 1
+        x0 = rr.uniform(0, 78); y0 = rr.uniform(-34, -6.0)
+        ang = rr.choice([0, math.pi, math.pi / 2, -math.pi / 2, 0.4, math.pi - 0.4, -0.5]) + rr.uniform(-0.2, 0.2)
+        sp = rr.uniform(1.05, 1.45); ln = sp * NFR / 30.0
+        x1, y1 = x0 + math.cos(ang) * ln, y0 + math.sin(ang) * ln
+        if not (-5 < x1 < 100 and -44 < y1 < -5.5): continue
+        ok = all(free(x0 + (x1 - x0) * t / 10, y0 + (y1 - y0) * t / 10) for t in range(11))
+        if not ok: continue
+        P.walker("walker%d" % n, rr, (x0, y0), (x1, y1), 0, NFR); n += 1
+    m = 0; tries = 0
+    while m < 11 and tries < 300:
+        tries += 1
+        cx, cy = rr.uniform(2, 75), rr.uniform(-36, -6.5)
+        if not free(cx, cy) or any(abs(cx - sx) < 6 and abs(cy - sy) < 5 for sx, sy in T.STALLS): continue
+        k = rr.randint(2, 5)
+        for i in range(k):
+            a = 2 * math.pi * i / k + rr.uniform(-0.2, 0.2)
+            P.standing_person("grp%d_%d" % (m, i), rr, (cx + math.cos(a) * 0.8, cy + math.sin(a) * 0.8, 0), a + math.pi)
+        m += 1
 
 
 def build(w=1080, h=1920, spp=64, full=True):

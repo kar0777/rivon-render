@@ -186,3 +186,76 @@ def animate_guests(holders, f0, f1, r):
 def hide_until(obs, f):
     for o in obs:
         key_vis(o, 0, False); key_vis(o, f, True)
+
+
+# ------------------------------------------------------------------ standing / walking people -----------------------
+def _body_mats(r):
+    return {'skin': r.choice(M['skin']), 'hair': r.choice(M['hair']), 'top': r.choice(M['top']), 'bottom': r.choice(M['pants']),
+            'shoe': r.choice(M['shoe'])}
+
+
+def _upper_body(mb, r, female, lean=0.0):
+    """torso/head for a standing figure, origin at the feet, facing +X; returns (hip_z, shoulder_z)"""
+    yaw = r.uniform(-0.5, 0.5)
+    mb.ellipsoid('bottom', (0, 0, 0.95), (0.14, 0.18, 0.1), 2)
+    if female and r.random() < 0.45:
+        mb.tube('bottom', (0, 0, 0.98), (0.0, 0, 0.55), 0.2, 0.25, 12, caps=False)        # skirt / dress
+    mb.ellipsoid('top', (0, 0, 1.22), (0.15, 0.2 if not female else 0.18, 0.3), 2, tilt=lean)
+    mb.ellipsoid('top', (0, 0, 1.45), (0.1, 0.25 if not female else 0.22, 0.1), 2)
+    mb.tube('skin', (0, 0, 1.5), (0.01, 0, 1.62), 0.047, 0.044)
+    hc = (0.02, 0, 1.74)
+    mb.ellipsoid('skin', hc, (0.1, 0.085, 0.115), 2, pivot=(0.01, 0, 1.62), rot_z=yaw)
+    mb.ellipsoid('skin', (hc[0] + 0.095, 0, hc[2] - 0.02), (0.025, 0.017, 0.03), 1, pivot=(0.01, 0, 1.62), rot_z=yaw)
+    style = r.choice(('short', 'short', 'long', 'bun', 'cap', 'bald' if not female else 'long'))
+    if style != 'bald': mb.ellipsoid('hair', (hc[0] - 0.015, 0, hc[2] + 0.03), (0.108, 0.093, 0.1), 2, pivot=(0.01, 0, 1.62), rot_z=yaw)
+    if style == 'long': mb.ellipsoid('hair', (hc[0] - 0.06, 0, hc[2] - 0.12), (0.075, 0.105, 0.2), 2, pivot=(0.01, 0, 1.62), rot_z=yaw)
+    if style == 'bun': mb.ellipsoid('hair', (hc[0] - 0.08, 0, hc[2] + 0.12), (0.05, 0.05, 0.05), 1, pivot=(0.01, 0, 1.62), rot_z=yaw)
+
+
+def standing_person(prefix, r, loc, yaw, parent=None):
+    mats = _body_mats(r); female = r.random() < 0.5
+    mb = MB(); _upper_body(mb, r, female)
+    for sy in (-1, 1):
+        mb.tube('bottom', (0, sy * 0.09, 0.92), (0.02, sy * 0.1, 0.48), 0.085, 0.065)
+        mb.tube('bottom', (0.02, sy * 0.1, 0.48), (0.0, sy * 0.1, 0.07), 0.062, 0.048)
+        mb.ellipsoid('shoe', (0.06, sy * 0.1, 0.04), (0.12, 0.05, 0.04), 1)
+        sh = (0, sy * 0.225, 1.43); pose = r.choice(('down', 'down', 'phone', 'gest'))
+        if pose == 'phone' and sy == 1: el = (0.14, sy * 0.26, 1.18); hd = (0.26, sy * 0.1, 1.4)
+        elif pose == 'gest': el = (0.16, sy * 0.3, 1.2); hd = (0.32, sy * 0.22, 1.32)
+        else: el = (0.0, sy * 0.28, 1.15); hd = (0.04, sy * 0.28, 0.9)
+        mb.tube('top', sh, el, 0.052, 0.045); mb.tube('top' if r.random() < 0.5 else 'skin', el, hd, 0.043, 0.032)
+        mb.ellipsoid('skin', (hd[0] + 0.02, hd[1], hd[2]), (0.05, 0.03, 0.03), 1)
+    root = empty(prefix, loc, (0, 0, yaw), parent)
+    mb.emit(prefix, mats, parent=root, smooth=True)
+    return root
+
+
+def walker(prefix, r, p0, p1, f0, f1):
+    """walking figure from p0 to p1 between frames f0..f1 with swinging legs/arms"""
+    mats = _body_mats(r); female = r.random() < 0.5
+    p0 = Vector((p0[0], p0[1], 0.0)); p1 = Vector((p1[0], p1[1], 0.0)); d = p1 - p0
+    yaw = math.atan2(d.y, d.x)
+    root = empty(prefix, (p0.x, p0.y, 0), (0, 0, yaw))
+    mb = MB(); _upper_body(mb, r, female, lean=0.05)
+    mb.emit(prefix, mats, parent=root, smooth=True)
+    legs = []; arms = []
+    for sy in (-1, 1):
+        hip = empty(prefix + "_h", (0, sy * 0.09, 0.93), parent=root)
+        lm = MB()
+        lm.tube('bottom', (0, 0, 0), (0.0, 0, -0.45), 0.085, 0.065); lm.tube('bottom', (0, 0, -0.45), (0.0, 0, -0.86), 0.062, 0.048)
+        lm.ellipsoid('shoe', (0.05, 0, -0.9), (0.12, 0.05, 0.04), 1)
+        lm.emit(prefix + "_l", mats, parent=hip, smooth=True); legs.append((sy, hip))
+        sh = empty(prefix + "_s", (0, sy * 0.225, 1.43), parent=root)
+        am = MB(); long_s = r.random() < 0.5
+        am.tube('top', (0, 0, 0), (0, sy * 0.02, -0.28), 0.052, 0.045)
+        am.tube('top' if long_s else 'skin', (0, sy * 0.02, -0.28), (0.02, sy * 0.03, -0.56), 0.043, 0.032)
+        am.ellipsoid('skin', (0.03, sy * 0.03, -0.6), (0.04, 0.03, 0.06), 1)
+        am.emit(prefix + "_a", mats, parent=sh, smooth=True); arms.append((sy, sh))
+    ph = r.uniform(0, 6.28)
+    for f in range(f0, f1 + 1, 5):
+        t = (f - f0) / (f1 - f0)
+        key_loc(root, f, p0.lerp(p1, t))
+        w = 2 * math.pi * (f - f0) / 28.0 + ph
+        for sy, h in legs: h.rotation_euler = (0, 0.5 * sy * math.sin(w), 0); h.keyframe_insert('rotation_euler', frame=f)
+        for sy, s in arms: s.rotation_euler = (0, -0.4 * sy * math.sin(w), 0); s.keyframe_insert('rotation_euler', frame=f)
+    return root

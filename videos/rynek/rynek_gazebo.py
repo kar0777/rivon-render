@@ -76,14 +76,19 @@ def trojak(post_c, top_z, corner):
     return ob
 
 
-# ------------------------------------------------------------------ gazebo -------------------------------------
+# ------------------------------------------------------------------ gazebo module ----------------------------
+# One long seating zone = identical RIVON modules side by side. Neighbouring modules have their own posts 0.2 m apart
+# (double posts, Trojak sockets side by side) and share one continuous flat roof.
+WX = 3.0                    # post centre-to-centre along the zone
+WY = 3.7                    # post centre-to-centre across the zone
+PITCH = WX + 0.2
 PH = {'stopa': (0, 14, 3), 'post': (14, 22, 4), 'tro': (44, 22, 4), 'beam': (70, 24, 6), 'roof': (100, 30, 0)}
 LIGHTS_AT = 135
 
 
 def _asm(a, s, key, i):
     off, dur, stag = PH[key]
-    t_in = int(round(a + (off + i * stag) * s)); return t_in, t_in + max(6, int(round(dur * s)))
+    t_in = int(round(a + (off + i * stag) * s)); return t_in, t_in + max(5, int(round(dur * s)))
 
 
 def _dis(d, key, i):
@@ -91,90 +96,94 @@ def _dis(d, key, i):
     t0 = d + base[0] + i * base[2]; return t0, t0 + base[1]
 
 
-def gazebo(g, cx, cy, assemblies, dismantle=None):
-    """assemblies: list of (start_frame, speed); dismantle: start frame of the quick take-down between the two assemblies"""
+def module(c, cx, cy, n_mod, assemblies, dismantle=None, dis_stag=5):
+    """assemblies: list of (start_frame, speed, stagger); the module starts at start + c*stagger.
+    dismantle: (start_frame, stagger) for the quick take-down between the first and second assembly."""
     topz = POST_H + 0.002
     arm_z = topz - 0.048
-    corners = [(-W / 2, -W / 2), (W / 2, -W / 2), (W / 2, W / 2), (-W / 2, W / 2)]
+    hx, hy = WX / 2, WY / 2
+    corners = [(-hx, -hy), (hx, -hy), (hx, hy), (-hx, hy)]
+    a_list = [(a0 + c * st, s) for (a0, s, st) in assemblies]
+    d0 = None if dismantle is None else dismantle[0] + c * dismantle[1]
 
-    def spans_for(key, i, off_in, off_out=None):
+    def spans_for(key, i, off_in):
         sp = []
-        for n, (a, s) in enumerate(assemblies):
+        for n, (a, s) in enumerate(a_list):
             t_in, t_land = _asm(a, s, key, i)
-            if dismantle is not None and n == 0 and key != 'stopa':
-                o0, o1 = _dis(dismantle, key, i)
-                sp.append((t_in, t_land, o0, o1, off_in, off_out or off_in))
+            if d0 is not None and n == 0:
+                o0, o1 = _dis(d0, key, i)
+                sp.append((t_in, t_land, o0, o1, off_in, off_in))
             else:
                 sp.append((t_in, t_land, None, None, off_in, off_in))
         return sp
-
-    info = {'bulbs': []}
     for i, (dx, dy) in enumerate(corners):
         px, py = cx + dx, cy + dy
-        s = stopa((px, py, 0))
-        a, sp = assemblies[0]; t_in, t_land = _asm(a, sp, 'stopa', i)
-        lifecycle([s], s.location, [(t_in, t_land, None, None, (0, 0, 1.7), (0, 0, 1.7))])
+        s_ = stopa((px, py, 0))
+        a, sp = a_list[0]; t_in, t_land = _asm(a, sp, 'stopa', i)
+        lifecycle([s_], s_.location, [(t_in, t_land, None, None, (0, 0, 1.7), (0, 0, 1.7))])
         p = box("post", (POST, POST, POST_H), (px, py, POST_H / 2 + 0.002), M['timber'])
         lifecycle([p], p.location, spans_for('post', i, (0, 0, 2.4)))
         tj = trojak((px, py), topz, i)
         lifecycle([tj], tj.location, spans_for('tro', i, (0, 0, 1.5)))
     eng = 0.15
-    runs = [((-W / 2, -W / 2), (W / 2, -W / 2)), ((W / 2, -W / 2), (W / 2, W / 2)), ((W / 2, W / 2), (-W / 2, W / 2)), ((-W / 2, W / 2), (-W / 2, -W / 2))]
+    runs = [((-hx, -hy), (hx, -hy)), ((hx, -hy), (hx, hy)), ((hx, hy), (-hx, hy)), ((-hx, hy), (-hx, -hy))]
     for j, (a_, b_) in enumerate(runs):
         va = Vector((cx + a_[0], cy + a_[1], arm_z)); vb = Vector((cx + b_[0], cy + b_[1], arm_z))
         d = (vb - va).normalized()
         bm_ = between("beam", va + d * eng, vb - d * eng, (POST, POST), M['timber'])
         side = Vector((d.y, -d.x, 0))
         lifecycle([bm_], bm_.location, spans_for('beam', j, tuple(side * 0.9 + Vector((0, 0, 0.55)))))
-    # ---- flat roof cassette: joists 50x150 @ 500, lining deck, membrane, zinc upstand, anthracite fascia
+    # ---- roof cassette for this module: joists 50x150 across the zone, lining deck, membrane, zinc upstand, fascia
     zr = topz + 0.004
-    root = empty("roof%d" % g, (cx, cy, zr))
-    half = W / 2 + OVER
+    root = empty("roof%d" % c, (cx, cy, zr))
+    ox0 = 0.45 if c == 0 else 0.1; ox1 = 0.45 if c == n_mod - 1 else 0.1
+    hyr = hy + 0.45
+    xa, xb = -hx - ox0, hx + ox1; xm = (xa + xb) / 2; lx = xb - xa
     kids = []
-    for i in range(7):
-        x = -W / 2 + i * (W / 6)
-        kids.append(box("joist", (0.05, 2 * half, RH), (x, 0, RH / 2), M['joist'], parent=root))
-    kids.append(box("deck", (2 * half, 2 * half, 0.022), (0, 0, RH + 0.011), M['lining'], parent=root, uvm=1.0))
-    kids.append(box("membrane", (2 * half + 0.02, 2 * half + 0.02, 0.01), (0, 0, RH + 0.027), M['membrane'], parent=root, grain=False))
+    nj = int(round(lx / 0.5)) + 1
+    for i in range(nj):
+        x = xa + 0.025 + (lx - 0.05) * i / (nj - 1)
+        kids.append(box("joist", (0.05, 2 * hyr, RH), (x, 0, RH / 2), M['joist'], parent=root))
+    kids.append(box("deck", (lx, 2 * hyr, 0.022), (xm, 0, RH + 0.011), M['lining'], parent=root))
+    kids.append(box("membrane", (lx + 0.004, 2 * hyr + 0.02, 0.01), (xm, 0, RH + 0.027), M['membrane'], parent=root, grain=False))
     for sgn in (-1, 1):
-        kids.append(box("fascia", (2 * half + 0.05, 0.025, 0.24), (0, sgn * (half + 0.0125), RH / 2 + 0.02), M['fascia'], parent=root))
-        kids.append(box("fascia", (0.025, 2 * half + 0.05, 0.24), (sgn * (half + 0.0125), 0, RH / 2 + 0.02), M['fascia'], parent=root))
-        kids.append(box("upstand", (2 * half, 0.03, 0.05), (0, sgn * (half - 0.015), RH + 0.06), M['zinc'], parent=root))
-        kids.append(box("upstand", (0.03, 2 * half, 0.05), (sgn * (half - 0.015), 0, RH + 0.06), M['zinc'], parent=root))
-    # corner downpipe (zinc) + drip spout
-    kids.append(box("spout", (0.06, 0.12, 0.04), (half - 0.03, -half + 0.06, RH + 0.04), M['zinc'], parent=root))
+        kids.append(box("fascia", (lx, 0.025, 0.24), (xm, sgn * (hyr + 0.0125), RH / 2 + 0.02), M['fascia'], parent=root))
+        kids.append(box("upstand", (lx, 0.03, 0.05), (xm, sgn * (hyr - 0.015), RH + 0.06), M['zinc'], parent=root))
+    if c == 0:
+        kids.append(box("fascia", (0.025, 2 * hyr + 0.05, 0.24), (xa - 0.0125, 0, RH / 2 + 0.02), M['fascia'], parent=root))
+        kids.append(box("upstand", (0.03, 2 * hyr, 0.05), (xa + 0.015, 0, RH + 0.06), M['zinc'], parent=root))
+    if c == n_mod - 1:
+        kids.append(box("fascia", (0.025, 2 * hyr + 0.05, 0.24), (xb + 0.0125, 0, RH / 2 + 0.02), M['fascia'], parent=root))
+        kids.append(box("upstand", (0.03, 2 * hyr, 0.05), (xb - 0.015, 0, RH + 0.06), M['zinc'], parent=root))
+        kids.append(box("spout", (0.06, 0.12, 0.04), (xb - 0.03, -hyr + 0.06, RH + 0.04), M['zinc'], parent=root))
     sp = []
-    for n, (a, s) in enumerate(assemblies):
+    for n, (a, s) in enumerate(a_list):
         t_in, t_land = _asm(a, s, 'roof', 0)
-        if dismantle is not None and n == 0:
-            o0, o1 = _dis(dismantle, 'roof', 0); sp.append((t_in, t_land, o0, o1, (0, 0, 1.8), (0, 0, 1.8)))
+        if d0 is not None and n == 0:
+            o0, o1 = _dis(d0, 'roof', 0); sp.append((t_in, t_land, o0, o1, (0, 0, 1.8), (0, 0, 1.8)))
         else: sp.append((t_in, t_land, None, None, (0, 0, 1.8), (0, 0, 1.8)))
     lifecycle(kids, (cx, cy, zr), sp, root=root)
-    # ---- festoon bulbs under the beams + pendant lamp (on when the roof is closed, off while it is taken down)
-    bulbs = []
-    ring = [(-W / 2 + 0.12, -W / 2 + 0.12), (W / 2 - 0.12, -W / 2 + 0.12), (W / 2 - 0.12, W / 2 - 0.12), (-W / 2 + 0.12, W / 2 - 0.12)]
-    for i in range(4):
-        a_ = Vector(ring[i]); b_ = Vector(ring[(i + 1) % 4])
-        for t in range(1, 9):
-            u = t / 9.0; p = a_.lerp(b_, u); sag = 0.15 * 4 * u * (1 - u)
-            bulbs.append(ball("bulb", 0.03, (cx + p.x, cy + p.y, topz - 0.16 - sag), M['bulbmat'], seg=8, rings=6))
-    cable = cyl("cable", 0.004, 0.5, (cx, cy, topz - 0.25), M['iron'], seg=6)
-    shade = cyl("shade", 0.22, 0.14, (cx, cy, topz - 0.55), M['zinc'], seg=20, r2=0.07, cap=False)
-    shade.rotation_euler = (math.pi, 0, 0)
-    lamp = ball("pendant_bulb", 0.05, (cx, cy, topz - 0.6), M['bulbmat'], seg=10, rings=6)
-    lights = bulbs + [cable, shade, lamp]
+    # ---- festoon bulbs under the front/back beams + pendant lamp over the table
+    lights = []
+    for sgn in (-1, 1):
+        for t in range(1, 11):
+            u = t / 11.0; x = -hx + 0.1 + (WX - 0.2) * u; sag = 0.14 * 4 * u * (1 - u)
+            lights.append(ball("bulb", 0.03, (cx + x, cy + sgn * (hy - 0.12), topz - 0.16 - sag), M['bulbmat'], seg=8, rings=6))
+    lights.append(cyl("cable", 0.004, 0.5, (cx, cy, topz - 0.25), M['iron'], seg=6))
+    sh = cyl("shade", 0.22, 0.14, (cx, cy, topz - 0.55), M['zinc'], seg=20, r2=0.07, cap=False); sh.rotation_euler = (math.pi, 0, 0)
+    lights.append(sh)
+    lights.append(ball("pendant_bulb", 0.05, (cx, cy, topz - 0.6), M['bulbmat'], seg=10, rings=6))
     for o in lights: key_vis(o, 0, False)
-    for n, (a, s) in enumerate(assemblies):
+    for n, (a, s) in enumerate(a_list):
         t_on = int(round(a + LIGHTS_AT * s))
         for o in lights: key_vis(o, t_on, True)
-        if dismantle is not None and n == 0:
-            for o in lights: key_vis(o, dismantle, False)
-    return info
+        if d0 is not None and n == 0:
+            for o in lights: key_vis(o, d0, False)
 
 
 # ------------------------------------------------------------------ parasols ------------------------------------
 def parasol(cx, cy, fabric):
-    R = 1.65; ztop = 2.78; zrim = 2.12
+    R = 1.45; ztop = 2.78; zrim = 2.12
     segs = 16; rings = 5
     me = bpy.data.meshes.new("canopy"); bm = bmesh.new()
     apex = bm.verts.new((0, 0, ztop))
