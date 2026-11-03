@@ -7,9 +7,9 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 HERE = os.path.dirname(os.path.abspath(__file__))
 class F:
-    FPS = 30; NFRAMES = 840
+    FPS = 30; NFRAMES = 750
     RAIN = (-9.0, -8.0); SNOW = (-9.0, -8.0)
-    TEXT_CUES = [{'kind': 'hook', 't0': 0.3, 't1': 3.7, 'lines': ['Altany nie postawisz', 'w jeden dzień.'], 't_b': 1.6, 'big': 'To mit.'}, {'kind': 'sub', 't0': 0.4, 't1': 3.6, 'text': 'Mówią, że altany w jeden dzień nie da się postawić.'}, {'kind': 'sub', 't0': 4.1, 't1': 7.6, 'text': 'Sobota, ósma rano. Zaczynamy od stóp i słupów.'}, {'kind': 'sub', 't0': 8.0, 't1': 11.0, 'text': 'Belki wsuwają się w łączniki RIVON.'}, {'kind': 'sub', 't0': 12.0, 't1': 14.7, 'text': 'Dokręcamy wkręty – i rama trzyma.'}, {'kind': 'sub', 't0': 15.1, 't1': 18.9, 'text': 'Na górze układamy krokwie, potem dach.'}, {'kind': 'sub', 't0': 19.8, 't1': 24.6, 'text': 'Niedziela rano – śniadanie już w nowej altanie.'}, {'kind': 'clock', 't0': 4.2, 't1': 19.0, 'hold': 0.9, 'h0': 8, 'h1': 17, 'title': 'Sobota · altana w jeden dzień'}, {'kind': 'badge', 't0': 19.7, 't1': 24.6, 'text': 'Zbudowana w jeden dzień'}, {'kind': 'endcard', 't0': 25.0, 't1': 28.0, 'sub': 'Łączniki do konstrukcji drewnianych', 'tag': 'Altana w jeden dzień.'}]
+    TEXT_CUES = [{'kind': 'endcard', 't0': 21.0, 't1': 25.0, 'sub': 'Łączniki do konstrukcji drewnianych', 'tag': 'Altana w jeden dzień.', 'y': 0.36, 'cta': 'Zamów łączniki RIVON', 'cta2': 'Link w opisie profilu'}, {'kind': 'hook', 't0': 0.2, 't1': 2.9, 'lines': ['Altany nie postawisz', 'w jeden dzień.'], 't_b': 1.5, 'big': 'To mit.'}, {'kind': 'sub', 't0': 0.3, 't1': 2.9, 'text': 'Podobno się nie da. To mit.'}, {'kind': 'sub', 't0': 3.2, 't1': 5.9, 'text': 'Sobota, ósma rano. Stopy i słupy.'}, {'kind': 'sub', 't0': 6.1, 't1': 9.8, 'text': 'Belki wsuwają się w łączniki RIVON.'}, {'kind': 'sub', 't0': 10.1, 't1': 11.9, 'text': 'Wkręty – i rama trzyma.'}, {'kind': 'sub', 't0': 12.2, 't1': 15.8, 'text': 'Krokwie, potem dach – gotowe.'}, {'kind': 'sub', 't0': 16.3, 't1': 20.8, 'text': 'Niedziela rano – śniadanie w nowej altanie.'}, {'kind': 'sub', 't0': 22.2, 't1': 24.8, 'text': 'Zamów łączniki RIVON i postaw swoją.'}, {'kind': 'clock', 't0': 3.3, 't1': 15.5, 'hold': 0.9, 'h0': 8, 'h1': 17, 'title': 'Sobota · altana w jeden dzień'}, {'kind': 'badge', 't0': 16.3, 't1': 20.6, 'text': 'Zbudowana w jeden dzień'}]
 ap = argparse.ArgumentParser(); ap.add_argument("frames", nargs="?"); ap.add_argument("out", nargs="?")
 ap.add_argument("--crf", type=int, default=16); ap.add_argument("--test", nargs=3, default=None); ap.add_argument("--audio", default=None)
 a = ap.parse_args()
@@ -169,17 +169,29 @@ def overlay(im, t):
         else:
             k = ease(np.clip((t - c["t0"]) / 1.0, 0, 1))
             if k <= 0: continue
+            yL = int(H * c.get("y", 0.44))
             d.rectangle([0, 0, W, H], fill=(6, 7, 8, int(215 * k)))
             ka = ease(np.clip((t - c["t0"] - 0.5) / 0.8, 0, 1))
-            lg = logo(int(W * 0.74), ka); lay.alpha_composite(lg, ((W - lg.width) // 2, int(H * 0.44) - lg.height // 2))
+            lg = logo(int(W * 0.74), ka); lay.alpha_composite(lg, ((W - lg.width) // 2, yL - lg.height // 2))
             kb = ease(np.clip((t - c["t0"] - 1.0) / 0.8, 0, 1))
             fs = font("Jost.ttf", 27); sub = c["sub"].upper(); tw = spaced_len(d, sub, fs, 3.2)
-            y_sub = int(H * 0.44) + lg.height // 2 + 44
+            y_sub = yL + lg.height // 2 + 44
             spaced(d, ((W - tw) / 2, y_sub), sub, fs, (232, 236, 238, int(255 * kb)), 3.2)
             if c.get("tag"):
                 kt = ease(np.clip((t - c["t0"] - 1.6) / 0.8, 0, 1)); ftg = font("Jost.ttf", 50); tg = c["tag"]; twg = d.textlength(tg, font=ftg)
-                d.text(((W - twg) / 2, int(H * 0.44) + lg.height // 2 + 150), tg, font=ftg, fill=(255, 255, 255, int(255 * kt)))
-            d.rectangle([W / 2 - 30, int(H * 0.44) + lg.height // 2 + 26, W / 2 + 30, int(H * 0.44) + lg.height // 2 + 27], fill=(150, 156, 162, int(255 * kb)))
+                d.text(((W - twg) / 2, yL + lg.height // 2 + 150), tg, font=ftg, fill=(255, 255, 255, int(255 * kt)))
+            if c.get("cta"):
+                kc = ease(np.clip((t - c["t0"] - 2.2) / 0.5, 0, 1))
+                if kc > 0:
+                    fb = font("Jost.ttf", 46, "SemiBold"); txt = c["cta"].upper(); tbw = spaced_len(d, txt, fb, 3.0)
+                    bw_ = int(tbw + 110); bh_ = 112; scl = 0.92 + 0.08 * kc; bw2, bh2 = int(bw_ * scl), int(bh_ * scl)
+                    bx_ = (W - bw2) // 2; by_ = int(H * 0.60)
+                    d.rounded_rectangle([bx_, by_, bx_ + bw2, by_ + bh2], radius=bh2 // 2, fill=(255, 255, 255, int(250 * kc)))
+                    spaced(d, ((W - tbw) / 2, by_ + (bh2 - 46) / 2 - 8), txt, fb, (10, 12, 14, int(255 * kc)), 3.0)
+                    if c.get("cta2"):
+                        f3 = font("Jost.ttf", 34, "Regular"); t3 = c["cta2"]; w3 = d.textlength(t3, font=f3)
+                        d.text(((W - w3) / 2, by_ + bh2 + 28), t3, font=f3, fill=(235, 238, 240, int(235 * kc)))
+            d.rectangle([W / 2 - 30, yL + lg.height // 2 + 26, W / 2 + 30, yL + lg.height // 2 + 27], fill=(150, 156, 162, int(255 * kb)))
     return Image.alpha_composite(im.convert("RGBA"), lay).convert("RGB")
 
 def load(path):
