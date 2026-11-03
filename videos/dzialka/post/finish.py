@@ -90,6 +90,44 @@ def weather(im, t):
         return base.convert("RGB")
     return im
 
+def analog_clock(hr, h0, h1, u, al, title, D=240, PAD=45, SS=4):
+    """round analog clock: dial with ticks + numerals, progress arc (08:00 -> 17:00), hour and minute hands; title under the dial"""
+    CW, CH = 600, D + 2 * 8 + 70
+    big = Image.new("RGBA", (CW * SS, CH * SS), (0, 0, 0, 0)); d = ImageDraw.Draw(big)
+    cx, cy, R = CW * SS / 2, (8 + D / 2) * SS, D / 2 * SS
+    A = lambda v: int(v * al)
+    d.ellipse([cx - R, cy - R, cx + R, cy + R], fill=(8, 10, 12, A(190)))
+    d.ellipse([cx - R, cy - R, cx + R, cy + R], outline=(255, 255, 255, A(70)), width=2 * SS)
+    # progress arc along the rim: from the start hour to the current hour (hour hand sweeps (h-12)*30 deg)
+    a0 = (h0 % 12) * 30 - 90; a1 = (hr % 12 if hr % 12 != 0 else 12) * 30 - 90
+    if a1 < a0: a1 += 360
+    rr = R - 6 * SS
+    d.arc([cx - rr, cy - rr, cx + rr, cy + rr], a0, a1, fill=(255, 255, 255, A(235)), width=4 * SS)
+    for i in range(60):                                     # tick marks
+        ang = np.deg2rad(i * 6); major = i % 5 == 0
+        r0 = R - (24 if major else 17) * SS; r1 = R - 12 * SS
+        d.line([(cx + r0 * np.sin(ang), cy - r0 * np.cos(ang)), (cx + r1 * np.sin(ang), cy - r1 * np.cos(ang))],
+               fill=(255, 255, 255, A(255 if major else 110)), width=(3 if major else 1) * SS)
+    fn_ = font("Jost.ttf", 25 * SS, "Medium")
+    for n_ in (12, 3, 6, 9):
+        ang = np.deg2rad(n_ * 30); rn = R - 46 * SS; tx = cx + rn * np.sin(ang); ty = cy - rn * np.cos(ang)
+        w_ = d.textlength(str(n_), font=fn_); d.text((tx - w_ / 2, ty - 17 * SS), str(n_), font=fn_, fill=(255, 255, 255, A(235)))
+    def hand(angle_deg, L, w, tail, col):
+        ang = np.deg2rad(angle_deg); sx, sy = np.sin(ang), -np.cos(ang)
+        p0 = (cx - sx * tail * SS, cy - sy * tail * SS); p1 = (cx + sx * L * SS, cy + sy * L * SS)
+        d.line([p0, p1], fill=col, width=int(w * SS))
+        for p in (p0, p1): d.ellipse([p[0] - w * SS / 2, p[1] - w * SS / 2, p[0] + w * SS / 2, p[1] + w * SS / 2], fill=col)
+    hand((hr % 12) * 30, 0.50 * D / 2, 7, 10, (255, 255, 255, A(255)))             # hour hand: short, thick
+    hand((hr - int(hr)) * 360, 0.80 * D / 2, 4, 14, (255, 255, 255, A(255)))       # minute hand: long, thin
+    d.ellipse([cx - 7 * SS, cy - 7 * SS, cx + 7 * SS, cy + 7 * SS], fill=(255, 255, 255, A(255)))
+    d.ellipse([cx - 3 * SS, cy - 3 * SS, cx + 3 * SS, cy + 3 * SS], fill=(8, 10, 12, A(255)))
+    img = big.resize((CW, CH), Image.LANCZOS); d2 = ImageDraw.Draw(img)
+    ft = font("Jost.ttf", 24, "Medium"); ttl = title.upper(); tw_ = spaced_len(d2, ttl, ft, 2.4)
+    pw = int(tw_ + 44); y0 = 8 + D + 16
+    d2.rounded_rectangle([(CW - pw) / 2, y0, (CW + pw) / 2, y0 + 42], radius=21, fill=(8, 10, 12, A(170)))
+    spaced(d2, ((CW - tw_) / 2, y0 + 7), ttl, ft, (232, 236, 238, A(255)), 2.4)
+    return img
+
 def overlay(im, t):
     W, H = im.size
     lay = Image.new("RGBA", im.size, (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
@@ -108,21 +146,8 @@ def overlay(im, t):
             al = min(ease(env(t, c["t0"], c["t1"] + c.get("hold", 0.0))), 1.0)
             if al <= 0: continue
             u = float(np.clip((t - c["t0"]) / (c["t1"] - c["t0"]), 0, 1)); u = float(u * u * (3 - 2 * u)) * 0.35 + u * 0.65
-            hr = c["h0"] + (c["h1"] - c["h0"]) * u; hh, mm = int(hr), int((hr - int(hr)) * 60)
-            ft = font("Jost.ttf", 25); fc = font("Jost.ttf", 64); fl = font("Jost.ttf", 22)
-            ttl = c["title"].upper(); tw_ = spaced_len(d, ttl, ft, 2.6)
-            pw = int(max(tw_ + 70, 560)); ph = 190; px0 = (W - pw) // 2; py0 = 215
-            pill = Image.new("RGBA", (pw, ph), (0, 0, 0, 0)); pd = ImageDraw.Draw(pill)
-            pd.rounded_rectangle([0, 0, pw - 1, ph - 1], radius=22, fill=(8, 10, 12, int(165 * al)))
-            spaced(pd, ((pw - tw_) / 2, 20), ttl, ft, (232, 236, 238, int(255 * al)), 2.6)
-            ct = "%02d:%02d" % (hh, mm); cw = pd.textlength(ct, font=fc)
-            pd.text(((pw - cw) / 2, 52), ct, font=fc, fill=(255, 255, 255, int(255 * al)))
-            bx0, bx1, by = 38, pw - 38, 148
-            pd.rounded_rectangle([bx0, by, bx1, by + 6], radius=3, fill=(255, 255, 255, int(70 * al)))
-            pd.rounded_rectangle([bx0, by, bx0 + max(6, int((bx1 - bx0) * u)), by + 6], radius=3, fill=(255, 255, 255, int(240 * al)))
-            pd.text((bx0, by + 14), "%02d:00" % c["h0"], font=fl, fill=(200, 205, 210, int(230 * al)))
-            e_ = "%02d:00" % c["h1"]; pd.text((bx1 - pd.textlength(e_, font=fl), by + 14), e_, font=fl, fill=(200, 205, 210, int(230 * al)))
-            lay.alpha_composite(pill, (px0, py0))
+            hr = c["h0"] + (c["h1"] - c["h0"]) * u
+            lay.alpha_composite(analog_clock(hr, c["h0"], c["h1"], u, al, c["title"]), ((W - 600) // 2, 170))
         elif c["kind"] == "hook":
             a1 = ease(env(t, c["t0"], c["t1"], 0.45, 0.4))
             if a1 <= 0: continue

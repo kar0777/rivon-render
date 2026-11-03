@@ -49,7 +49,8 @@ jobs:
             [ "$PART" = "0" ] || exit 0
             RANGES="--frames $LIST"; NCH=1
           else
-            PER=$(( (FR + NP - 1) / NP )); S0=$((PART*PER)); E0=$((S0+PER-1)); [ $E0 -ge $FR ] && E0=$((FR-1))
+            BASE=$(jq -r '.start // 0' run.json)
+            PER=$(( (FR - BASE + NP - 1) / NP )); S0=$((BASE+PART*PER)); E0=$((S0+PER-1)); [ $E0 -ge $FR ] && E0=$((FR-1))
             [ $S0 -ge $FR ] && exit 0
             NCH=$(( (E0 - S0 + CH) / CH ))
           fi
