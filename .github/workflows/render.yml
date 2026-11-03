@@ -39,7 +39,7 @@ jobs:
           NAME=$(jq -r .name run.json); SCENE=$GITHUB_WORKSPACE/$(jq -r .scene run.json)
           FR=$(jq -r '.frames' run.json); NP=$(jq -r '.parts' run.json)
           W=$(jq -r .w run.json); H=$(jq -r .h run.json); SPP=$(jq -r .spp run.json); CH=$(jq -r '.chunk // 12' run.json)
-          LIST=$(jq -r '.list // ""' run.json)
+          LIST=$(jq -r '.list // ""' run.json); EXTRA=$(jq -r '.extra // ""' run.json)
           B=frames/$NAME-$(printf %02d $PART)
           mkdir -p $GITHUB_WORKSPACE/out
           if git ls-remote --exit-code --heads origin $B >/dev/null 2>&1; then
@@ -56,7 +56,7 @@ jobs:
           for c in $(seq 0 $((NCH-1))); do
             if [ -n "$LIST" ]; then ARGS="--frames $LIST"; else cs=$((S0+c*CH)); ce=$((cs+CH-1)); [ $ce -gt $E0 ] && ce=$E0; ARGS="--start $cs --end $ce"; fi
             cd $SCENE
-            /tmp/blender/blender -b RIVON_film2_scene.blend -P render_rivon.py -- --preset approved --w $W --h $H --spp $SPP --persist 0 $ARGS --out $GITHUB_WORKSPACE/out 2>&1 | grep -E "FRAME|rror" | tail -25
+            /tmp/blender/blender -b RIVON_film2_scene.blend -P render_rivon.py -- --preset approved --w $W --h $H --spp $SPP --persist 0 $EXTRA $ARGS --out $GITHUB_WORKSPACE/out 2>&1 | grep -E "FRAME|rror" | tail -25
             cd $GITHUB_WORKSPACE
             rm -rf /tmp/pushrepo && mkdir /tmp/pushrepo && cp out/*.png /tmp/pushrepo/
             cd /tmp/pushrepo && git init -q -b $B && git add -A && git commit -q -m "$NAME part $PART chunk $c" && git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" $B

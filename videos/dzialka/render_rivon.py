@@ -15,7 +15,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--preset", default="test", choices=["test", "approved", "draft", "light", "lite", "final"])
 ap.add_argument("--out", default="frames"); ap.add_argument("--start", type=int, default=0); ap.add_argument("--end", type=int, default=1679)
 ap.add_argument("--step", type=int, default=1); ap.add_argument("--frames", default=""); ap.add_argument("--blend", default="")
-ap.add_argument("--spp", type=int, default=0); ap.add_argument("--w", type=int, default=0); ap.add_argument("--h", type=int, default=0); ap.add_argument("--persist", type=int, default=0); ap.add_argument("--device", default="auto")
+ap.add_argument("--seed", type=int, default=-1); ap.add_argument("--spp", type=int, default=0); ap.add_argument("--w", type=int, default=0); ap.add_argument("--h", type=int, default=0); ap.add_argument("--persist", type=int, default=0); ap.add_argument("--device", default="auto")
 a = ap.parse_args(argv)
 if a.blend: bpy.ops.wm.open_mainfile(filepath=a.blend)
 sc = bpy.context.scene
@@ -39,6 +39,7 @@ except Exception as e: print("device setup:", e)
 print("RENDER DEVICE:", dev)
 
 # ---- quality ------------------------------------------------------------------------------------------------
+if a.seed >= 0: sc.cycles.seed = a.seed; sc.cycles.use_animated_seed = False   # fixed noise pattern in every frame -> no flicker between frames
 sc.cycles.samples = P["spp"]; sc.cycles.use_adaptive_sampling = True; sc.cycles.adaptive_threshold = 0.012
 sc.cycles.use_denoising = True; sc.cycles.denoiser = 'OPENIMAGEDENOISE'; sc.cycles.denoising_quality = 'HIGH' if a.preset == "final" else 'BALANCED'
 sc.cycles.denoising_input_passes = 'RGB_ALBEDO_NORMAL'; sc.cycles.denoising_prefilter = 'ACCURATE'
