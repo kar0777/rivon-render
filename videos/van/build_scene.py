@@ -510,8 +510,8 @@ SHOTS = [  # frame, cam xyz, target xyz   (None target = follow the van)
     (500, (-9.0, -3.6, 2.6),  (-3.2, 2.3, 1.6)),
     (580, (-9.0, 6.2, 3.1),   (-3.2, 2.3, 1.7)),
     (650, (-8.5, -6.0, 3.0),  (-3.2, 2.3, 1.6)),
-    (760, (-2.0, -7.0, 2.7),  (-3.2, 2.4, 1.7)),
-    (840, (2.8, -6.2, 2.7),   (-3.2, 2.4, 1.7)),
+    (720, (-2.0, -7.0, 2.7),  (-3.2, 2.4, 1.7)),
+    (780, (6.5, -3.2, 4.3),   (-3.1, 2.6, 1.4)),
     (900, (6.5, -3.2, 4.3),   (-3.1, 2.6, 1.4)),
 ]
 CUTS = (130, 301, 344)     # hard cuts: previous key holds, new shot starts on the frame
@@ -524,6 +524,10 @@ for o_ in (cam, tgt):
     for fc in _fcurves(o_.animation_data.action):
         for k_ in fc.keyframe_points:
             if round(k_.co[0]) + 1 in CUTS: k_.interpolation = 'CONSTANT'
+import json
+EV = [{"name": it.o.name, "f0": it.f0, "f1": it.f0 + it.dur} for it in ITEMS]
+EV += [{"name": "VAN_STOP", "f0": T_DRIVE, "f1": T_DRIVE}, {"name": "DOOR", "f0": T_DOOR, "f1": T_DOOR + 32}, {"name": "OPEN", "f0": T_OPEN, "f1": T_OPEN + 20}]
+json.dump(EV, open(OUT + ".events.json", "w"))
 sc.frame_set(1)
 bpy.ops.wm.save_as_mainfile(filepath=OUT)
 print("SAVED", OUT, "items", len(ITEMS))
