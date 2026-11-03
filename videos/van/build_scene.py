@@ -230,6 +230,78 @@ for xx in (-3.0, -1.0, 0.9):
     for yy in (0.93, -0.93):
         box("rackpost", 0.04, 0.04, 1.4, RACK, (xx, yy, 1.4), parent=vp)
 
+# ------------------------------------------------------------------ extra van detail --------------------------------------
+CHROME = RIM
+ORANGE = pmat("van_orange", (0.95, 0.38, 0.02, 1), 0.2)
+PLATE = pmat("van_plate", (0.92, 0.92, 0.9, 1), 0.4)
+RUBBER = pmat("van_rubber", (0.02, 0.02, 0.022, 1), 0.9)
+DRL = pmat("van_drl", (1, 1, 1, 1), 0.1, 0.0, **{"Emission Color": (1, 1, 1, 1), "Emission Strength": 9.0})
+DOME = pmat("van_dome", (1, 0.92, 0.78, 1), 0.3, 0.0, **{"Emission Color": (1, 0.9, 0.72, 1), "Emission Strength": 7.0})
+for s in (1, -1):
+    # body belt line + panel seams on the cargo box, cab door outline and handles
+    box("belt%d" % s, 4.35, 0.008, 0.016, TRIM, (-1.025, s * 1.003, 1.12), parent=vp)
+    box("beltlow%d" % s, 4.35, 0.008, 0.012, TRIM, (-1.025, s * 1.003, 0.9), parent=vp)
+    for xx in (-1.75, -0.30):
+        box("seam%d" % s, 0.012, 0.008, TOP - WZ0 - 0.05, TRIM, (xx, s * 1.003, (TOP + WZ0) / 2), parent=vp)
+    box("cabseamR%d" % s, 0.012, 0.008, 1.85, TRIM, (1.30, s * 0.992, 1.55), parent=vp)
+    box("cabseamF%d" % s, 0.012, 0.008, 0.70, TRIM, (2.50, s * 0.992, 1.0), parent=vp)
+    box("cabseamB%d" % s, 1.22, 0.008, 0.012, TRIM, (1.90, s * 0.992, 0.66), parent=vp)
+    box("cabhandle%d" % s, 0.14, 0.03, 0.03, CHROME, (1.48, s * 1.0, 1.26), parent=vp, bevel=0.008)
+    box("fuelcap%d" % s, 0.01, 0.1, 0.1, TRIM, (1.62, s * 0.99, 0.98), parent=vp) if s == 1 else None
+    for xx in (-3.12, 1.05):
+        box("marker%d" % s, 0.07, 0.012, 0.03, ORANGE, (xx, s * 1.004, 1.5), parent=vp, bevel=0.004)
+    # mirror glass, DRL, fog lamps
+    box("mirrorglass%d" % s, 0.008, 0.075, 0.22, GLASS, (2.066, s * 1.1, 1.62), parent=vp)
+    box("drl%d" % s, 0.012, 0.30, 0.022, DRL, (3.205, s * 0.75, 1.145), parent=vp)
+    cyl("fog%d" % s, 0.055, 0.02, LAMP, (3.225, s * 0.72, 0.52), (0, math.pi / 2, 0), vp, seg=20)
+    cyl("fogring%d" % s, 0.065, 0.015, TRIM, (3.218, s * 0.72, 0.52), (0, math.pi / 2, 0), vp, seg=20)
+    # wipers
+    box("wiper%d" % s, 0.012, 0.55, 0.014, TRIM, (2.47, s * 0.35 - 0.0, 1.39), (0, 0, s * 0.14), parent=vp)
+    # door hinges (rear) and mud flaps
+    for zz in (0.62, 1.4, 2.25):
+        box("hinge%d" % s, 0.05, 0.05, 0.14, TRIM, (-3.235, s * 1.012, zz), parent=vp)
+    box("mudflap%d" % s, 0.02, 0.3, 0.3, RUBBER, (-2.45, s * 0.88, 0.3), parent=vp)
+    box("mudflapF%d" % s, 0.02, 0.28, 0.26, RUBBER, (1.62, s * 0.9, 0.3), parent=vp)
+    # wheel-arch flares
+    for xx in (2.25, -1.95):
+        box("flare%d" % s, 1.0, 0.045, 0.035, RUBBER, (xx, s * 1.0, 0.86), parent=vp)
+    # interior cargo rails
+    for zz in (1.0, 1.85):
+        box("erail%d" % s, 4.25, 0.012, 0.035, RACK, (-1.025, s * 0.941, zz), parent=vp)
+# front: grille slats, badge, plate
+for k in range(5):
+    box("slat%d" % k, 0.012, 1.08, 0.016, CHROME, (3.222, 0, 0.68 + k * 0.075), parent=vp)
+cyl("badge", 0.075, 0.012, PLATE, (3.226, 0, 0.99), (0, math.pi / 2, 0), vp, seg=28)
+box("platefrontb", 0.012, 0.56, 0.14, TRIM, (3.224, 0, 0.50), parent=vp, bevel=0.004)
+box("platefront", 0.014, 0.52, 0.11, PLATE, (3.228, 0, 0.50), parent=vp)
+box("plateraer", 0.014, 0.52, 0.11, PLATE, (-3.298, 0, 0.5), parent=vp)
+box("platerearb", 0.012, 0.56, 0.14, TRIM, (-3.296, 0, 0.5), parent=vp, bevel=0.004)
+box("hood_crease", 0.012, 1.4, 0.012, TRIM, (3.15, 0, 1.12), parent=vp)
+box("visor", 0.28, 1.7, 0.04, TRIM, (1.72, 0, 2.30), parent=vp, bevel=0.01)
+box("roofvent", 0.55, 0.38, 0.08, PAINT, (-1.9, 0, TOP + 0.04), parent=vp, bevel=0.02)
+cyl("antenna", 0.007, 0.35, TRIM, (1.45, 0.4, TOP + 0.17), (0, 0, 0), vp, seg=8)
+box("domelight", 3.4, 0.10, 0.025, DOME, (-1.0, 0, TOP - 0.07), parent=vp)
+# wheel details: slotted face, hub, tread blocks
+for w in WH:
+    for sgn in (1, -1):
+        cyl("hub", 0.075, 0.03, CHROME, (0, sgn * 0.125, 0), (math.pi / 2, 0, 0), w, seg=24)
+        for k in range(8):
+            a = k * math.pi / 4
+            cyl("slot", 0.032, 0.012, TRIM, (0.165 * math.cos(a), sgn * 0.123, 0.165 * math.sin(a)), (math.pi / 2, 0, 0), w, seg=12)
+    for k in range(28):
+        a = k * 2 * math.pi / 28
+        box("tread", 0.05, 0.236, 0.02, TIRE, (0.375 * math.cos(a), 0, 0.375 * math.sin(a)), (0, -(a + math.pi / 2), 0), w)
+# rear door exterior: logos, handles, rubber seal
+for piv, s in DOORS:
+    c = -s * 0.49
+    hw, hh = 0.4, 0.4 * 206 / 1078
+    q = quad("doorlogo", [(-0.0275, c + hw, 1.25 - hh), (-0.0275, c - hw, 1.25 - hh), (-0.0275, c - hw, 1.25 + hh), (-0.0275, c + hw, 1.25 + hh)], DEC_DARK, piv)
+    uvl = q.data.uv_layers.new(name="UVMap")
+    for l, (u, v) in zip(q.data.loops, ((0, 0), (1, 0), (1, 1), (0, 1))): uvl.data[l.index].uv = (u, v)
+    box("doorhandle", 0.03, 0.03, 0.34, CHROME, (-0.05, -s * 0.12, 1.0), parent=piv, bevel=0.008)
+    box("doorseal", 0.02, 0.02, 1.9, RUBBER, (-0.03, -s * 0.97, 1.74), parent=piv)
+    box("doorstrip", 0.012, 0.9, 0.03, TRIM, (-0.03, -s * 0.49, 0.85), parent=piv)
+
 # ------------------------------------------------------------------ van path -------------------------------------------
 STOP = Vector((9.25, 11.2, 0.0))          # centre of the parked van, heading -Y  (front bumper at y~8)
 R = 6.65; S1 = 12.0; ARC = R * math.pi / 2; S3 = 33.95 - STOP.y

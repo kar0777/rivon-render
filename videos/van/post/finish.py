@@ -11,11 +11,6 @@ class F:
     RAIN = (-9.0, -8.0); SNOW = (-9.0, -8.0)
     TEXT_CUES = [
         {'kind': 'hook', 't0': 0.25, 't1': 3.4, 'l1': 'Busik z łącznikami', 'l2': 'już na miejscu'},
-        {'kind': 'caption', 't0': 6.9, 't1': 10.2, 'line1': 'Łączniki i belki z busa'},
-        {'kind': 'caption', 't0': 11.5, 't1': 13.0, 'line1': 'Stopa montażowa'},
-        {'kind': 'caption', 't0': 13.1, 't1': 14.9, 'line1': 'Łącznik narożny'},
-        {'kind': 'caption', 't0': 15.1, 't1': 17.0, 'line1': 'Mocowanie belek'},
-        {'kind': 'caption', 't0': 17.8, 't1': 22.6, 'line1': 'Altana w kształcie litery L'},
         {'kind': 'endcard', 't0': 23.0, 't1': 26.0, 'sub': 'Łączniki do konstrukcji drewnianych', 'tag': 'Zbuduj swoją altanę.'}]
 ap = argparse.ArgumentParser(); ap.add_argument("frames", nargs="?"); ap.add_argument("out", nargs="?")
 ap.add_argument("--crf", type=int, default=16); ap.add_argument("--test", nargs=3, default=None); ap.add_argument("--audio", default=None)
