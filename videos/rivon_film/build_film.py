@@ -8,6 +8,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from film_lib import *      # noqa
 import film_envs as E
 import film_world as W
+import film_stage as ST
+import film_sets as SETM
+import film_labs as LB
 
 # ---- environment placement: PLOT (the whole Polish plot) is rotated/moved, the pergola stays at the world origin
 def _plot(F, W, rot_deg=0.0):
@@ -17,22 +20,18 @@ def _plot(F, W, rot_deg=0.0):
 
 ENVS = {
     "lab":        dict(kind="lab"),
-    # every application has its OWN real photographed surrounding (Poly Haven CC0 HDRI), never the same house/yard
-    "carport":    dict(kind="hdri", fid="stuttgart_suburbs",     rot=math.radians(0), car=True,  pad=False, ground=("stone_tiles_02_diff_2k.jpg", "stone_tiles_02_rough_2k.exr", 0.5)),
-    "barbecue":   dict(kind="hdri", fid="suburban_garden",       rot=math.radians(180), car=False, pad=True,  ground=("PROC_LAWN", None, 1.0)),
-    "kitchen":    dict(kind="hdri", fid="studio_garden",         rot=math.radians(270), car=False, pad=True,  ground=("PROC_LAWN", None, 1.0)),
-    "lounge":     dict(kind="hdri", fid="symmetrical_garden_02", rot=math.radians(90), car=False, pad=True,  ground=("PROC_LAWN", None, 1.0)),
-    "commercial": dict(kind="hdri", fid="piazza_bologni",        rot=math.radians(90), car=False, pad=False, ground=("stone_tiles_02_diff_2k.jpg", "stone_tiles_02_rough_2k.exr", 0.5)),
+    # every application is its own modelled daylight set: own house, yard, trees and sky (no photo panoramas)
+    "carport":    dict(kind="set"), "barbecue": dict(kind="set"), "kitchen": dict(kind="set"), "lounge": dict(kind="set"), "commercial": dict(kind="set"),
 }
 
 # ---- camera shots (low, wide, close: the pergola must read as big, heavy and strong)
 SHOTS = {
-    "S0_lab":        dict(env="lab",        loc=(5.4, -6.4, 0.9), tgt=(0.0, 0.0, 1.55), lens=26),
-    "S1_carport":    dict(env="carport",    loc=(5.6, -5.6, 0.85), tgt=(0.0, 0.0, 1.45), lens=24),
-    "S2_barbecue":   dict(env="barbecue",   loc=(-5.2, -5.4, 0.9), tgt=(0.0, 0.0, 1.5), lens=24),
-    "S3_kitchen":    dict(env="kitchen",    loc=(5.0, -5.2, 0.9), tgt=(0.0, 0.3, 1.5), lens=24),
-    "S4_lounge":     dict(env="lounge",     loc=(5.0, 5.0, 0.95), tgt=(0.0, 0.0, 1.5), lens=24),
-    "S5_commercial": dict(env="commercial", loc=(-5.8, -4.6, 0.95), tgt=(0.0, 0.0, 1.5), lens=24),
+    "S0_lab":        dict(env="lab",        loc=(5.0, -8.6, 0.75), tgt=(0.0, 0.0, 2.2), lens=22),
+    "S1_carport":    dict(env="carport",    loc=(6.5, -8.5, 1.0), tgt=(0.0, 0.5, 1.4), lens=24),
+    "S2_barbecue":   dict(env="barbecue",   loc=(-6.0, -7.0, 1.0), tgt=(0.4, 0.8, 1.3), lens=24),
+    "S3_kitchen":    dict(env="kitchen",    loc=(-6.5, -6.0, 1.0), tgt=(1.0, 0.5, 1.4), lens=24),
+    "S4_lounge":     dict(env="lounge",     loc=(4.2, -6.2, 0.9), tgt=(0.0, 1.5, 1.5), lens=22),
+    "S5_commercial": dict(env="commercial", loc=(-5.5, -4.8, 1.0), tgt=(0.0, 1.2, 1.5), lens=22),
 }
 SHOT_ORDER = list(SHOTS)
 
@@ -99,7 +98,7 @@ def prepare(w, h, spp):
                     src = bc.links[0].from_socket; lm.node_tree.links.new(src, hs.inputs["Color"]); lm.node_tree.links.new(hs.outputs[0], bc)
     import_ram()
     build_pergola("PERGOLA")
-    lab = collection("LAB"); E.build_lab(lab)
+    lab = collection("LAB"); LB.v5b_tubes_dark_floor(lab)      # owner-approved lab: LED-tube hall with the dark wet floor
     collection("ENV_PROPS"); collection("ENV_PAD"); collection("ENV_DOME")
     # sun (outdoor key light)
     sun = bpy.data.lights.new("sun", "SUN"); sun.energy = 4.2; sun.angle = math.radians(0.8); sun.color = (1.0, 0.86, 0.70)
@@ -112,9 +111,10 @@ def prepare(w, h, spp):
     sc.camera = co; cam.clip_start = 0.05; cam.clip_end = 400
     # lab world
     lw = bpy.data.worlds.new("lab_world"); lw.use_nodes = True
-    lw.node_tree.nodes["Background"].inputs["Color"].default_value = (0.012, 0.016, 0.024, 1)
+    lw.node_tree.nodes["Background"].inputs["Color"].default_value = (0.0005, 0.0007, 0.001, 1)
     sc.render.engine = "CYCLES"; sc.cycles.device = "CPU"; sc.cycles.samples = spp
     sc.cycles.use_denoising = True; sc.cycles.denoiser = "OPENIMAGEDENOISE"
+    sc.cycles.use_volume_guiding = True; sc.cycles.volume_bounces = 2
     sc.cycles.max_bounces = 6; sc.cycles.diffuse_bounces = 3; sc.cycles.glossy_bounces = 4
     sc.cycles.transparent_max_bounces = 8; sc.cycles.use_adaptive_sampling = True; sc.cycles.adaptive_threshold = 0.02
     sc.render.resolution_x, sc.render.resolution_y, sc.render.resolution_percentage = w, h, 100
@@ -149,17 +149,12 @@ def apply_env(name):
     _excl("LAB", not lab); _excl("PLOT_COLL", True)           # the old plot (same house everywhere) is no longer used
     bpy.data.objects["sun"].hide_render = True                # outdoor light comes from the photographed sky itself
     if lab:
-        _excl("CAR_RAM", True); sc.world = _state["lab_world"]; sc.view_settings.exposure = 0.15
+        _excl("CAR_RAM", True); sc.world = _state["lab_world"]; sc.view_settings.exposure = 0.0
     else:
-        fid = cfg["fid"]
-        if fid not in _state["worlds"]: _state["worlds"][fid] = W.make_world(fid, cfg["rot"], cfg.get("strength", 1.0))
-        sc.world = _state["worlds"][fid]; sc.view_settings.exposure = cfg.get("exposure", 0.3)
-        W.build_dome(bpy.data.collections["ENV_DOME"], fid, cfg["rot"])
-        W.ground_disc(bpy.data.collections["ENV_DOME"], fid, *cfg["ground"][:2], cfg["ground"][2])
-        _hide_car(not cfg.get("car"))
+        res = SETM.SETS[name](bpy.data.collections["ENV_DOME"])
+        sc.world = res["world"]; sc.view_settings.exposure = res.get("exp", 0.0)
+        _hide_car(not res.get("car"))
         ram = bpy.data.objects["CAR_RAM_ROOT"]; ram.location = (0.0, 0.0, 0.0); ram.rotation_euler = (0, 0, 0)
-        if cfg.get("pad"):
-            box("PAD_paving", (4.5, 7.2, 0.12), (0, 0, -0.048), E.M("paving"), bpy.data.collections["ENV_PAD"], 0, 0.004)
     if name in E.PROPS: E.PROPS[name](bpy.data.collections["ENV_PROPS"])
     _state["env"] = name
 
