@@ -371,10 +371,32 @@ def van_pose(s):
         return Vector((cxy.x + R * math.sin(ph), cxy.y + R * math.cos(ph), 0)), -ph
     return Vector((9.25, 33.95 - (s - S1 - ARC), 0)), -math.pi / 2
 T_DRIVE = 185
-VAN_POS = {}; VAN_H = {}
+# v3: the film now starts right AFTER the corner (the old 17 m/s corner + whip-pan + tiny dot crawling down the drive looked unnatural).
+# natural speed profile along the drive: rolling in at ~22 km/h, gentle acceleration to ~29 km/h, one firm smooth brake to the stop.
+S0 = S1 + ARC
+_T = (T_DRIVE - 1) / 30.0; _v0, _tA, _Tb = 6.0, 1.5, 2.7
+_vp = (S3 - 0.5 * _tA * _v0) / (_T - 0.5 * _tA - 0.6 * _Tb)
+_tB = _T - _Tb
+_dA = _tA * (_v0 + _vp) / 2; _dB = _dA + _vp * (_tB - _tA)
+def drive_dist(t):
+    if t <= 0: return _v0 * t
+    if t <= _tA:
+        x = t / _tA; return _v0 * t + (_vp - _v0) * _tA * (x ** 3 - x ** 4 / 2)
+    if t <= _tB: return _dA + _vp * (t - _tA)
+    u = min(1.0, (t - _tB) / _Tb); return _dB + 0.4 * _vp * _Tb * (1 - (1 - u) ** 2.5)
+def drive_speed(t):
+    if t <= 0: return _v0
+    if t <= _tA:
+        x = t / _tA; return _v0 + (_vp - _v0) * (3 * x * x - 2 * x ** 3)
+    if t <= _tB: return _vp
+    u = min(1.0, (t - _tB) / _Tb); return _vp * (1 - u) ** 1.5
+print("van drive: v0 %.1f vp %.2f m/s, dist %.2f / %.2f" % (_v0, _vp, drive_dist(_T), S3))
+VAN_POS = {}; VAN_H = {}; VAN_PITCH = {}; VAN_SPEED = {}
 for f in range(1, T_DRIVE + 1):
-    u = (f - 1) / (T_DRIVE - 1); s = TOTAL * (1 - (1 - u) ** 1.8)
-    p, h = van_pose(s); key(VAN, f, loc=p, euler=(0, 0, h)); VAN_POS[f] = p; VAN_H[f] = h
+    t_ = (f - 1) / 30.0; s = S0 + drive_dist(t_)
+    acc = (drive_speed(t_ + 0.05) - drive_speed(t_ - 0.05)) / 0.1 if f < T_DRIVE else 0.0
+    pit = max(-0.012, min(0.014, -0.003 * acc))             # nose dips when braking, rises when accelerating (<=0.8 deg)
+    p, h = van_pose(s); key(VAN, f, loc=p, euler=(0, pit, h)); VAN_POS[f] = p; VAN_H[f] = h; VAN_PITCH[f] = pit; VAN_SPEED[f] = drive_speed(t_)
     for w in WH: key(w, f, euler=(0, s / 0.37, 0))
 key(VAN, T_DRIVE + 1, loc=van_pose(TOTAL)[0], euler=(0, 0, -math.pi / 2)); key(VAN, NF, loc=van_pose(TOTAL)[0], euler=(0, 0, -math.pi / 2))
 for w in WH: key(w, T_DRIVE + 1, euler=(0, TOTAL / 0.37, 0)); key(w, NF, euler=(0, TOTAL / 0.37, 0))
@@ -387,7 +409,7 @@ VAN_M = Matrix.Translation(STOP) @ Matrix.Rotation(-math.pi / 2, 4, 'Z')   # wor
 
 def van_to_world(p): return VAN_M @ Vector(p)
 def van_M_at(f):
-    f = max(1, min(f, T_DRIVE)); return Matrix.Translation(VAN_POS[f]) @ Matrix.Rotation(VAN_H[f], 4, 'Z')
+    f = max(1, min(f, T_DRIVE)); return Matrix.Translation(VAN_POS[f]) @ Euler((0, VAN_PITCH[f], VAN_H[f]), 'XYZ').to_matrix().to_4x4()
 
 # ============================================================== GAZEBO PLAN ==============================================
 AX, AY = -5.1, 0.6
@@ -646,8 +668,6 @@ sc.camera = cam
 tgt = bpy.data.objects.new("cam_target", None); link(tgt)
 tc = cam.constraints.new('TRACK_TO'); tc.target = tgt; tc.track_axis = 'TRACK_NEGATIVE_Z'; tc.up_axis = 'UP_Y'
 SHOTS = [  # frame, cam xyz, target xyz   (None target = follow the van)
-    (1,   (9.6, 45.6, 1.1),   None),
-    (129, (9.6, 45.6, 1.1),   None),
     (130, (13.8, 8.4, 1.7),   None),
     (192, (13.8, 8.4, 1.7),   (9.25, 1.9, 1.6)),
     (230, (13.8, 8.4, 1.8),   (9.0, 2.7, 1.9)),
@@ -685,7 +705,7 @@ def _sun_rot(az_deg, el_deg):
     src = Vector((math.cos(e) * math.cos(a), math.cos(e) * math.sin(a), math.sin(e)))     # direction TO the sun
     return (-src).to_track_quat('-Z', 'Y').to_euler()
 LIGHT_PLAN = {   # first blender frame of the shot: (sun azimuth deg [0=+x, 90=+y], elevation deg, view exposure)
-    1:   (28.0, 27.0, 0.95),     # street, van arrives (sun from the east, camera left)
+    1:   (28.0, 27.0, 0.35),     # chase shot, van arrives (sun from the east, camera left)
     130: (18.0, 27.0, 0.35),     # van at the plot
     231: (28.0, 27.0, -0.20),    # behind the van, cartons fly out
     269: (232.0, 27.0, 0.95),    # gazebo plot (sun from the south-west, camera left-behind)
@@ -702,13 +722,19 @@ for _ob in (_sun, sc):
     for _fc in _fcurves(_ob.animation_data.action):
         for _k in _fc.keyframe_points: _k.interpolation = 'CONSTANT'
 for f in range(1, 193):
-    if f in VAN_POS: key(tgt, f, loc=VAN_POS[f] + Vector((0, 0, 1.1 if f >= 130 else 2.3)))
+    if f in VAN_POS: key(tgt, f, loc=VAN_POS[f] + Vector((0, 0, 1.1 if f >= 130 else 1.15)))
 # frames 232..300: the camera target rides with the carton that is currently flying out of the van (smoothed)
 _CART = [it for it in ITEMS if it.o.name.startswith("carton")]
 def _cart_pos(f):
     act = [it for it in _CART if it.f0 <= f <= it.f0 + it.dur]
     it = max(act, key=lambda i: i.f0) if act else _CART[0]
     return it.pose(f)[0]
+# shot 1 (frames 1..129): smooth chase camera, a few metres behind the van on the left, riding the same path (lagging a little)
+CHASE_GAP, CHASE_LAT, CHASE_LAG = 6.6, 2.7, 0.40
+for f in range(1, 130):
+    t_ = (f - 1) / 30.0; sc_ = S0 + drive_dist(t_ - CHASE_LAG) - CHASE_GAP
+    pc, hc = van_pose(sc_); nl = Vector((-math.sin(hc), math.cos(hc), 0))
+    key(cam, f, loc=pc + nl * CHASE_LAT + Vector((0, 0, 1.30 + 0.35 * f / 129.0)))
 for f, c_, t_ in SHOTS:
     key(cam, f, loc=c_)
     if t_ is not None: key(tgt, f, loc=t_)
@@ -718,6 +744,7 @@ for o_ in (cam, tgt):
             if round(k_.co[0]) + 1 in CUTS: k_.interpolation = 'CONSTANT'
 import json
 EV = [{"name": it.o.name, "f0": it.f0, "f1": it.f0 + it.dur} for it in ITEMS]
+EV += [{"name": "VAN_SPEED", "f0": 1, "f1": T_DRIVE, "v": [VAN_SPEED[f] for f in range(1, T_DRIVE + 1)]}]
 EV += [{"name": "VAN_STOP", "f0": T_DRIVE, "f1": T_DRIVE}, {"name": "DOOR", "f0": T_DOOR, "f1": T_DOOR + 32}, {"name": "OPEN", "f0": T_OPEN, "f1": T_OPEN + 20}]
 json.dump(EV, open(OUT + ".events.json", "w"))
 sc.frame_set(1)
