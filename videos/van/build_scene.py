@@ -54,6 +54,27 @@ ROOFM = M("roof_RAL7016", "roof_RAL7016_fade")
 KRAFT = M("kraft"); LABEL = M("carton_label")
 print("materials:", MET and MET.name, [m.name for m in TIMB], ROOFM and ROOFM.name, KRAFT and KRAFT.name, LABEL and LABEL.name)
 
+# ============================================================== v2 SCENE EDITS ============================================
+# (a) the birch "vtree2" stood right on the van's driveway -> move it next to the road
+_vt = bpy.data.objects["vtree2"]; _vt.location = _vt.location + Vector((4.2, 1.6, 0.0))
+# (b) the driveway continues further south (drive2 + kerbs: only their southern vertices are pulled out)
+ROAD_END = -4.5
+for _n in ("drive2", "kerbL", "kerbR"):
+    _o = bpy.data.objects[_n]; _mw = _o.matrix_world; _mi = _mw.inverted()
+    for _v in _o.data.vertices:
+        _w = _mw @ _v.co
+        if _w.y < 8.0: _v.co = _mi @ Vector((_w.x, ROAD_END, _w.z))
+# (c) no grass / flowers / ferns growing through the new tarmac
+_ge = bpy.data.objects["grass_emit"]; _gm = _ge.matrix_world; _vg = _ge.vertex_groups["dens"]
+_zero = [v.index for v in _ge.data.vertices if 7.25 <= (_gm @ v.co).x <= 11.25 and ROAD_END - 0.15 <= (_gm @ v.co).y <= 7.5]
+_vg.add(_zero, 0.0, 'REPLACE')
+for _o in bpy.data.objects:
+    if _o.type != 'MESH' or _o.parent or _o.name in ("drive2", "kerbL", "kerbR", "grass_emit"): continue
+    _bb = [_o.matrix_world @ Vector(c) for c in _o.bound_box]
+    _mn = [min(v[i] for v in _bb) for i in range(3)]; _mx = [max(v[i] for v in _bb) for i in range(3)]
+    if _mn[0] > 7.0 and _mx[0] < 11.5 and _mn[1] > ROAD_END - 0.3 and _mx[1] < 7.6 and _mx[2] < 1.2:
+        print("hidden on new road:", _o.name); _o.hide_render = True; _o.hide_viewport = True
+
 # ------------------------------------------------------------------ helpers --------------------------------------------
 def pmat(name, color, rough=0.5, metal=0.0, **kw):
     m = bpy.data.materials.new(name); m.use_nodes = True
@@ -302,8 +323,44 @@ for piv, s in DOORS:
     box("doorseal", 0.02, 0.02, 1.9, RUBBER, (-0.03, -s * 0.97, 1.74), parent=piv)
     box("doorstrip", 0.012, 0.9, 0.03, TRIM, (-0.03, -s * 0.49, 0.85), parent=piv)
 
+# ------------------------------------------------------------------ v2 filler: the empty lawn in front of the van -------------
+# a thuja hedge along the south boundary (like the east / west ones), a few spruces, birches and shrubs in front of it
+def _mesh_centre(o):
+    bb = [o.matrix_world @ Vector(c) for c in o.bound_box]
+    return Vector((sum(v.x for v in bb) / 8, sum(v.y for v in bb) / 8, 0.0))
+_rng = random.Random(21)
+_thuja = [o for o in bpy.data.objects if o.name.startswith("thuja15_")]
+_x = -14.6
+while _x < 15.0:
+    src = _rng.choice(_thuja); c = _mesh_centre(src)
+    o = bpy.data.objects.new("v2thuja", src.data)           # shared mesh, verts are in world space around c
+    o.location = Vector((_x, -13.1 + _rng.uniform(-0.15, 0.15), 0.0)) - c
+    o.rotation_mode = 'XYZ'
+    COLL.objects.link(o)
+    # rotate about its own centre: parent trick avoided -> use small yaw only (mesh is ~1 m wide)
+    _x += _rng.uniform(1.05, 1.3)
+_spruce_pairs = []
+for o in bpy.data.objects:
+    if o.name.startswith("spruce_") and "_spruce_trunk" not in o.name and "_spruce" in o.name:
+        t = bpy.data.objects.get(o.name.replace("_spruce", "_spruce_trunk", 1))
+        if t: _spruce_pairs.append((o, t))
+for (px, py, sc_) in ((12.8, -9.6, 0.95), (-5.5, -10.9, 1.05), (-11.5, -9.2, 0.9), (-13.5, -11.0, 1.1)):
+    so, st = _rng.choice(_spruce_pairs[:12]); rz = _rng.uniform(0, 6.28)
+    for src in (so, st):
+        o = bpy.data.objects.new("v2sp", src.data); o.location = (px, py, -0.02); o.rotation_euler = (0, 0, rz); o.scale = (sc_, sc_, sc_)
+        COLL.objects.link(o)
+_birch = bpy.data.objects["vtree4"]
+for (px, py, rz) in ((8.0, -9.8, 1.1), (-1.5, -10.4, 4.0), (-9.0, -7.6, 2.4)):
+    o = bpy.data.objects.new("v2birch", _birch.data); o.location = (px, py, -0.02); o.rotation_euler = (0, 0, rz); o.scale = (0.7, 0.7, 1.2)
+    COLL.objects.link(o)
+_shrubs = [o for o in bpy.data.objects if o.name.startswith("shrub") and o.type == 'MESH' and o.name[5:].isdigit() and int(o.name[5:]) < 20]
+for (px, py) in ((13.2, -3.2), (13.6, -1.6), (12.4, 0.8), (14.0, 3.0), (6.8, -9.2), (3.0, -9.6), (-3.4, -9.0), (-7.8, -9.4), (13.3, -7.0)):
+    src = _rng.choice(_shrubs); k = _rng.uniform(0.9, 1.25)
+    o = bpy.data.objects.new("v2shrub", src.data); o.location = (px, py, -0.02); o.rotation_euler = (0, 0, _rng.uniform(0, 6.28)); o.scale = (k, k, k)
+    COLL.objects.link(o)
+
 # ------------------------------------------------------------------ van path -------------------------------------------
-STOP = Vector((9.25, 11.2, 0.0))          # centre of the parked van, heading -Y  (front bumper at y~8)
+STOP = Vector((9.25, -1.3, 0.0))          # centre of the parked van, heading -Y  (front bumper at y=-4.5, the new end of the road)
 R = 6.65; S1 = 12.0; ARC = R * math.pi / 2; S3 = 33.95 - STOP.y
 TOTAL = S1 + ARC + S3
 def van_pose(s):
@@ -366,13 +423,20 @@ class Item:
 def quat(e): return Euler(e, 'XYZ').to_quaternion()
 
 def exit_via(start_w, dest, lift=1.0, up=3.8):
-    """world-space waypoints: out of the rear doors (van rear faces +Y), up and over the van, then down to the destination"""
+    """world-space waypoints: straight out of the open rear doors (van rear faces +Y), then one smooth left-hand sweep over the lawn
+    (no loop over the van roof) down to the destination.  The last point is 'near the destination'."""
     s = Vector(start_w); d = Vector(dest)
-    rear = Vector((STOP.x, STOP.y + 3.2 + 1.6, max(s.z, 1.2) + 0.3))
-    top = Vector((STOP.x - 1.2, STOP.y + 2.2, up))
-    mid = top.lerp(d + Vector((0, 0, up * 0.55)), 0.55) + Vector((-1.5, -0.5, 0))
-    near = d + Vector((0, 0, lift))
-    return [Vector((s.x, s.y + 0.0, s.z)).lerp(rear, 0.35), rear, top, mid, near]
+    z0 = max(s.z, 1.15)
+    door = Vector((STOP.x + (s.x - STOP.x) * 0.5, STOP.y + 3.2 + 0.7, z0 + 0.05))
+    out = Vector((door.x - 0.15, door.y + 1.7, z0 + 0.45))
+    zap = max(2.2, up * 0.62)
+    dx = d.x - out.x; ytop = out.y + 3.1
+    pa = Vector((out.x + 0.06 * dx, out.y + 1.5, lerp(out.z, zap, 0.45)))
+    pb = Vector((out.x + 0.20 * dx, ytop - 0.1, zap))
+    pc = Vector((out.x + 0.45 * dx, lerp(ytop, d.y, 0.30), zap))
+    pd = Vector((out.x + 0.72 * dx, lerp(ytop, d.y, 0.72), lerp(zap, d.z + lift, 0.55)))
+    near = d + Vector((0.5, 0.0, lift))
+    return [door, out, pa, pb, pc, pd, near]
 
 ITEMS = []
 def add_item(obj, start_loc, start_quat, end_loc, end_quat, f0, dur, via):
@@ -569,12 +633,13 @@ tc = cam.constraints.new('TRACK_TO'); tc.target = tgt; tc.track_axis = 'TRACK_NE
 SHOTS = [  # frame, cam xyz, target xyz   (None target = follow the van)
     (1,   (9.6, 45.6, 1.1),   None),
     (129, (9.6, 45.6, 1.1),   None),
-    (130, (13.6, 19.6, 1.7),  None),
-    (192, (13.6, 19.6, 1.7),  (9.25, 14.4, 1.6)),
-    (231, (13.6, 19.6, 1.8),  (9.0, 15.2, 1.9)),
-    (300, (13.6, 19.6, 2.3),  None),
-    (301, (4.5, 2.0, 1.9),    (-3.0, 0.8, 1.2)),
-    (343, (4.5, 2.0, 1.9),    (-3.5, 0.0, 0.9)),
+    (130, (13.8, 8.4, 1.7),   None),
+    (192, (13.8, 8.4, 1.7),   (9.25, 1.9, 1.6)),
+    (230, (13.8, 8.4, 1.8),   (9.0, 2.7, 1.9)),
+    (231, (9.6, 9.4, 1.55),   (9.25, 2.4, 1.5)),        # cut: straight behind the van - the open doors, cartons fly out toward the viewer and sweep to the right
+    (268, (9.6, 9.4, 1.6),    (7.4, 4.2, 1.9)),
+    (269, (3.0, -4.2, 1.7),   (-1.0, 1.0, 1.4)),        # cut: gazebo plot - the cartons arrive from the right and land
+    (343, (3.0, -4.2, 1.75),  (-3.4, 0.0, 0.9)),
     (344, (3.4, -3.9, 2.0),   (-3.2, 1.0, 1.2)),
     (420, (-1.2, -6.6, 2.3),  (-3.2, 2.0, 1.6)),
     (500, (-9.0, -3.6, 2.6),  (-3.2, 2.3, 1.6)),
@@ -584,7 +649,19 @@ SHOTS = [  # frame, cam xyz, target xyz   (None target = follow the van)
     (780, (6.5, -3.2, 4.3),   (-3.1, 2.6, 1.4)),
     (900, (6.5, -3.2, 4.3),   (-3.1, 2.6, 1.4)),
 ]
-CUTS = (130, 301, 344)     # hard cuts: previous key holds, new shot starts on the frame
+cd_.lens = 24; cd_.keyframe_insert('lens', frame=1); cd_.keyframe_insert('lens', frame=230)
+cd_.lens = 30; cd_.keyframe_insert('lens', frame=231); cd_.keyframe_insert('lens', frame=268)
+cd_.lens = 26; cd_.keyframe_insert('lens', frame=269); cd_.keyframe_insert('lens', frame=343)
+cd_.lens = 24; cd_.keyframe_insert('lens', frame=344); cd_.keyframe_insert('lens', frame=NF)
+# soft fill light on the van's rear while the cartons leave (shot 231..268 only)
+_ld = bpy.data.lights.new("rearfill", 'AREA'); _ld.shape = 'RECTANGLE'; _ld.size = 6.0; _ld.size_y = 4.0; _ld.color = (1.0, 0.97, 0.92)
+_lo = bpy.data.objects.new("rearfill", _ld); link(_lo); _lo.location = (10.4, 13.0, 2.4)
+_tc = _lo.constraints.new('TRACK_TO'); _tc.target = tgt; _tc.track_axis = 'TRACK_NEGATIVE_Z'; _tc.up_axis = 'UP_Y'
+for _f, _e in ((1, 0.0), (230, 0.0), (231, 1500.0), (268, 1500.0), (269, 0.0), (NF, 0.0)):
+    _ld.energy = _e; _ld.keyframe_insert("energy", frame=_f)
+for _fc in _fcurves(_ld.animation_data.action):
+    for _k in _fc.keyframe_points: _k.interpolation = 'CONSTANT'
+CUTS = (130, 231, 269, 344)     # hard cuts: previous key holds, new shot starts on the frame
 for f in range(1, 193):
     if f in VAN_POS: key(tgt, f, loc=VAN_POS[f] + Vector((0, 0, 1.1 if f >= 130 else 2.3)))
 # frames 232..300: the camera target rides with the carton that is currently flying out of the van (smoothed)
@@ -593,11 +670,6 @@ def _cart_pos(f):
     act = [it for it in _CART if it.f0 <= f <= it.f0 + it.dur]
     it = max(act, key=lambda i: i.f0) if act else _CART[0]
     return it.pose(f)[0]
-for f in range(232, 301):
-    acc = Vector((0, 0, 0)); n_ = 0
-    for k in range(-6, 7):
-        acc += _cart_pos(min(max(f + k, 232), 320)); n_ += 1
-    key(tgt, f, loc=acc / n_ + Vector((0, 0, 0.2)))
 for f, c_, t_ in SHOTS:
     key(cam, f, loc=c_)
     if t_ is not None: key(tgt, f, loc=t_)

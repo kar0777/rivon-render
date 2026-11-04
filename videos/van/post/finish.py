@@ -10,8 +10,11 @@ class F:
     FPS = 30; NFRAMES = 780
     RAIN = (-9.0, -8.0); SNOW = (-9.0, -8.0)
     TEXT_CUES = [
-        {'kind': 'hook', 't0': 0.25, 't1': 3.4, 'l1': 'Busik z łącznikami', 'l2': 'już na miejscu'},
-        {'kind': 'endcard', 't0': 23.0, 't1': 26.0, 'sub': 'Łączniki do konstrukcji drewnianych', 'tag': 'Zbuduj swoją altanę.'}]
+        {'kind': 'endcard', 't0': 21.7, 't1': 26.0,
+         'sub': 'Łączniki do konstrukcji drewnianych',
+         'about': ['Stopy, trójaki i mocowania belek', 'do altan, wiat i tarasów'],
+         'tag': 'Zbuduj swoją altanę.',
+         'cta': 'Kup łączniki RIVON', 'url': ''}]
 ap = argparse.ArgumentParser(); ap.add_argument("frames", nargs="?"); ap.add_argument("out", nargs="?")
 ap.add_argument("--crf", type=int, default=16); ap.add_argument("--test", nargs=3, default=None); ap.add_argument("--audio", default=None)
 a = ap.parse_args()
@@ -146,19 +149,31 @@ def overlay(im, t):
             spaced(pd, (36, 20), tx, ft, (255, 255, 255, int(255 * al)), 3.0)
             lay.alpha_composite(pill, (px0, py0))
         else:
-            k = ease(np.clip((t - c["t0"]) / 1.0, 0, 1))
+            k = ease(np.clip((t - c["t0"]) / 0.7, 0, 1))
             if k <= 0: continue
-            d.rectangle([0, 0, W, H], fill=(6, 7, 8, int(215 * k)))
+            d.rectangle([0, 0, W, H], fill=(6, 7, 8, int(222 * k)))
+            y_logo = int(H * 0.33)
             ka = ease(np.clip((t - c["t0"] - 0.5) / 0.8, 0, 1))
-            lg = logo(int(W * 0.74), ka); lay.alpha_composite(lg, ((W - lg.width) // 2, int(H * 0.44) - lg.height // 2))
+            lg = logo(int(W * 0.74), ka); lay.alpha_composite(lg, ((W - lg.width) // 2, y_logo - lg.height // 2))
             kb = ease(np.clip((t - c["t0"] - 1.0) / 0.8, 0, 1))
+            y0 = y_logo + lg.height // 2
             fs = font("Jost.ttf", 27); sub = c["sub"].upper(); tw = spaced_len(d, sub, fs, 3.2)
-            y_sub = int(H * 0.44) + lg.height // 2 + 44
-            spaced(d, ((W - tw) / 2, y_sub), sub, fs, (232, 236, 238, int(255 * kb)), 3.2)
+            spaced(d, ((W - tw) / 2, y0 + 44), sub, fs, (232, 236, 238, int(255 * kb)), 3.2)
+            d.rectangle([W / 2 - 30, y0 + 26, W / 2 + 30, y0 + 27], fill=(150, 156, 162, int(255 * kb)))
+            kc = ease(np.clip((t - c["t0"] - 1.5) / 0.8, 0, 1)); fa = font("Jost.ttf", 40)
+            for i_, ln in enumerate(c.get("about", [])):
+                twa = d.textlength(ln, font=fa); d.text(((W - twa) / 2, y0 + 140 + i_ * 62), ln, font=fa, fill=(214, 219, 223, int(255 * kc)))
             if c.get("tag"):
-                kt = ease(np.clip((t - c["t0"] - 1.6) / 0.8, 0, 1)); ftg = font("Jost.ttf", 50); tg = c["tag"]; twg = d.textlength(tg, font=ftg)
-                d.text(((W - twg) / 2, int(H * 0.44) + lg.height // 2 + 150), tg, font=ftg, fill=(255, 255, 255, int(255 * kt)))
-            d.rectangle([W / 2 - 30, int(H * 0.44) + lg.height // 2 + 26, W / 2 + 30, int(H * 0.44) + lg.height // 2 + 27], fill=(150, 156, 162, int(255 * kb)))
+                kt = ease(np.clip((t - c["t0"] - 1.9) / 0.8, 0, 1)); ftg = font("Jost.ttf", 58); tg = c["tag"]; twg = d.textlength(tg, font=ftg)
+                d.text(((W - twg) / 2, y0 + 300), tg, font=ftg, fill=(255, 255, 255, int(255 * kt)))
+            if c.get("cta"):
+                kx = ease(np.clip((t - c["t0"] - 2.4) / 0.7, 0, 1)); fb = font("Jost.ttf", 44); bt = c["cta"].upper(); bw = spaced_len(d, bt, fb, 3.0)
+                pw = int(bw + 120); ph = 116; px0 = (W - pw) // 2; py0 = y0 + 450 + int(10 * (1 - kx))
+                d.rounded_rectangle([px0, py0, px0 + pw, py0 + ph], radius=58, fill=(255, 255, 255, int(255 * kx)))
+                spaced(d, (px0 + (pw - bw) / 2, py0 + 29), bt, fb, (12, 14, 16, int(255 * kx)), 3.0)
+                if c.get("url"):
+                    fu = font("Jost.ttf", 38); twu = d.textlength(c["url"], font=fu)
+                    d.text(((W - twu) / 2, py0 + ph + 34), c["url"], font=fu, fill=(214, 219, 223, int(255 * kx)))
     return Image.alpha_composite(im.convert("RGBA"), lay).convert("RGB")
 
 def load(path):
