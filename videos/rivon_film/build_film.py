@@ -25,16 +25,48 @@ ENVS = {
 
 # ---- camera shots (low, wide, close: the pergola must read as big, heavy and strong)
 SHOTS = {
-    "S0_lab":        dict(env="lab",        loc=(6.6, -7.9, 1.0), tgt=(0.0, 0.0, 1.5), lens=28),
-    "S1_carport":    dict(env="carport",    loc=(7.6, -7.8, 1.05), tgt=(0.0, 0.0, 1.5), lens=27),
-    "S2_barbecue":   dict(env="barbecue",   loc=(-6.4, -7.0, 1.05), tgt=(0.0, 0.0, 1.5), lens=27),
-    "S3_kitchen":    dict(env="kitchen",    loc=(6.3, -6.3, 1.1), tgt=(0.0, 0.3, 1.5), lens=27),
-    "S4_lounge":     dict(env="lounge",     loc=(6.2, 6.0, 1.15), tgt=(0.0, 0.0, 1.5), lens=27),
-    "S5_commercial": dict(env="commercial", loc=(-7.0, -5.6, 1.1), tgt=(0.0, 0.0, 1.5), lens=27),
+    "S0_lab":        dict(env="lab",        loc=(5.4, -6.4, 0.9), tgt=(0.0, 0.0, 1.55), lens=26),
+    "S1_carport":    dict(env="carport",    loc=(5.6, -5.6, 0.85), tgt=(0.0, 0.0, 1.45), lens=24),
+    "S2_barbecue":   dict(env="barbecue",   loc=(-5.2, -5.4, 0.9), tgt=(0.0, 0.0, 1.5), lens=24),
+    "S3_kitchen":    dict(env="kitchen",    loc=(5.0, -5.2, 0.9), tgt=(0.0, 0.3, 1.5), lens=24),
+    "S4_lounge":     dict(env="lounge",     loc=(5.0, 5.0, 0.95), tgt=(0.0, 0.0, 1.5), lens=24),
+    "S5_commercial": dict(env="commercial", loc=(-5.8, -4.6, 0.95), tgt=(0.0, 0.0, 1.5), lens=24),
 }
 SHOT_ORDER = list(SHOTS)
 
 _state = {"env": None}
+
+
+BODY_WHITE = ("Material_6", "Material_16")        # white paint of the Dodge RAM 1500 -> repainted black
+GLASS = ("Material_2",)
+RIMS = ("Material_9", "Material_17", "Material_27", "Material_29", "Material_30", "Material_12")
+
+
+def import_ram():
+    """Owner-supplied Dodge RAM 1500 (SketchUp .dae converted to metric glTF, geometry untouched), body repainted gloss black."""
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=str(HERE / "ram.glb"))
+    new = [o for o in bpy.data.objects if o not in before]
+    coll = collection("CAR_RAM")
+    root = bpy.data.objects.new("CAR_RAM_ROOT", None); coll.objects.link(root)
+    for o in new:
+        if o.parent is None or o.parent not in new: o.parent = root
+        link(o, coll)
+    for m in {ms.material for o in new if o.type == "MESH" for ms in o.material_slots if ms.material}:
+        b = next((n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+        if b is None: continue
+        if m.name in BODY_WHITE:       # gloss black car paint with clear coat
+            b.inputs["Base Color"].default_value = (0.004, 0.004, 0.005, 1); b.inputs["Metallic"].default_value = 0.2
+            b.inputs["Roughness"].default_value = 0.28; b.inputs["Coat Weight"].default_value = 1.0; b.inputs["Coat Roughness"].default_value = 0.03
+        elif m.name in GLASS:
+            b.inputs["Base Color"].default_value = (0.01, 0.014, 0.018, 1); b.inputs["Roughness"].default_value = 0.04
+            b.inputs["Specular IOR Level"].default_value = 1.0; b.inputs["Alpha"].default_value = 1.0
+            m.blend_method = "OPAQUE" if hasattr(m, "blend_method") else None
+        elif m.name in RIMS:
+            b.inputs["Metallic"].default_value = 0.9; b.inputs["Roughness"].default_value = 0.32
+        else:
+            b.inputs["Roughness"].default_value = 0.55
+    return root
 
 
 def prepare(w, h, spp):
@@ -63,6 +95,7 @@ def prepare(w, h, spp):
                 else:
                     hs = lm.node_tree.nodes.new("ShaderNodeHueSaturation"); hs.inputs["Saturation"].default_value = 0.88; hs.inputs["Value"].default_value = 0.8
                     src = bc.links[0].from_socket; lm.node_tree.links.new(src, hs.inputs["Color"]); lm.node_tree.links.new(hs.outputs[0], bc)
+    import_ram()
     build_pergola("PERGOLA")
     lab = collection("LAB"); E.build_lab(lab)
     collection("ENV_PROPS"); collection("ENV_PAD")
@@ -95,12 +128,13 @@ def _excl(name, on):
 
 
 def _hide_car(on):
+    """Old Mercedes is never used; the Dodge RAM (collection CAR_RAM) shows only in the carport."""
     car = bpy.data.objects.get("car")
-    if car is None: return
-    stack = [car]
+    stack = [car] if car else []
     while stack:
-        o = stack.pop(); o.hide_render = on; o.hide_viewport = on
+        o = stack.pop(); o.hide_render = True; o.hide_viewport = True
         stack += list(o.children)
+    _excl("CAR_RAM", on)
 
 
 def apply_env(name):
@@ -111,11 +145,13 @@ def apply_env(name):
         for o in list(c.objects): bpy.data.objects.remove(o, do_unlink=True)
     lab = cfg["kind"] == "lab"
     _excl("LAB", not lab); _excl("PLOT_COLL", lab)
+    if lab: _excl("CAR_RAM", True)
     bpy.data.objects["sun"].hide_render = lab
     sc.world = _state["lab_world"] if lab else _state["world_outdoor"]
     if not lab:
         loc, rot = cfg["plot"]; p = bpy.data.objects["PLOT"]; p.location = loc; p.rotation_euler = (0, 0, rot)
         _hide_car(not cfg.get("car"))
+        ram = bpy.data.objects["CAR_RAM_ROOT"]; ram.location = (0.0, 0.0, 0.0); ram.rotation_euler = (0, 0, 0)
         if cfg.get("pad"):
             box("PAD_paving", (4.5, 7.2, 0.12), (0, 0, -0.048), E.M("paving"), bpy.data.collections["ENV_PAD"], 0, 0.004)
     if name in E.PROPS: E.PROPS[name](bpy.data.collections["ENV_PROPS"])
@@ -126,3 +162,11 @@ def set_shot(shot, w=None):
     s = SHOTS[shot]; apply_env(s["env"])
     cam = bpy.data.objects["film_cam"]; cam.location = s["loc"]; cam.data.lens = s["lens"]
     cam.rotation_euler = mathutils.Vector(np.array(s["tgt"]) - np.array(s["loc"])).to_track_quat("-Z", "Y").to_euler()
+    bpy.context.view_layer.update()
+    # clear small foreground clutter (shrubs, rocks, lamp heads) that would block the pergola; lamps/bollards are never shown
+    cl = mathutils.Vector(s["loc"])
+    for o in bpy.data.collections["PLOT_COLL"].objects:
+        if o.type != "MESH" or o.name in ("lawn",) or o.name.startswith(("grass", "street", "walk", "curb", "drive", "terrace", "patio", "house", "fence", "tree")): continue
+        always = o.name.startswith(("bollard", "lamppost", "streetlight", "boulders"))
+        near = max(o.dimensions) < 3.2 and (o.matrix_world.translation - cl).length < 4.2
+        o.hide_render = bool(always or near)
