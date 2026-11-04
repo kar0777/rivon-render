@@ -371,10 +371,10 @@ def van_pose(s):
         return Vector((cxy.x + R * math.sin(ph), cxy.y + R * math.cos(ph), 0)), -ph
     return Vector((9.25, 33.95 - (s - S1 - ARC), 0)), -math.pi / 2
 T_DRIVE = 185
-VAN_POS = {}
+VAN_POS = {}; VAN_H = {}
 for f in range(1, T_DRIVE + 1):
     u = (f - 1) / (T_DRIVE - 1); s = TOTAL * (1 - (1 - u) ** 1.8)
-    p, h = van_pose(s); key(VAN, f, loc=p, euler=(0, 0, h)); VAN_POS[f] = p
+    p, h = van_pose(s); key(VAN, f, loc=p, euler=(0, 0, h)); VAN_POS[f] = p; VAN_H[f] = h
     for w in WH: key(w, f, euler=(0, s / 0.37, 0))
 key(VAN, T_DRIVE + 1, loc=van_pose(TOTAL)[0], euler=(0, 0, -math.pi / 2)); key(VAN, NF, loc=van_pose(TOTAL)[0], euler=(0, 0, -math.pi / 2))
 for w in WH: key(w, T_DRIVE + 1, euler=(0, TOTAL / 0.37, 0)); key(w, NF, euler=(0, TOTAL / 0.37, 0))
@@ -386,6 +386,8 @@ for piv, s in DOORS:
 VAN_M = Matrix.Translation(STOP) @ Matrix.Rotation(-math.pi / 2, 4, 'Z')   # world matrix of the parked van
 
 def van_to_world(p): return VAN_M @ Vector(p)
+def van_M_at(f):
+    f = max(1, min(f, T_DRIVE)); return Matrix.Translation(VAN_POS[f]) @ Matrix.Rotation(VAN_H[f], 4, 'Z')
 
 # ============================================================== GAZEBO PLAN ==============================================
 AX, AY = -5.1, 0.6
@@ -403,10 +405,16 @@ TROJ = {"SW": ((-0.05, 0.05), (math.pi, 0, 0)), "SE": ((-0.05, -0.05), (math.pi,
 class Item:
     def __init__(self, obj, start_loc, start_quat, end_loc, end_quat, f0, dur, via=None, hold_inside=None):
         self.o = obj; self.p0 = Vector(start_loc); self.q0 = Quaternion(start_quat); self.p1 = Vector(end_loc); self.q1 = Quaternion(end_quat)
-        self.f0 = f0; self.dur = dur; self.via = [Vector(v) for v in (via or [])]
+        self.f0 = f0; self.dur = dur; self.via = [Vector(v) for v in (via or [])]; self.ride = False
+    def rest(self, f):
+        """before its own flight an item that lies in the van travels WITH the van while it drives in"""
+        if self.ride and f < T_DRIVE:
+            Mf = van_M_at(f); off = VAN_M.inverted() @ self.p0; qoff = VAN_M.to_quaternion().inverted() @ self.q0
+            return Mf @ off, Mf.to_quaternion() @ qoff
+        return self.p0, self.q0
     def pose(self, f):
         u = (f - self.f0) / self.dur
-        if u <= 0: return self.p0, self.q0
+        if u <= 0: return self.rest(f)
         if u >= 1: return self.p1, self.q1
         e = ease(u); pts = [self.p0] + self.via + [self.p1]
         pts = [pts[0]] + pts + [pts[-1]] if False else pts
@@ -415,6 +423,10 @@ class Item:
         o = self.o; f_first, f_last = self.f0, self.f0 + self.dur
         if not skip1:
             p, q = self.pose(1); key(o, 1, loc=p, quat=q)
+            if self.ride:
+                prev = q
+                for f in range(2, min(T_DRIVE + 1, f_first) + 1):
+                    p, q = self.pose(f); q = q.copy(); q.make_compatible(prev); prev = q; key(o, f, loc=p, quat=q)
         p, q = self.pose(f_first); key(o, f_first, loc=p, quat=q)
         for f in range(f_first + 1, f_last):
             p, q = self.pose(f); key(o, f, loc=p, quat=q)
@@ -440,7 +452,7 @@ def exit_via(start_w, dest, lift=1.0, up=3.8):
 
 ITEMS = []
 def add_item(obj, start_loc, start_quat, end_loc, end_quat, f0, dur, via):
-    it = Item(obj, start_loc, start_quat, end_loc, end_quat, f0, dur, via); ITEMS.append(it); return it
+    it = Item(obj, start_loc, start_quat, end_loc, end_quat, f0, dur, via); it.ride = True; ITEMS.append(it); return it
 
 # ------------------------------------------------------------------ cartons -------------------------------------------
 def make_carton(name, dx, dy, dz):
@@ -525,7 +537,7 @@ for idx, c in enumerate(ORDER):
     # posts leave the van like the others, ride stacked horizontally
     vq = Quaternion((VAN_M.to_quaternion())) @ quat((0, math.pi / 2, 0))
     pvia = exit_via(pstart, pend + Vector((0, 0, 1.4)), lift=0.0, up=4.2)
-    it = Item(po, pstart, vq, pend, quat((0, 0, 0)), s0 + 8, 46, pvia[:-1] + [pend + Vector((0, 0, 0.9))]); ITEMS.append(it); POST_OBJ[c] = it
+    it = Item(po, pstart, vq, pend, quat((0, 0, 0)), s0 + 8, 46, pvia[:-1] + [pend + Vector((0, 0, 0.9))]); it.ride = True; ITEMS.append(it); POST_OBJ[c] = it
     # trojak
     to = bpy.data.objects.new("trojak_" + c, MESH["trojak"]); link(to); to.rotation_mode = 'QUATERNION'
     (tx, ty2), er = TROJ[ty]
@@ -558,7 +570,7 @@ for bi, (a, b) in enumerate(BEAMS):
     sw = van_to_world((-3.0 + L / 2 - 0.0, slot[0], slot[1]))
     sq = VAN_M.to_quaternion() @ quat((0, math.pi / 2, 0))
     via = exit_via(sw, endloc + Vector((0, 0, 0.3)), lift=0.0, up=4.0)
-    it = Item(bo, sw, sq, endloc, endq, f0 + bi * 0, 42, via[:-1] + [endloc + Vector((0, 0, 0.5))]); ITEMS.append(it); BEAM_OBJ.append((it, f0 + 42))
+    it = Item(bo, sw, sq, endloc, endq, f0 + bi * 0, 42, via[:-1] + [endloc + Vector((0, 0, 0.5))]); it.ride = True; ITEMS.append(it); BEAM_OBJ.append((it, f0 + 42))
 beams_done = max(t for _, t in BEAM_OBJ)
 
 mount_slot = lambda n: Vector((((n % 8) % 4 - 1.5) * 0.105 - 0.05, (((n % 8) // 4) - 0.5) * 0.115 - 0.055, -0.17 + (n // 8) * 0.152))
@@ -579,7 +591,7 @@ for ri, (xo, _, span, kind) in enumerate(RAF):
     # the rafter is a box with its LONG axis along local Y -> starts lying along the van (van X axis == world -Y when parked) : needs a Z yaw of 90deg in van frame
     sq = VAN_M.to_quaternion() @ quat((0, 0, math.pi / 2))
     via = exit_via(sw, endloc + Vector((0, 0, 0.5)), lift=0.0, up=4.0)
-    it = Item(ro, sw, sq, endloc, endq, f0, 40, via[:-1] + [endloc + Vector((0, 0, 0.5))]); ITEMS.append(it)
+    it = Item(ro, sw, sq, endloc, endq, f0, 40, via[:-1] + [endloc + Vector((0, 0, 0.5))]); it.ride = True; ITEMS.append(it)
     # two mounts per rafter: near end (low y) and far end (high y)
     for end in (0, 1):
         mo = mount_obj()
@@ -604,13 +616,16 @@ for k in range(13):
     col = k % 2; lvl = k // 2
     sw = van_to_world((-3.0 + L / 2, 0.17 if col == 0 else -0.17, 2.13 + lvl * 0.042)); sq = VAN_M.to_quaternion()
     via = exit_via(sw, endloc + Vector((0, 0, 0.5)), lift=0.0, up=4.3)
-    it = Item(so_, sw, sq, endloc, quat((0, 0, 0)), f0, 34, via[:-1] + [endloc + Vector((0, 0, 0.6))]); ITEMS.append(it)
+    it = Item(so_, sw, sq, endloc, quat((0, 0, 0)), f0, 34, via[:-1] + [endloc + Vector((0, 0, 0.6))]); it.ride = True; ITEMS.append(it)
 
 # ------------------------------------------------------------------ bake -------------------------------------------------
 def ride(it, off, qloc, k):
     """parts that sit in a carton follow it (in the van and while it flies) until their own flight starts"""
+    prev = None
     for f in range(1, it.f0 + 1):
-        p, q = inside_start(k, off, qloc, f); key(it.o, f, loc=p, quat=q)
+        p, q = inside_start(k, off, qloc, f); q = q.copy()
+        if prev is not None: q.make_compatible(prev)
+        prev = q; key(it.o, f, loc=p, quat=q)
 RIDERS = set()
 for idx, c in enumerate(ORDER):
     st = STOPA_OBJ[c]; tr = TROJ_OBJ[c]
