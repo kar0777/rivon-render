@@ -17,9 +17,9 @@ def build_materials_gaz():
     M['timber'] = pbr("timber_post", (0.8, 0.6, 0.4), tex="olive_veneer_diff_2k.jpg", tex_rough="olive_veneer_rough_2k.exr",
                       tex_bump="olive_veneer_disp_2k.png", tile=0.8, bump=0.2, rough=0.55, bevel=0.003, vary=0.1, mult=(1.0, 0.88, 0.7))
     M['joist'] = pbr("timber_joist", (0.7, 0.5, 0.3), tex="teak_veneer_diff_2k.jpg", tex_rough="teak_veneer_rough_2k.exr",
-                     tex_bump="teak_veneer_disp_2k.png", tile=0.8, bump=0.15, rough=0.55, bevel=0.003, vary=0.12)
+                     tex_bump="teak_veneer_disp_2k.png", tile=0.8, bump=0.15, rough=0.55, bevel=0.003, vary=0.12, mult=(0.78, 0.72, 0.64))
     M['lining'] = pbr("deck_lining", (0.7, 0.5, 0.3), tex="teak_veneer_diff_2k.jpg", tex_rough="teak_veneer_rough_2k.exr",
-                      tex_bump="teak_veneer_disp_2k.png", tile=0.35, bump=0.15, rough=0.5, bevel=0.0, mult=(0.95, 0.85, 0.72))
+                      tex_bump="teak_veneer_disp_2k.png", tile=0.35, bump=0.15, rough=0.5, bevel=0.0, mult=(0.98, 0.95, 0.9))
     M['membrane'] = procedural("roof_membrane", (0.07, 0.07, 0.075), (0.11, 0.11, 0.115), scale=30, rough=0.75, bump=0.1, spec=0.3)
     M['zinc'] = pbr("zinc", (0.55, 0.57, 0.6), rough=0.35, metal=0.9, bevel=0.002, grime=0.3)
     M['fascia'] = pbr("fascia_anthracite", (0.05, 0.055, 0.06), rough=0.4, bevel=0.003, grime=0.3)
@@ -82,8 +82,8 @@ def trojak(post_c, top_z, corner):
 # same height for both connectors, so all beam axes line up (post top - 48 mm). One continuous flat roof made of 3 m cassettes.
 WX = 3.0                    # column pitch (along the zone)
 WY = 3.7                    # post centre-to-centre across the zone
-PH = {'stopa': (0, 14, 3), 'post': (14, 22, 4), 'con': (44, 22, 4), 'beam': (70, 24, 6), 'roof': (100, 30, 0)}
-LIGHTS_AT = 135
+PH = {'stopa': (0, 14, 3), 'post': (14, 22, 4), 'con': (44, 22, 4), 'beam': (70, 24, 6), 'moc': (96, 10, 0), 'raft': (104, 16, 2), 'roof': (126, 26, 0)}
+LIGHTS_AT = 160
 
 
 def _asm(a, s, key, i):
@@ -103,6 +103,19 @@ def trojnik(post_c, base_z, side):
     ob = new_obj("RIVON_Trojnik", import_stl("Trojnik"), None)
     th = -math.pi / 2 if side > 0 else math.pi / 2
     ob.matrix_world = Matrix.Translation((post_c[0], post_c[1], base_z)) @ Matrix.Rotation(th, 4, 'Z') @ Matrix.Translation((-0.05, -0.15, 0.0))
+    loc = ob.matrix_world.to_translation(); rot = ob.matrix_world.to_euler()
+    ob.location = loc; ob.rotation_euler = rot
+    return ob
+
+
+def mocowanie(xr, y_face, z_anchor, d):
+    """RIVON Mocowanie belek 2 (exact STEP mesh): plate screwed flat to the inner face of the rail, channel runs into the span (direction d = +-Y),
+    channel floor 98 mm below the plate top. CAD x -> world -Z, CAD z -> d, CAD y -> -d x ... (right-handed). CAD anchor (50,55,-2) = plate centre on the rail face."""
+    ob = new_obj("RIVON_Mocowanie", import_stl("Mocowanie"), None)
+    c = (-1.0, 0.0, 0.0) if d > 0 else (1.0, 0.0, 0.0)
+    R = Matrix([[0.0, c[0], 0.0], [0.0, 0.0, d], [-1.0, 0.0, 0.0]])       # columns: cadx->-Z, cady->c, cadz->(0,d,0)
+    M4 = R.to_4x4()
+    ob.matrix_world = Matrix.Translation((xr, y_face, z_anchor)) @ M4 @ Matrix.Translation((-0.05, -0.055, 0.002))
     loc = ob.matrix_world.to_translation(); rot = ob.matrix_world.to_euler()
     ob.location = loc; ob.rotation_euler = rot
     return ob
@@ -165,34 +178,55 @@ def structure(x0, nbays, cy, assemblies, dismantle=None):
                     o0, o1 = _dis(d_of(k), 'beam', ri); sp.append((t_in, t_land, o0, o1, (0, side * 0.9, 0.55), (0, side * 0.9, 0.55)))
                 else: sp.append((t_in, t_land, None, None, (0, side * 0.9, 0.55), (0, side * 0.9, 0.55)))
             lifecycle([bm_], bm_.location, sp)
-        zr = topz + 0.004
+        rail_top = arm_z + POST / 2                      # = topz - 0.003
         cx = (xa + xb) / 2
+        # --- rafters 45x98 hang between the rails in RIVON Mocowanie belek saddles, top flush with the rail top (nothing sticks out above)
+        yin_f, yin_b = yf + POST / 2, yb - POST / 2
+        z_anchor = rail_top - 0.050
+        rlen = (yin_b - yin_f) - 0.004
+        n_raf = 6
+        for i in range(n_raf):
+            xr = cx + (-1.25 + 0.5 * i)
+            pair = []
+            for ri, (yface, d) in enumerate(((yin_f, +1), (yin_b, -1))):
+                mo = mocowanie(xr, yface, z_anchor, d)
+                sp = []
+                for n in range(len(assemblies)):
+                    a_, s_ = a_of(k + 1, n); t_in, t_land = _asm(a_, s_, 'moc', i + ri * 0)
+                    sp.append((t_in + i, t_land + i, None, None, (0, d * 0.5, 0.0), (0, d * 0.5, 0.0)))
+                lifecycle([mo], mo.location, sp)
+            rf = box("rafter", (0.045, rlen, 0.098), (xr, cy, rail_top - 0.049), M['joist'])
+            sp = []
+            for n in range(len(assemblies)):
+                a_, s_ = a_of(k + 1, n); t_in, t_land = _asm(a_, s_, 'raft', i)
+                sp.append((t_in, t_land, None, None, (0, 0, 1.3), (0, 0, 1.3)))
+            lifecycle([rf], rf.location, sp)
+        # --- roof cassette on top: lining deck + membrane + zinc upstands + fascia (sits directly on rails and rafters)
+        zr = rail_top
         root = empty("roof%d" % k, (cx, cy, zr))
         ox0 = 0.45 if k == 0 else 0.0; ox1 = 0.45 if k == nbays - 1 else 0.0
-        hyr = WY / 2 + 0.45
+        hyr = WY / 2 + 0.30
         lo, hi = -WX / 2 - ox0, WX / 2 + ox1; xm = (lo + hi) / 2; lx = hi - lo
         kids = []
-        nj = int(round(lx / 0.5)) + 1
-        for i in range(nj):
-            kids.append(box("joist", (0.05, 2 * hyr, RH), (lo + 0.025 + (lx - 0.05) * i / (nj - 1), 0, RH / 2), M['joist'], parent=root))
-        kids.append(box("deck", (lx, 2 * hyr, 0.022), (xm, 0, RH + 0.011), M['lining'], parent=root))
-        kids.append(box("membrane", (lx + 0.004, 2 * hyr + 0.02, 0.01), (xm, 0, RH + 0.027), M['membrane'], parent=root, grain=False))
+        kids.append(box("deck", (lx, 2 * hyr, 0.022), (xm, 0, 0.011), M['lining'], parent=root))
+        kids.append(box("membrane", (lx + 0.004, 2 * hyr + 0.02, 0.01), (xm, 0, 0.027), M['membrane'], parent=root, grain=False))
         for sgn in (-1, 1):
-            kids.append(box("fascia", (lx, 0.025, 0.24), (xm, sgn * (hyr + 0.0125), RH / 2 + 0.02), M['fascia'], parent=root))
-            kids.append(box("upstand", (lx, 0.03, 0.05), (xm, sgn * (hyr - 0.015), RH + 0.06), M['zinc'], parent=root))
+            kids.append(box("edge", (lx, 0.045, 0.098), (xm, sgn * (hyr - 0.0225), -0.049), M['joist'], parent=root))
+            kids.append(box("fascia", (lx, 0.025, 0.24), (xm, sgn * (hyr + 0.0125), -0.035), M['fascia'], parent=root))
+            kids.append(box("upstand", (lx, 0.03, 0.05), (xm, sgn * (hyr - 0.015), 0.057), M['zinc'], parent=root))
         if k == 0:
-            kids.append(box("fascia", (0.025, 2 * hyr + 0.05, 0.24), (lo - 0.0125, 0, RH / 2 + 0.02), M['fascia'], parent=root))
-            kids.append(box("upstand", (0.03, 2 * hyr, 0.05), (lo + 0.015, 0, RH + 0.06), M['zinc'], parent=root))
+            kids.append(box("fascia", (0.025, 2 * hyr + 0.05, 0.24), (lo - 0.0125, 0, -0.035), M['fascia'], parent=root))
+            kids.append(box("upstand", (0.03, 2 * hyr, 0.05), (lo + 0.015, 0, 0.057), M['zinc'], parent=root))
+            kids.append(box("edge", (0.045, 2 * hyr, 0.098), (lo + 0.0225, 0, -0.049), M['joist'], parent=root))
         if k == nbays - 1:
-            kids.append(box("fascia", (0.025, 2 * hyr + 0.05, 0.24), (hi + 0.0125, 0, RH / 2 + 0.02), M['fascia'], parent=root))
-            kids.append(box("upstand", (0.03, 2 * hyr, 0.05), (hi - 0.015, 0, RH + 0.06), M['zinc'], parent=root))
-            kids.append(box("spout", (0.06, 0.12, 0.04), (hi - 0.03, -hyr + 0.06, RH + 0.04), M['zinc'], parent=root))
+            kids.append(box("fascia", (0.025, 2 * hyr + 0.05, 0.24), (hi + 0.0125, 0, -0.035), M['fascia'], parent=root))
+            kids.append(box("upstand", (0.03, 2 * hyr, 0.05), (hi - 0.015, 0, 0.057), M['zinc'], parent=root))
+            kids.append(box("edge", (0.045, 2 * hyr, 0.098), (hi - 0.0225, 0, -0.049), M['joist'], parent=root))
+            kids.append(box("spout", (0.06, 0.12, 0.04), (hi - 0.03, -hyr + 0.06, 0.06), M['zinc'], parent=root))
         sp = []
         for n in range(len(assemblies)):
-            a, s = a_of(k + 1, n); t_in, t_land = _asm(a, s, 'roof', 0)
-            if dismantle is not None and n == 0:
-                o0, o1 = _dis(d_of(k), 'roof', 0); sp.append((t_in, t_land, o0, o1, (0, 0, 1.8), (0, 0, 1.8)))
-            else: sp.append((t_in, t_land, None, None, (0, 0, 1.8), (0, 0, 1.8)))
+            a_, s_ = a_of(k + 1, n); t_in, t_land = _asm(a_, s_, 'roof', 0)
+            sp.append((t_in, t_land, None, None, (0, 0, 1.8), (0, 0, 1.8)))
         lifecycle(kids, (cx, cy, zr), sp, root=root)
         # festoon bulbs and a pendant lamp for this bay
         lights = []
@@ -266,7 +300,7 @@ def animate_parasol(ob, parts, clo, f0, fold=34, sink=28):
     # gusts of wind: the open parasols rock and shudder (the gazebo next to them does not move)
     import random as _r; rr = _r.Random(int(f0) * 7 + 3); ph = rr.uniform(0, 6.28)
     for fr in range(0, int(f0), 4):
-        amp = 0.035 + 0.075 * min(1.0, fr / max(1, f0 - 8)) ** 1.3
+        amp = 0.035 + 0.075 * min(1.0, fr / 60.0) ** 1.3
         key_rot(ob, fr, (amp * math.sin(fr * 0.62 + ph), amp * 0.8 * math.sin(fr * 0.47 + ph * 1.7), 0))
     key_rot(ob, f0, (0, 0, 0)); key_rot(ob, f1, (0, 0, 0.45))
     for p in parts:
