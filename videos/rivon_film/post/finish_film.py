@@ -16,9 +16,9 @@ G0, G1 = 828, 842            # engraved mark -> white graphic
 M0, M1 = 846, 864            # graphic glides to its final place
 W0, W1 = 858, 874            # wordmark
 C0 = 866                     # CTA lines (second one 6 frames later, 12-frame fades)
-ICON_FINAL = (0.5, 0.385, 0.25)          # centre x, centre y (fraction of frame), width (fraction of frame width)
-WORD_Y, WORD_W = 0.495, 0.44
-CTA_Y = 0.62
+ICON_FINAL = (0.5, 0.42, 0.25)          # centre x, centre y (fraction of frame), width (fraction of frame width)
+WORD_Y, WORD_W = 0.525, 0.44
+CTA_Y = 0.65
 ap = argparse.ArgumentParser(); ap.add_argument("frames", nargs="?"); ap.add_argument("out", nargs="?"); ap.add_argument("--crf", type=int, default=16)
 ap.add_argument("--audio", default=None); ap.add_argument("--still", nargs=3, default=None); ap.add_argument("--fps", type=int, default=30)
 a = ap.parse_args()
