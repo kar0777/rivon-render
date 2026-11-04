@@ -10,7 +10,7 @@ class F:
     FPS = 30; NFRAMES = 780
     RAIN = (-9.0, -8.0); SNOW = (-9.0, -8.0)
     TEXT_CUES = [
-        {'kind': 'endcard', 't0': 21.7, 't1': 26.0,
+        {'kind': 'endcard', 't0': 21.2, 't1': 26.0,
          'sub': 'Łączniki do konstrukcji drewnianych',
          'about': ['Stopy, trójaki i mocowania belek', 'do altan, wiat i tarasów'],
          'tag': 'Zbuduj swoją altanę.',
@@ -153,21 +153,21 @@ def overlay(im, t):
             if k <= 0: continue
             d.rectangle([0, 0, W, H], fill=(6, 7, 8, int(222 * k)))
             y_logo = int(H * 0.33)
-            ka = ease(np.clip((t - c["t0"] - 0.5) / 0.8, 0, 1))
+            ka = ease(np.clip((t - c["t0"] - 0.3) / 0.6, 0, 1))
             lg = logo(int(W * 0.74), ka); lay.alpha_composite(lg, ((W - lg.width) // 2, y_logo - lg.height // 2))
-            kb = ease(np.clip((t - c["t0"] - 1.0) / 0.8, 0, 1))
+            kb = ease(np.clip((t - c["t0"] - 0.6) / 0.6, 0, 1))
             y0 = y_logo + lg.height // 2
             fs = font("Jost.ttf", 27); sub = c["sub"].upper(); tw = spaced_len(d, sub, fs, 3.2)
             spaced(d, ((W - tw) / 2, y0 + 44), sub, fs, (232, 236, 238, int(255 * kb)), 3.2)
             d.rectangle([W / 2 - 30, y0 + 26, W / 2 + 30, y0 + 27], fill=(150, 156, 162, int(255 * kb)))
-            kc = ease(np.clip((t - c["t0"] - 1.5) / 0.8, 0, 1)); fa = font("Jost.ttf", 40)
+            kc = ease(np.clip((t - c["t0"] - 0.9) / 0.6, 0, 1)); fa = font("Jost.ttf", 40)
             for i_, ln in enumerate(c.get("about", [])):
                 twa = d.textlength(ln, font=fa); d.text(((W - twa) / 2, y0 + 140 + i_ * 62), ln, font=fa, fill=(214, 219, 223, int(255 * kc)))
             if c.get("tag"):
-                kt = ease(np.clip((t - c["t0"] - 1.9) / 0.8, 0, 1)); ftg = font("Jost.ttf", 58); tg = c["tag"]; twg = d.textlength(tg, font=ftg)
+                kt = ease(np.clip((t - c["t0"] - 1.2) / 0.6, 0, 1)); ftg = font("Jost.ttf", 58); tg = c["tag"]; twg = d.textlength(tg, font=ftg)
                 d.text(((W - twg) / 2, y0 + 300), tg, font=ftg, fill=(255, 255, 255, int(255 * kt)))
             if c.get("cta"):
-                kx = ease(np.clip((t - c["t0"] - 2.4) / 0.7, 0, 1)); fb = font("Jost.ttf", 44); bt = c["cta"].upper(); bw = spaced_len(d, bt, fb, 3.0)
+                kx = ease(np.clip((t - c["t0"] - 1.5) / 0.6, 0, 1)); fb = font("Jost.ttf", 44); bt = c["cta"].upper(); bw = spaced_len(d, bt, fb, 3.0)
                 pw = int(bw + 120); ph = 116; px0 = (W - pw) // 2; py0 = y0 + 450 + int(10 * (1 - kx))
                 d.rounded_rectangle([px0, py0, px0 + pw, py0 + ph], radius=58, fill=(255, 255, 255, int(255 * kx)))
                 spaced(d, (px0 + (pw - bw) / 2, py0 + 29), bt, fb, (12, 14, 16, int(255 * kx)), 3.0)

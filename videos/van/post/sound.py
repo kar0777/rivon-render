@@ -36,7 +36,11 @@ def noise_bed(d, f, g): return lp(noise(int(d * SR)), f, 1) * g
 amb = lp(noise(N), 600, 1); amb = 0.05 * amb / np.abs(amb).max(); L += amb; R += amb * 0.9
 # ---- van drive 0..6.17 s : engine + tyres, speed profile = derivative of the van path
 T0, T1 = 0.0, 185 / FPS; t = np.arange(int((T1 + 0.2) * SR)) / SR; u = np.clip(t / T1, 0, 1)
-spd = 1.8 * (1 - u) ** 0.8; spd /= spd.max(); spd = np.where(t < T1, spd, 0) * np.clip((t) / 0.5, 0, 1)
+_vs = [e for e in ev if e["name"] == "VAN_SPEED"]
+if _vs:      # v3: real speed profile exported by build_scene.py (one value per frame)
+    vv = np.array(_vs[0]["v"], float); spd = np.interp(t * FPS, np.arange(len(vv)) + 0.0, vv / vv.max()); spd = np.where(t < T1, spd, 0)
+else:
+    spd = 1.8 * (1 - u) ** 0.8; spd /= spd.max(); spd = np.where(t < T1, spd, 0) * np.clip((t) / 0.5, 0, 1)
 ph = 2 * np.pi * np.cumsum(30 + 38 * spd) / SR
 eng = (np.sin(ph) + 0.6 * np.sin(2 * ph) + 0.4 * np.sin(3 * ph) + 0.25 * np.sin(4.02 * ph)) * (0.25 + 0.75 * spd)
 eng = lp(eng, 900, 2) * 0.28
