@@ -677,6 +677,30 @@ for _f, _e in ((1, 0.0), (230, 0.0), (231, 1500.0), (268, 1500.0), (269, 0.0), (
 for _fc in _fcurves(_ld.animation_data.action):
     for _k in _fc.keyframe_points: _k.interpolation = 'CONSTANT'
 CUTS = (130, 231, 269, 344)     # hard cuts: previous key holds, new shot starts on the frame
+
+# ---- v3 CINEMATIC LIGHTING: one consistent "golden hour" look; the key sun is re-aimed at every cut so that each shot is lit
+# from ~3/4 front-side (never straight into the lens, never flat from behind) + a constant exposure offset per shot.
+def _sun_rot(az_deg, el_deg):
+    a, e = math.radians(az_deg), math.radians(el_deg)
+    src = Vector((math.cos(e) * math.cos(a), math.cos(e) * math.sin(a), math.sin(e)))     # direction TO the sun
+    return (-src).to_track_quat('-Z', 'Y').to_euler()
+LIGHT_PLAN = {   # first blender frame of the shot: (sun azimuth deg [0=+x, 90=+y], elevation deg, view exposure)
+    1:   (28.0, 27.0, 0.95),     # street, van arrives (sun from the east, camera left)
+    130: (18.0, 27.0, 0.35),     # van at the plot
+    231: (28.0, 27.0, -0.20),    # behind the van, cartons fly out
+    269: (232.0, 27.0, 0.95),    # gazebo plot (sun from the south-west, camera left-behind)
+    344: (232.0, 27.0, 0.55),    # gazebo orbit
+}
+_sun = bpy.data.objects["sun"]; _sun.data.color = (1.0, 0.84, 0.64)
+for _fc in list(_fcurves(sc.animation_data.action)):      # the old film animated the exposure per frame (0.65 -> 0.15): that was the dark/bright jumping
+    if _fc.data_path.endswith("view_settings.exposure"): sc.animation_data.action.layers[0].strips[0].channelbags[0].fcurves.remove(_fc)
+sc.view_settings.view_transform = 'Khronos PBR Neutral'
+for _f, (_az, _el, _ex) in LIGHT_PLAN.items():
+    _sun.rotation_euler = _sun_rot(_az, _el); _sun.keyframe_insert("rotation_euler", frame=_f)
+    sc.view_settings.exposure = _ex; sc.view_settings.keyframe_insert("exposure", frame=_f)
+for _ob in (_sun, sc):
+    for _fc in _fcurves(_ob.animation_data.action):
+        for _k in _fc.keyframe_points: _k.interpolation = 'CONSTANT'
 for f in range(1, 193):
     if f in VAN_POS: key(tgt, f, loc=VAN_POS[f] + Vector((0, 0, 1.1 if f >= 130 else 2.3)))
 # frames 232..300: the camera target rides with the carton that is currently flying out of the van (smoothed)
