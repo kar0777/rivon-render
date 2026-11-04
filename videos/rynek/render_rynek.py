@@ -17,6 +17,7 @@ t0 = time.time()
 co, tgt = B.build(w=a.w, h=a.h, spp=a.spp)
 print("BUILD %.1fs" % (time.time() - t0), flush=True)
 if a.cam:
+    co.animation_data_clear(); tgt.animation_data_clear()
     v = [float(x) for x in a.cam.split(",")]; co.location = v[:3]; tgt.location = v[3:6]
 sc = bpy.context.scene; sc.cycles.device = 'CPU'
 sc.render.use_persistent_data = bool(a.persist)

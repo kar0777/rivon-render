@@ -287,6 +287,8 @@ def ratusz(pos, yaw):
         else:
             mb.box('interior', (cx, 0.9, 2.55), (1.3, 0.1, 2.0)); mb.box('glass', (cx, 0.88, 2.55), (1.2, 0.04, 1.9))
             mb.box('iron', (cx, 0.82, 2.55), (0.05, 0.06, 2.0)); mb.box('iron', (cx, 0.82, 2.0), (1.3, 0.06, 0.05))
+    for zz, hh in ((zg + 0.45, 0.5), (z1 + 0.55, 0.4)):          # painted terracotta friezes
+        mb.box('red', (Wd / 2, -0.28, zz), (Wd + 0.5, 0.12, hh), grain=False)
     # plinth, band between ground and loggia
     mb.box('stone', (Wd / 2, -0.12, 0.3), (Wd + 0.2, 0.3, 0.6), uvm=0.5)
     mb.box('trim', (Wd / 2, -0.25, zg + 0.1), (Wd + 0.6, 0.7, 0.35), grain=False)
@@ -322,11 +324,11 @@ def ratusz(pos, yaw):
     for k in range(int(Wd / 1.2)):
         mb.box('wall', (0.6 + k * 1.2, 0.25, za + 0.5), (0.8, 0.6, 1.0))
         mb.box('trim', (0.6 + k * 1.2, 0.25, za + 1.05), (0.9, 0.7, 0.1), grain=False)
-    mb.box('wall', (Wd / 2, 0.7, za + 0.3), (Wd, 0.5, 0.6))
+    mb.box('red', (Wd / 2, 0.7, za + 0.3), (Wd, 0.5, 0.6))
     for gx, gwid in ((Wd * 0.2, 6.0), (Wd * 0.5, 7.6), (Wd * 0.8, 6.0)):
         gh = gwid * 0.62
         prof = [(gx + gwid / 2, za + 0.6), (gx + gwid / 2 - 0.5, za + 0.6 + gh * 0.5), (gx, za + 0.6 + gh), (gx - gwid / 2 + 0.5, za + 0.6 + gh * 0.5), (gx - gwid / 2, za + 0.6)]
-        gm.slab_y('wall', [prof, rect_pts(gx - 0.5, gx + 0.5, za + 1.5, za + 1.5 + gh * 0.4)], 0.5, 1.1)
+        gm.slab_y('ochre', [prof, rect_pts(gx - 0.5, gx + 0.5, za + 1.5, za + 1.5 + gh * 0.4)], 0.5, 1.1)
         mb.blob('gold', (gx, 0.8, za + 0.7 + gh + 0.2), 0.22)
     # roof (hip) and main block
     mb.box('wall', (Wd / 2, Dp / 2 + 0.5, z2 / 2), (Wd - 0.2, Dp - 1.0, z2), grain=False)
@@ -506,3 +508,27 @@ def market_stalls():
         for _ in range(26):
             mb.blob(r.choice(('g1', 'g2', 'g3', 'g4', 'g3')), (r.uniform(-1.1, 1.1), 0.9 + r.uniform(-0.3, 0.3), 1.0 + r.uniform(0, 0.15)), r.uniform(0.07, 0.13), 1)
         mb.emit("stall%d" % k, mats, loc=(x, y, 0), rot=(0, 0, r.choice((0, math.pi / 2, math.pi, -math.pi / 2)) + r.uniform(-0.2, 0.2)))
+
+
+def big_tree(x, y, s=1.0):
+    mb = MB(); mats = {'wood': M['wood_dark']}
+    mb.tube('wood', (0, 0, 0), (0.05, 0.03, 4.2 * s), 0.22 * s, 0.14 * s, 8, caps=False)
+    mb.emit("btree", mats, loc=(x, y, 0))
+    rr = random.Random(int(x * 3 + y * 11))
+    lm = MB(); lmats = {'leaf': M['leaf']}
+    for _ in range(170):
+        a = rr.uniform(0, 6.283); rad = rr.uniform(0, 1.0) ** 0.6 * 3.0 * s; zz = rr.uniform(-1, 1)
+        sq = math.sqrt(max(0.0, 1 - zz * zz * 0.8))
+        lm.blob('leaf', (math.cos(a) * rad * sq, math.sin(a) * rad * sq, 6.3 * s + zz * 2.4 * s), rr.uniform(0.45, 0.75) * s, 2)
+    lm.emit("btree_l", lmats, loc=(x, y, 0), smooth=True)
+
+
+def church_tower(x, y, h=42.0):
+    mb = MB(); cm = MB()
+    mats = {'brick': M['brick'], 'trim': M['trim'], 'copper': M['copper'], 'gold': M['gold'], 'wall': M['wall_cream']}
+    mb.box('brick', (0, 0, h * 0.35), (7.0, 7.0, h * 0.7))
+    mb.box('trim', (0, 0, h * 0.7 + 0.2), (7.8, 7.8, 0.4), grain=False)
+    _prism_poly(mb, 'wall', (0, 0), 3.3, 8, h * 0.7 + 0.4, h * 0.88)
+    _cone(cm, 'copper', (0, 0, h * 0.88), 3.6, h * 0.34, 8)
+    cm.blob('gold', (0, 0, h * 0.88 + h * 0.34 + 0.2), 0.4, 2)
+    mb.emit("church", mats, loc=(x, y, 0)); cm.emit("church_c", mats, loc=(x, y, 0))

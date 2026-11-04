@@ -490,7 +490,7 @@ def procedural(name, c1, c2, scale=40.0, rough=0.8, bump=0.25, bevel=0.0, c3=Non
     return m
 
 
-def cobble_material(name="cobble", bw=0.2, bh=0.1, c1=(0.3, 0.26, 0.25), c2=(0.64, 0.5, 0.44), mortar=(0.07, 0.065, 0.06), msize=0.012,
+def cobble_material(name="cobble", bw=0.2, bh=0.1, c1=(0.36, 0.29, 0.25), c2=(0.72, 0.53, 0.42), mortar=(0.07, 0.065, 0.06), msize=0.012,
                     offset=0.5, rough=0.72):
     """granite setts laid in running bond (like the real Rynek): per-sett tone, dark joints, dirt patches, bump per sett"""
     m, nt, bsdf = mat_new(name)
