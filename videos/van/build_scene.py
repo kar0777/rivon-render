@@ -730,7 +730,7 @@ def _cart_pos(f):
     it = max(act, key=lambda i: i.f0) if act else _CART[0]
     return it.pose(f)[0]
 # shot 1 (frames 1..129): smooth chase camera, a few metres behind the van on the left, riding the same path (lagging a little)
-CHASE_GAP, CHASE_LAT, CHASE_LAG = 6.6, 2.7, 0.40
+CHASE_GAP, CHASE_LAT, CHASE_LAG = 6.8, 0.45, 0.40
 for f in range(1, 130):
     t_ = (f - 1) / 30.0; sc_ = S0 + drive_dist(t_ - CHASE_LAG) - CHASE_GAP
     pc, hc = van_pose(sc_); nl = Vector((-math.sin(hc), math.cos(hc), 0))
