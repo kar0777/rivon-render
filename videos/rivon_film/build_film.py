@@ -7,6 +7,7 @@ import bpy, mathutils
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from film_lib import *      # noqa
 import film_envs as E
+import film_world as W
 
 # ---- environment placement: PLOT (the whole Polish plot) is rotated/moved, the pergola stays at the world origin
 def _plot(F, W, rot_deg=0.0):
@@ -16,11 +17,12 @@ def _plot(F, W, rot_deg=0.0):
 
 ENVS = {
     "lab":        dict(kind="lab"),
-    "carport":    dict(kind="plot", plot=_plot((6.6, 12.25), (0.0, 0.0)), car=True, pad=False),
-    "barbecue":   dict(kind="plot", plot=_plot((-3.35, 2.35), (0.0, 0.0)), car=False, pad=True),
-    "kitchen":    dict(kind="plot", plot=_plot((-0.25, 12.1), (0.0, 3.8)), car=False, pad=True),
-    "lounge":     dict(kind="plot", plot=_plot((-3.35, 2.35), (0.0, 0.0), 90), car=False, pad=True),
-    "commercial": dict(kind="plot", plot=_plot((-0.25, 12.1), (3.8, 0.0), -90), car=False, pad=True),
+    # every application has its OWN real photographed surrounding (Poly Haven CC0 HDRI), never the same house/yard
+    "carport":    dict(kind="hdri", fid="stuttgart_suburbs",     rot=math.radians(0), car=True,  pad=False, ground=("stone_tiles_02_diff_2k.jpg", "stone_tiles_02_rough_2k.exr", 0.5)),
+    "barbecue":   dict(kind="hdri", fid="suburban_garden",       rot=math.radians(180), car=False, pad=True,  ground=("PROC_LAWN", None, 1.0)),
+    "kitchen":    dict(kind="hdri", fid="studio_garden",         rot=math.radians(270), car=False, pad=True,  ground=("PROC_LAWN", None, 1.0)),
+    "lounge":     dict(kind="hdri", fid="symmetrical_garden_02", rot=math.radians(90), car=False, pad=True,  ground=("PROC_LAWN", None, 1.0)),
+    "commercial": dict(kind="hdri", fid="piazza_bologni",        rot=math.radians(90), car=False, pad=False, ground=("stone_tiles_02_diff_2k.jpg", "stone_tiles_02_rough_2k.exr", 0.5)),
 }
 
 # ---- camera shots (low, wide, close: the pergola must read as big, heavy and strong)
@@ -34,7 +36,7 @@ SHOTS = {
 }
 SHOT_ORDER = list(SHOTS)
 
-_state = {"env": None}
+_state = {"env": None, "worlds": {}}
 
 
 BODY_WHITE = ("Material_6", "Material_16")        # white paint of the Dodge RAM 1500 -> repainted black
@@ -98,7 +100,7 @@ def prepare(w, h, spp):
     import_ram()
     build_pergola("PERGOLA")
     lab = collection("LAB"); E.build_lab(lab)
-    collection("ENV_PROPS"); collection("ENV_PAD")
+    collection("ENV_PROPS"); collection("ENV_PAD"); collection("ENV_DOME")
     # sun (outdoor key light)
     sun = bpy.data.lights.new("sun", "SUN"); sun.energy = 4.2; sun.angle = math.radians(0.8); sun.color = (1.0, 0.86, 0.70)
     so = bpy.data.objects.new("sun", sun); collection("LIGHTS").objects.link(so)
@@ -140,16 +142,20 @@ def _hide_car(on):
 def apply_env(name):
     if _state["env"] == name: return
     sc = bpy.context.scene; cfg = ENVS[name]
-    for cn in ("ENV_PROPS", "ENV_PAD"):
+    for cn in ("ENV_PROPS", "ENV_PAD", "ENV_DOME"):
         c = bpy.data.collections[cn]
         for o in list(c.objects): bpy.data.objects.remove(o, do_unlink=True)
     lab = cfg["kind"] == "lab"
-    _excl("LAB", not lab); _excl("PLOT_COLL", lab)
-    if lab: _excl("CAR_RAM", True)
-    bpy.data.objects["sun"].hide_render = lab
-    sc.world = _state["lab_world"] if lab else _state["world_outdoor"]
-    if not lab:
-        loc, rot = cfg["plot"]; p = bpy.data.objects["PLOT"]; p.location = loc; p.rotation_euler = (0, 0, rot)
+    _excl("LAB", not lab); _excl("PLOT_COLL", True)           # the old plot (same house everywhere) is no longer used
+    bpy.data.objects["sun"].hide_render = True                # outdoor light comes from the photographed sky itself
+    if lab:
+        _excl("CAR_RAM", True); sc.world = _state["lab_world"]; sc.view_settings.exposure = 0.15
+    else:
+        fid = cfg["fid"]
+        if fid not in _state["worlds"]: _state["worlds"][fid] = W.make_world(fid, cfg["rot"], cfg.get("strength", 1.0))
+        sc.world = _state["worlds"][fid]; sc.view_settings.exposure = cfg.get("exposure", 0.3)
+        W.build_dome(bpy.data.collections["ENV_DOME"], fid, cfg["rot"])
+        W.ground_disc(bpy.data.collections["ENV_DOME"], fid, *cfg["ground"][:2], cfg["ground"][2])
         _hide_car(not cfg.get("car"))
         ram = bpy.data.objects["CAR_RAM_ROOT"]; ram.location = (0.0, 0.0, 0.0); ram.rotation_euler = (0, 0, 0)
         if cfg.get("pad"):
@@ -163,10 +169,3 @@ def set_shot(shot, w=None):
     cam = bpy.data.objects["film_cam"]; cam.location = s["loc"]; cam.data.lens = s["lens"]
     cam.rotation_euler = mathutils.Vector(np.array(s["tgt"]) - np.array(s["loc"])).to_track_quat("-Z", "Y").to_euler()
     bpy.context.view_layer.update()
-    # clear small foreground clutter (shrubs, rocks, lamp heads) that would block the pergola; lamps/bollards are never shown
-    cl = mathutils.Vector(s["loc"])
-    for o in bpy.data.collections["PLOT_COLL"].objects:
-        if o.type != "MESH" or o.name in ("lawn",) or o.name.startswith(("grass", "street", "walk", "curb", "drive", "terrace", "patio", "house", "fence", "tree")): continue
-        always = o.name.startswith(("bollard", "lamppost", "streetlight", "boulders"))
-        near = max(o.dimensions) < 3.2 and (o.matrix_world.translation - cl).length < 4.2
-        o.hide_render = bool(always or near)
