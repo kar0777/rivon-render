@@ -1,6 +1,7 @@
 name: render-film
 # RIVON film (ONE SYSTEM. ENDLESS POSSIBILITIES). Starts only when a branch named film/<name> containing run.json is pushed.
 # run.json (control frames): {"name":"c1","scene":"videos/rivon_film","parts":6,"w":810,"h":1440,"spp":64,"stills":true,"frames":"0,1,2,3,4,5"}
+# run.json (partial re-render): {"name":"p1","scene":"videos/rivon_film","parts":20,"w":540,"h":960,"spp":12,"flist":"210,211,...","chunk":4}
 # run.json (animation):     {"name":"v1","scene":"videos/rivon_film","parts":20,"w":1080,"h":1920,"spp":64,"frames":900,"chunk":12}
 on:
   push:
@@ -47,7 +48,12 @@ jobs:
           if git ls-remote --exit-code --heads origin $B >/dev/null 2>&1; then
             git fetch -q origin $B && git archive FETCH_HEAD | tar -x -C $GITHUB_WORKSPACE/out
           fi
-          if [ "$STILLS" = "true" ]; then
+          FLIST=$(jq -r '.flist // empty' run.json)
+          if [ -n "$FLIST" ]; then
+            # timeline frames from an explicit list (partial re-render): part i takes every NP-th item, rendered in chunks
+            CHUNKS=(); while read -r L; do [ -n "$L" ] && CHUNKS+=("--frames $L"); done < <(echo "$FLIST" | python3 -c "import sys;l=sys.stdin.read().strip().split(',')[$PART::$NP];ch=$CH;print(chr(10).join(','.join(l[i:i+ch]) for i in range(0,len(l),ch)))")
+            [ ${#CHUNKS[@]} -gt 0 ] || exit 0
+          elif [ "$STILLS" = "true" ]; then
             # control frames: part i renders every NP-th item of the list
             LIST=$(jq -r .frames run.json | python3 -c "import sys;l=sys.stdin.read().strip().split(',');print(','.join(l[$PART::$NP]))")
             [ -n "$LIST" ] || exit 0

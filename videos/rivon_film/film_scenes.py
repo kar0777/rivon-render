@@ -162,11 +162,11 @@ def set_carport(coll):
     FS.house_modern(coll, (-12.3, 1.5), 90, "villa", cladding=(0.5, 0.36, 0.25), plaster_col=(0.92, 0.91, 0.88), garage=False)
     shrubs(coll, [(-7.0, y) for y in (-3.4, -2.3, 1.8, 2.9, 4.0, 5.1)], 1, 0.75, 0.45, "pink")
     shrubs(coll, [(-7.0, y) for y in (-1.6, 0.6)], 2, 0.5, 0.35, "yellow")
-    FS.slat_fence(coll, (7.6, -22), (7.6, 10), 1.8, (0.58, 0.42, 0.28), "fenceR"); FS.hedge(coll, (-7.5, 10.0), (7.6, 10.0), 2.0, 1.1)
+    FS.slat_fence(coll, (12.5, -22), (12.5, 10), 1.8, (0.58, 0.42, 0.28), "fenceR"); FS.hedge(coll, (-7.5, 10.0), (12.5, 10.0), 2.0, 1.1)
     FS.slat_fence(coll, (-7.5, -22), (-7.5, -9), 1.6, (0.58, 0.42, 0.28), "fenceL")
     bases = FS.tree_meshes(coll, 21, "broad", 2)
-    for p, s in (((-9.5, 12.5), 1.0), ((11.0, 5.0), 0.95), ((10.0, -10.0), 0.9), ((-3.0, 17.0), 1.1), ((16, 12), 1.2), ((-20, -8), 1.2), ((3.5, 13), 0.9)): FS.place_tree(coll, bases, (p[0], p[1], 0), p[0], s)
-    for p in ((-8, -26.0), (12, -18.5)): FS.place_tree(coll, bases, (p[0], p[1], 0), 1.0, 0.7)
+    for p, s in (((-9.5, 12.5), 1.0), ((11.0, 5.0), 0.95), ((19.0, -12.0), 0.9), ((-3.0, 17.0), 1.1), ((16, 12), 1.2), ((-20, -8), 1.2), ((3.5, 13), 0.9)): FS.place_tree(coll, bases, (p[0], p[1], 0), p[0], s)
+    for p in ((-8, -26.0), (19, -19.5)): FS.place_tree(coll, bases, (p[0], p[1], 0), 1.0, 0.7)
     shrubs(coll, [(4.6, -2.6), (4.9, -3.6)], 7, 0.45, 0.4, "violet")
     g = P.G(coll, "carport_props", bevel=0.01)
     for y in (-4.0, -8.0, -12.0, -16.0):       # driveway bollard lights
@@ -174,9 +174,9 @@ def set_carport(coll):
     g.box((5.6, 6.0, 0.55), (0.62, 0.62, 1.1), "graphite"); g.box((5.6, 6.0, 1.12), (0.66, 0.66, 0.05), "charcoal")      # wheelie bin
     P.potted(g, -7.3, -1.0, 0.7, 0.45, "tall", 5); P.potted(g, -7.3, 0.0, 0.7, 0.45, "tall", 6)
     g.flush()
-    pergola_roof(coll, (0.04, 0.043, 0.05))
+    pergola_roof(coll, (0.30, 0.31, 0.33), 0.5)
     cyl("lamp_pole", 0.07, 6.0, (-12, -21.4, 3.0), mat_matte("pole", (0.1, 0.1, 0.11, 1), 0.4), coll, 12)
-    return dict(world=sky_world(1.0, 0.45, 1.0), exp=0.15, car=True, sun=(34, 15, 7.2, SUN_WARM))
+    return dict(world=sky_world(1.6, 0.45, 1.0), exp=0.35, car=True, sun=(44, -28, 7.6, SUN_WARM))
 
 
 # ================================================================================================ 2 BARBECUE (garden party: dining table, small kitchen, mangal, fire pit)

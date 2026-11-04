@@ -54,6 +54,14 @@ def build_plan():
     return plan
 
 
+HERO_T0, HERO_T1, HERO_TH0, HERO_TH_HOLD = 758, 826, 18.0, 149.2     # spin eases in/out so the engraved logo ends up facing the camera and holds
+
+
+def hero_theta(f):
+    u = clamp01((f - HERO_T0) / (HERO_T1 - HERO_T0))
+    return HERO_TH0 + (HERO_TH_HOLD - HERO_TH0) * e_io(u)
+
+
 class Anim:
     def __init__(self):
         bpy.context.view_layer.update(); self.plan = build_plan()
@@ -96,7 +104,7 @@ class Anim:
         """hero Trojak 3D leaves its post position, floats to the lab centre and turns slowly (rigid motion only)."""
         o = self.hero["obj"]
         u = e_io(clamp01((f - 758) / 40.0)); hp = Vector((0.0, 0.0, 1.25))
-        th = math.radians(18.0 + (f - 758) * 1.6)
+        th = math.radians(hero_theta(f))
         base_loc, base_q = self.hero["loc0"], self.hero["q0"]
         M0 = Matrix.Translation(base_loc) @ base_q.to_matrix().to_4x4()
         c0 = self.hero_center
@@ -154,16 +162,14 @@ CAM = {
     "commercial": ((-5.2, -5.2, 1.1), (-7.6, -6.8, 1.25), (0.4, 1.0, 1.3), (0.5, 1.0, 1.35), 21, 23),
     "lab2":       ((-5.8, -5.4, 1.3), (4.5, -6.8, 1.0), (0, 0, 1.6), (0, 0, 1.4), 25, 22),
 }
-HERO_CAM = ((0.8, -0.95, 1.45), (-0.75, -1.0, 1.2), (0.0, 0.0, 1.25), (0.0, 0.0, 1.25), 50, 55)
+HERO_FINAL = ((-0.2137, -0.5596, 1.2999), (0.114, -0.0098, 1.2999), 70.0)       # face-on to the engraved RIVON mark of the hero connector (0.64 m away)
 
 
 def camera_for_frame(f):
     if f <= LAB1[1]: return orbit(f, LAB1[0], LAB1[1], *CAM["lab1"])
     for name, s in SCENES:
         if s <= f < s + SCENE_LEN: return orbit(f, s, s + SCENE_LEN - 1, *CAM[name])
-    if f < 758: return orbit(f, LAB2[0], 757, *CAM["lab2"])
-    if f < 790:                                     # blend lab2 end-pose -> hero close-up
-        a = orbit(757, LAB2[0], 757, *CAM["lab2"]); b = orbit(790, 790, 899, *HERO_CAM)
-        u = e_io((f - 758) / 32.0)
-        return tuple(np.array(a[0]) * (1 - u) + np.array(b[0]) * u), tuple(np.array(a[1]) * (1 - u) + np.array(b[1]) * u), a[2] * (1 - u) + b[2] * u
-    return orbit(f, 790, 899, *HERO_CAM)
+    if f < HERO_T0: return orbit(f, LAB2[0], 757, *CAM["lab2"])
+    a0 = orbit(757, LAB2[0], 757, *CAM["lab2"]); b0 = HERO_FINAL
+    u = e_io(clamp01((f - HERO_T0) / (HERO_T1 - HERO_T0)))
+    return tuple(np.array(a0[0]) * (1 - u) + np.array(b0[0]) * u), tuple(np.array(a0[1]) * (1 - u) + np.array(b0[1]) * u), a0[2] * (1 - u) + b0[2] * u
