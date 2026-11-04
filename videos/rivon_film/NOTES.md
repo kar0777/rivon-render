@@ -7,3 +7,9 @@ carport, barbecue, summer kitchen, lounge, commercial cafe terrace + the dark la
 - `film_lib.py` materials, STL reader, pergola builder · `film_envs.py` props/lab · `build_film.py` env placement + camera shots · `render_film.py` renderer (resumable).
 - Control frames: push branch `film/<name>` with run.json (see `.github/workflows/render-film.yml`).
 Rules (owner): free assets only; no full final render until the owner writes exactly «Утверждаю, запускай финальный рендер» after >=5 control frames; connector geometry is final.
+
+## v2 (daylight sets + timeline)
+- `film_scenes.py` five bright sets (carport / barbecue / summer kitchen / lounge / cafe), `film_props.py` furniture + guests, `film_sets.py` houses/trees/materials.
+- Light = truck-video recipe: saturated procedural sky ramp + warm SUN lamp (7.2 W/m2, ~35-50 deg), Khronos PBR Neutral, exposure +0.15; lab keeps AgX Medium High Contrast.
+- `film_anim.py` timeline: 0-209 lab assembly, 210-689 five scenes x 96 frames, 690-899 lab disassembly + hero Trojak 3D + CTA.  `build_film.apply_frame(f)` sets env/pergola/hero/camera.
+- Post: `post/finish_film.py` (grade, flash on cuts, CTA "Jedno rozwiazanie. Wiele mozliwosci." + RIVON logo, MP4), `post/sound_film.py` + `film_events.py` (synth material sounds).

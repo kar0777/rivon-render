@@ -10,6 +10,7 @@ import film_envs as E
 import film_stage as ST
 import film_sets as SETM
 import film_scenes as SCN
+import film_anim as AN
 import film_labs as LB
 
 # ---- environment placement: PLOT (the whole Polish plot) is rotated/moved, the pergola stays at the world origin
@@ -166,4 +167,21 @@ def set_shot(shot, w=None):
     cam = bpy.data.objects["film_cam"]; cam.location = s["loc"]; cam.data.lens = s["lens"]
     cam.rotation_euler = mathutils.Vector(np.array(s["tgt"]) - np.array(s["loc"])).to_track_quat("-Z", "Y").to_euler()
     d = cam.data.dof; d.use_dof = True; d.focus_distance = float(np.linalg.norm(np.array(s["tgt"]) - np.array(s["loc"]))) * 1.02; d.aperture_fstop = 4.0
+    bpy.context.view_layer.update()
+
+
+# ---------------------------------------------------------------------------------------------- timeline mode
+_anim = {"obj": None}
+
+
+def apply_frame(f):
+    """Everything that depends on the film frame f (0..899): environment, pergola assembly state, hero connector, camera."""
+    if _anim["obj"] is None: _anim["obj"] = AN.Anim()
+    apply_env(AN.env_for_frame(f))
+    _anim["obj"].apply(f)
+    loc, tgt, lens = AN.camera_for_frame(f)
+    cam = bpy.data.objects["film_cam"]; cam.location = loc; cam.data.lens = lens
+    cam.rotation_euler = mathutils.Vector(np.array(tgt) - np.array(loc)).to_track_quat("-Z", "Y").to_euler()
+    hero = f >= 780
+    d = cam.data.dof; d.use_dof = True; d.focus_distance = float(np.linalg.norm(np.array(tgt) - np.array(loc))) * (1.0 if hero else 1.02); d.aperture_fstop = 2.2 if hero else 4.0
     bpy.context.view_layer.update()

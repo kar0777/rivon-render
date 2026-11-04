@@ -17,6 +17,6 @@ for f in frames:
     if p.exists(): print("FRAME", f, "exists"); continue
     t = time.time()
     if "--stills" in a: B.set_shot(B.SHOT_ORDER[f])
-    else: raise SystemExit("animation timeline not built yet; use --stills")
+    else: B.apply_frame(f)
     sc.render.filepath = str(p); bpy.ops.render.render(write_still=True)
     print("FRAME", f, "ok", round(time.time() - t, 1), "s", flush=True)
