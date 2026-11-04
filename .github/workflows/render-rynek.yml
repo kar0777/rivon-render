@@ -61,6 +61,6 @@ jobs:
             /tmp/blender/blender -b -P render_rynek.py -- --w $W --h $H --spp $SPP --persist 0 $ARGS --out $GITHUB_WORKSPACE/out 2>&1 | grep -E "FRAME|rror|Traceback" | tail -25
             cd $GITHUB_WORKSPACE
             rm -rf /tmp/pushrepo && mkdir /tmp/pushrepo && cp out/*.png /tmp/pushrepo/
-            cd /tmp/pushrepo && git init -q -b $B && git add -A && git commit -q -m "$NAME part $PART chunk $c" && git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" $B
+            cd /tmp/pushrepo && git init -q -b $B && git add -A && git commit -q -m "$NAME part $PART chunk $c" && for t in 1 2 3 4 5 6; do git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" $B && break; echo "push retry $t"; sleep $((t*15)); done
             cd $GITHUB_WORKSPACE
           done
