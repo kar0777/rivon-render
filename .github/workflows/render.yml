@@ -55,10 +55,16 @@ jobs:
           fi
           for c in $(seq 0 $((NCH-1))); do
             if [ -n "$LIST" ]; then ARGS="--frames $LIST"; else cs=$((S0+c*CH)); ce=$((cs+CH-1)); [ $ce -gt $E0 ] && ce=$E0; ARGS="--start $cs --end $ce"; fi
+            N0=$(ls $GITHUB_WORKSPACE/out/*.png 2>/dev/null | wc -l)
             cd $SCENE
             /tmp/blender/blender -b RIVON_film2_scene.blend -P render_rivon.py -- --preset approved --w $W --h $H --spp $SPP --persist 0 $EXTRA $ARGS --out $GITHUB_WORKSPACE/out 2>&1 | grep -E "FRAME|rror" | tail -25
             cd $GITHUB_WORKSPACE
-            rm -rf /tmp/pushrepo && mkdir /tmp/pushrepo && cp out/*.png /tmp/pushrepo/
-            cd /tmp/pushrepo && git init -q -b $B && git add -A && git commit -q -m "$NAME part $PART chunk $c" && git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" $B
-            cd $GITHUB_WORKSPACE
+            N1=$(ls out/*.png 2>/dev/null | wc -l)
+            if [ "$N1" -gt "$N0" ]; then
+              rm -rf /tmp/pushrepo && mkdir /tmp/pushrepo && cp out/*.png /tmp/pushrepo/
+              cd /tmp/pushrepo && git init -q -b $B && git add -A && git commit -q -m "$NAME part $PART chunk $c"
+              OK=0; for try in 1 2 3 4 5 6; do if git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" $B; then OK=1; break; fi; sleep 20; done
+              [ "$OK" = "1" ] || exit 1
+              cd $GITHUB_WORKSPACE
+            fi
           done
