@@ -13,6 +13,17 @@ ap.add_argument("--start", type=int, default=0); ap.add_argument("--end", type=i
 ap.add_argument("--frames", default=""); ap.add_argument("--out", default="frames"); ap.add_argument("--persist", type=int, default=0)
 ap.add_argument("--cam", default="")        # debug: "x,y,z,tx,ty,tz" static camera
 a = ap.parse_args(argv)
+import numpy as np
+def grade_png(path, sat=1.45, con=0.12, warm=0.03):
+    # final look: richer colour + a little contrast, applied to the sRGB frame
+    im = bpy.data.images.load(path); w, h = im.size
+    buf = np.empty(w * h * 4, dtype=np.float32); im.pixels.foreach_get(buf); buf = buf.reshape(-1, 4)
+    c = buf[:, :3]; l = (c * np.array([0.2126, 0.7152, 0.0722], dtype=np.float32)).sum(1, keepdims=True)
+    c = l + (c - l) * sat
+    c = c + np.array([warm, 0.0, -warm], dtype=np.float32) * c.mean(1, keepdims=True)
+    c = np.clip(c, 0, 1); c = c * (1 - con) + c * c * (3 - 2 * c) * con
+    buf[:, :3] = np.clip(c * 1.06, 0, 1)
+    im.pixels.foreach_set(buf.ravel()); im.filepath_raw = path; im.file_format = 'PNG'; im.save(); bpy.data.images.remove(im)
 t0 = time.time()
 co, tgt = B.build(w=a.w, h=a.h, spp=a.spp)
 print("BUILD %.1fs" % (time.time() - t0), flush=True)
@@ -29,5 +40,6 @@ for f in frames:
     if os.path.exists(path): continue
     sc.frame_set(f); sc.render.filepath = path; ts = time.time()
     bpy.ops.render.render(write_still=True)
+    if not os.environ.get('NOGRADE'): grade_png(path)
     print("FRAME %d  %.0fs" % (f, time.time() - ts), flush=True)
 print("DONE", out)

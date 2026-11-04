@@ -263,6 +263,11 @@ def animate_parasol(ob, parts, clo, f0, fold=34, sink=28):
     f1 = f0 + fold; f2 = f1 + sink
     clo.value = 0.0; clo.keyframe_insert('value', frame=f0)
     clo.value = 1.0; clo.keyframe_insert('value', frame=f1)
+    # gusts of wind: the open parasols rock and shudder (the gazebo next to them does not move)
+    import random as _r; rr = _r.Random(int(f0) * 7 + 3); ph = rr.uniform(0, 6.28)
+    for fr in range(0, int(f0), 4):
+        amp = 0.035 + 0.075 * min(1.0, fr / max(1, f0 - 8)) ** 1.3
+        key_rot(ob, fr, (amp * math.sin(fr * 0.62 + ph), amp * 0.8 * math.sin(fr * 0.47 + ph * 1.7), 0))
     key_rot(ob, f0, (0, 0, 0)); key_rot(ob, f1, (0, 0, 0.45))
     for p in parts:
         z0 = p.location.z
