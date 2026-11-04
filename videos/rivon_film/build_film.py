@@ -26,11 +26,11 @@ ENVS = {
 # ---- camera shots (low, wide, close: the pergola must read as big, heavy and strong)
 SHOTS = {
     "S0_lab":        dict(env="lab",        loc=(5.0, -8.6, 0.75), tgt=(0.0, 0.0, 2.2), lens=22),
-    "S1_carport":    dict(env="carport",    loc=(6.5, -8.5, 1.0), tgt=(0.0, 0.5, 1.4), lens=24),
-    "S2_barbecue":   dict(env="barbecue",   loc=(-6.0, -7.0, 1.0), tgt=(0.4, 0.8, 1.3), lens=24),
-    "S3_kitchen":    dict(env="kitchen",    loc=(-6.5, -6.0, 1.0), tgt=(1.0, 0.5, 1.4), lens=24),
-    "S4_lounge":     dict(env="lounge",     loc=(4.2, -6.2, 0.9), tgt=(0.0, 1.5, 1.5), lens=22),
-    "S5_commercial": dict(env="commercial", loc=(-5.5, -4.8, 1.0), tgt=(0.0, 1.2, 1.5), lens=22),
+    "S1_carport":    dict(env="carport",    loc=(6.4, -7.8, 0.8), tgt=(0.2, 0.3, 2.3), lens=20),
+    "S2_barbecue":   dict(env="barbecue",   loc=(-5.8, -7.0, 0.8), tgt=(0.3, 0.8, 2.2), lens=20),
+    "S3_kitchen":    dict(env="kitchen",    loc=(-6.2, -6.0, 0.8), tgt=(1.2, 0.5, 2.2), lens=20),
+    "S4_lounge":     dict(env="lounge",     loc=(5.0, -6.8, 0.8), tgt=(0.0, 1.6, 2.3), lens=19),
+    "S5_commercial": dict(env="commercial", loc=(-5.4, -6.2, 0.9), tgt=(0.2, 1.6, 2.3), lens=19),
 }
 SHOT_ORDER = list(SHOTS)
 
@@ -118,7 +118,7 @@ def prepare(w, h, spp):
     sc.cycles.transparent_max_bounces = 8; sc.cycles.use_adaptive_sampling = True; sc.cycles.adaptive_threshold = 0.02
     sc.render.resolution_x, sc.render.resolution_y, sc.render.resolution_percentage = w, h, 100
     sc.render.image_settings.file_format = "PNG"; sc.render.film_transparent = False
-    sc.view_settings.view_transform = "Khronos PBR Neutral"; sc.view_settings.look = "None"; sc.view_settings.exposure = 0.15
+    sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - Medium High Contrast"; sc.view_settings.exposure = 0.0
     _state["world_outdoor"] = sc.world; _state["lab_world"] = lw
     return sc
 

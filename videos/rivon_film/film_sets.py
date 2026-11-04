@@ -127,9 +127,9 @@ def tree_meshes(coll, seed, kind="broad", n=2):
                 cen = (p[0] * 2.7, p[1] * 2.7, H * 0.62 + p[2] * 2.3 + 0.2); rad = rng.uniform(0.75, 1.3) * (1.1 - 0.3 * abs(p[2]))
             else:   # columnar / cypress-like
                 t_ = b_ / (blobs - 1); cz = H * 0.2 + t_ * H * 0.78; rad = (0.95 - 0.7 * t_) + rng.uniform(-0.05, 0.1); cen = (rng.uniform(-0.12, 0.12), rng.uniform(-0.12, 0.12), cz)
-            bm = bmesh.new(); bmesh.ops.create_icosphere(bm, subdivisions=2, radius=rad)
+            bm = bmesh.new(); bmesh.ops.create_icosphere(bm, subdivisions=3, radius=rad)
             for v in bm.verts:
-                d = np.array(v.co); r = 1.0 + 0.18 * math.sin(d[0] * 5.1 + b_) * math.cos(d[1] * 4.3 + 2 * b_) + rng.uniform(-0.1, 0.1)
+                d = np.array(v.co); r = 1.0 + 0.14 * math.sin(d[0] * 5.1 + b_) * math.cos(d[1] * 4.3 + 2 * b_) + 0.10 * math.sin(d[2] * 11.0 + d[0] * 9.0 + b_ * 1.7) * math.cos(d[1] * 10.0 - b_) + 0.05 * math.sin((d[0] + d[1] + d[2]) * 23.0) + rng.uniform(-0.03, 0.03)
                 v.co = mathutils.Vector(d * r) + mathutils.Vector(cen)
             bm.verts.ensure_lookup_table()
             V = np.array([list(v.co) for v in bm.verts]); F = [[v.index for v in f.verts] for f in bm.faces]; bm.free()
@@ -215,7 +215,7 @@ def hip_roof(coll, cx, cy, W, D, z0, pitch_deg, over, mat, key="hip"):
     ob = bpy.data.objects.new(key, me); ob.location = (cx, cy, 0); link(ob, coll); return ob
 
 
-def sky_world(sun_elev, sun_rot, strength=0.33, dust=1.5, air=1.0):
+def sky_world(sun_elev, sun_rot, strength=0.33, dust=0.7, air=1.5):
     w = bpy.data.worlds.new("sky"); w.use_nodes = True; nt = w.node_tree; nt.nodes.clear()
     o = nt.nodes.new("ShaderNodeOutputWorld"); bg = nt.nodes.new("ShaderNodeBackground"); sk = nt.nodes.new("ShaderNodeTexSky")
     sk.sky_type = "MULTIPLE_SCATTERING"; sk.sun_elevation = math.radians(sun_elev); sk.sun_rotation = math.radians(sun_rot); sk.aerosol_density = dust; sk.air_density = air; sk.sun_size = math.radians(0.55); sk.sun_intensity = 1.0
@@ -246,7 +246,7 @@ def house_traditional(coll, loc, rot_deg, plaster_col=(0.88, 0.84, 0.74), roof_c
         pm = plaster(plaster_col, f"pl_{key}")
         box(f"{key}_wall", (W, D, Hw), (0, 0, Hw / 2 + 0.4), pm, coll, 0, 0.01)
         box(f"{key}_plinth", (W + 0.06, D + 0.06, 0.55), (0, 0, 0.275), paving((0.35, 0.34, 0.33), 0.8, "plinth"), coll, 0, 0.01)
-        gable_roof(coll, 0, 0, W, D, Hw + 0.4, pitch, 0.55, roof_tiles(roof_col), "x", key + "_roof")
+        gable_roof(coll, 0, 0, W, D, Hw + 0.4, pitch, 0.55, roof_tiles(tuple(min(1.0, c * 1.8) for c in roof_col)), "x", key + "_roof")
         for sx in (-1, 1):                                                  # chimney + gutters
             pass
         box(f"{key}_chimney", (0.7, 0.7, 2.0), (W * 0.27, 0.6, Hw + 0.4 + (D / 2 + 0.55) * math.tan(math.radians(pitch)) * 0.7 + 0.6), plaster((0.55, 0.45, 0.4), "chim"), coll, 0, 0.01)
@@ -307,7 +307,7 @@ def townhouse(coll, loc, rot_deg, W, D, floors, plaster_col, roof_col, key, grou
         up = 3.15; H = ground_h + up * (floors - 1) + 0.3
         pm = plaster(plaster_col, f"pl_{key}")
         box(f"{key}_wall", (W, D, H), (0, 0, H / 2), pm, coll, 0, 0.01)
-        gable_roof(coll, 0, 0, W, D, H, roof_pitch, 0.35, roof_tiles(roof_col), "x", key + "_roof")
+        gable_roof(coll, 0, 0, W, D, H, roof_pitch, 0.35, roof_tiles(tuple(min(1.0, c * 1.8) for c in roof_col)), "x", key + "_roof")
         cor = mat_matte("cornice", (0.9, 0.88, 0.82, 1), 0.7)
         box(f"{key}_cornice", (W + 0.3, 0.45, 0.28), (0, -D / 2 - 0.1, H - 0.14), cor, coll, 0, 0.01)
         box(f"{key}_band", (W + 0.12, 0.2, 0.18), (0, -D / 2 - 0.05, ground_h), cor, coll, 0, 0.01)
@@ -357,7 +357,7 @@ def set_carport(coll):
     # street lamp
     cyl("lamp_pole", 0.07, 6.0, (-12, -20.6, 3.0), mat_matte("pole", (0.1, 0.1, 0.11, 1), 0.4), coll, 12)
     box("lamp_arm", (1.2, 0.06, 0.06), (-11.4, -20.6, 6.0), mat_matte("pole", (0.1, 0.1, 0.11, 1), 0.4), coll, 0, 0.0)
-    return dict(world=sky_world(24, 150), exp=-0.1, car=True)
+    return dict(world=sky_world(24, 150, dust=0.8), exp=-0.1, car=True)
 
 
 def set_barbecue(coll):
@@ -423,7 +423,7 @@ def set_lounge(coll):
     gr = foliage_mat("grass_orn", (0.12, 0.1, 0.04), (0.45, 0.4, 0.2), 4.0)
     for k, x in enumerate(np.linspace(-9.5, 9.5, 9)):
         sphere(f"orn{k}", 0.55, (x, 4.3 + 0.0, 0.35), gr, coll, 14, (1, 1, 0.7))
-    return dict(world=sky_world(11, 330, dust=2.0), exp=0.0, car=False)
+    return dict(world=sky_world(11, 330, dust=1.4, air=1.3), exp=0.0, car=False)
 
 
 def set_cafe(coll):
@@ -432,7 +432,7 @@ def set_cafe(coll):
     cob = paving((0.42, 0.4, 0.38), 0.7, "terrace_pav")
     _pad(coll, "terrace", (30, 15.5), (0, 0.0), cob, 0.0)
     _pad(coll, "road", (240, 9.0), (0, -17.0), asphalt(), -0.05); box("curb2", (240, 0.18, 0.15), (0, -12.4, -0.03), paving((0.7, 0.7, 0.7), 0.8, "curb"), coll, 0, 0.01)
-    blds = [(-6.8, 6.0, 3, (0.84, 0.62, 0.48), (0.28, 0.14, 0.1), None, (0.15, 0.3, 0.2), False),
+    blds = [(-6.8, 6.0, 3, (0.78, 0.56, 0.42), (0.28, 0.14, 0.1), None, (0.15, 0.3, 0.2), False),
             (0.0, 7.0, 3, (0.92, 0.88, 0.76), (0.45, 0.2, 0.14), (( 0.1, 0.35, 0.28), (0.95, 0.95, 0.92)), None, True),
             (6.9, 6.2, 4, (0.62, 0.72, 0.78), (0.3, 0.15, 0.11), None, None, False),
             (-13.4, 6.4, 3, (0.9, 0.78, 0.55), (0.28, 0.14, 0.1), None, (0.4, 0.15, 0.12), False),
