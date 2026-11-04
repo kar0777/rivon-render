@@ -7,7 +7,6 @@ import bpy, mathutils
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from film_lib import *      # noqa
 import film_envs as E
-import film_world as W
 import film_stage as ST
 import film_sets as SETM
 import film_labs as LB
