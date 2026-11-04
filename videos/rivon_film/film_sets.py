@@ -20,7 +20,7 @@ def tinted_pbr(key, diff, rough, disp, scale, tint, ds=0.002):
 
 
 def plaster(color, key=None):
-    return tinted_pbr(key or f"plaster_{color}", "beige_wall_002_diff_2k.jpg", "beige_wall_002_rough_2k.jpg", "beige_wall_002_disp_2k.png", 0.5, color, 0.004)
+    return tinted_pbr(key or f"plaster_{color}", "beige_wall_002_diff_2k.jpg", "beige_wall_002_rough_2k.jpg", "beige_wall_002_disp_2k.png", 0.5, tuple(c * 1.55 for c in color), 0.004)
 
 
 def roof_tiles(color): return tinted_pbr(f"roof_{color}", "clay_roof_tiles_03_diff_2k.jpg", "clay_roof_tiles_03_rough_2k.exr", "clay_roof_tiles_03_disp_2k.png", 0.55, color, 0.01)

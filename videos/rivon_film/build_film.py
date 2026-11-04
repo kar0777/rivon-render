@@ -9,6 +9,7 @@ from film_lib import *      # noqa
 import film_envs as E
 import film_stage as ST
 import film_sets as SETM
+import film_scenes as SCN
 import film_labs as LB
 
 # ---- environment placement: PLOT (the whole Polish plot) is rotated/moved, the pergola stays at the world origin
@@ -26,11 +27,11 @@ ENVS = {
 # ---- camera shots (low, wide, close: the pergola must read as big, heavy and strong)
 SHOTS = {
     "S0_lab":        dict(env="lab",        loc=(5.0, -8.6, 0.75), tgt=(0.0, 0.0, 2.2), lens=22),
-    "S1_carport":    dict(env="carport",    loc=(6.4, -7.8, 0.8), tgt=(0.2, 0.3, 2.3), lens=20),
-    "S2_barbecue":   dict(env="barbecue",   loc=(-5.8, -7.0, 0.8), tgt=(0.3, 0.8, 2.2), lens=20),
-    "S3_kitchen":    dict(env="kitchen",    loc=(-6.2, -6.0, 0.8), tgt=(1.2, 0.5, 2.2), lens=20),
-    "S4_lounge":     dict(env="lounge",     loc=(5.0, -6.8, 0.8), tgt=(0.0, 1.6, 2.3), lens=19),
-    "S5_commercial": dict(env="commercial", loc=(-5.4, -6.2, 0.9), tgt=(0.2, 1.6, 2.3), lens=19),
+    "S1_carport":    dict(env="carport",    loc=(6.8, -8.0, 0.9), tgt=(-0.6, 0.4, 1.2), lens=24),
+    "S2_barbecue":   dict(env="barbecue",   loc=(-5.6, -7.2, 0.9), tgt=(0.5, 0.4, 1.2), lens=24),
+    "S3_kitchen":    dict(env="kitchen",    loc=(-3.2, -7.2, 0.9), tgt=(0.8, 1.0, 1.25), lens=22),
+    "S4_lounge":     dict(env="lounge",     loc=(5.4, -6.4, 0.85), tgt=(-0.4, 0.9, 1.15), lens=22),
+    "S5_commercial": dict(env="commercial", loc=(-5.2, -5.2, 1.1), tgt=(0.4, 1.0, 1.3), lens=21),
 }
 SHOT_ORDER = list(SHOTS)
 
@@ -118,7 +119,7 @@ def prepare(w, h, spp):
     sc.cycles.transparent_max_bounces = 8; sc.cycles.use_adaptive_sampling = True; sc.cycles.adaptive_threshold = 0.02
     sc.render.resolution_x, sc.render.resolution_y, sc.render.resolution_percentage = w, h, 100
     sc.render.image_settings.file_format = "PNG"; sc.render.film_transparent = False
-    sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - Medium High Contrast"; sc.view_settings.exposure = 0.0
+    sc.view_settings.view_transform = "Khronos PBR Neutral"; sc.view_settings.look = "None"; sc.view_settings.exposure = 0.0
     _state["world_outdoor"] = sc.world; _state["lab_world"] = lw
     return sc
 
@@ -146,15 +147,17 @@ def apply_env(name):
         for o in list(c.objects): bpy.data.objects.remove(o, do_unlink=True)
     lab = cfg["kind"] == "lab"
     _excl("LAB", not lab); _excl("PLOT_COLL", True)           # the old plot (same house everywhere) is no longer used
-    bpy.data.objects["sun"].hide_render = True                # outdoor light comes from the photographed sky itself
+    bpy.data.objects["sun"].hide_render = True
     if lab:
-        _excl("CAR_RAM", True); sc.world = _state["lab_world"]; sc.view_settings.exposure = 0.0
+        _excl("CAR_RAM", True); sc.world = _state["lab_world"]; sc.view_settings.exposure = 0.0; sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - Medium High Contrast"
     else:
-        res = SETM.SETS[name](bpy.data.collections["ENV_DOME"])
-        sc.world = res["world"]; sc.view_settings.exposure = res.get("exp", 0.0)
+        res = SCN.SETS[name](bpy.data.collections["ENV_DOME"])
+        sc.world = res["world"]; sc.view_settings.exposure = res.get("exp", 0.0); sc.view_settings.view_transform = "Khronos PBR Neutral"; sc.view_settings.look = "None"
+        el, az, en, col = res["sun"]; so = bpy.data.objects["sun"]; so.hide_render = False; so.data.energy = en; so.data.color = col; so.data.angle = math.radians(0.6)
+        d = -mathutils.Vector((math.cos(math.radians(el)) * math.cos(math.radians(az)), math.cos(math.radians(el)) * math.sin(math.radians(az)), math.sin(math.radians(el))))
+        so.rotation_euler = d.to_track_quat("-Z", "Y").to_euler()
         _hide_car(not res.get("car"))
         ram = bpy.data.objects["CAR_RAM_ROOT"]; ram.location = (0.0, 0.0, 0.0); ram.rotation_euler = (0, 0, 0)
-    if name in E.PROPS: E.PROPS[name](bpy.data.collections["ENV_PROPS"])
     _state["env"] = name
 
 
@@ -162,4 +165,5 @@ def set_shot(shot, w=None):
     s = SHOTS[shot]; apply_env(s["env"])
     cam = bpy.data.objects["film_cam"]; cam.location = s["loc"]; cam.data.lens = s["lens"]
     cam.rotation_euler = mathutils.Vector(np.array(s["tgt"]) - np.array(s["loc"])).to_track_quat("-Z", "Y").to_euler()
+    d = cam.data.dof; d.use_dof = True; d.focus_distance = float(np.linalg.norm(np.array(s["tgt"]) - np.array(s["loc"]))) * 1.02; d.aperture_fstop = 4.0
     bpy.context.view_layer.update()
