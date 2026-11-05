@@ -371,33 +371,48 @@ def van_pose(s):
         return Vector((cxy.x + R * math.sin(ph), cxy.y + R * math.cos(ph), 0)), -ph
     return Vector((9.25, 33.95 - (s - S1 - ARC), 0)), -math.pi / 2
 T_DRIVE = 185
-# v3: the film now starts right AFTER the corner (the old 17 m/s corner + whip-pan + tiny dot crawling down the drive looked unnatural).
-# natural speed profile along the drive: rolling in at ~22 km/h, gentle acceleration to ~29 km/h, one firm smooth brake to the stop.
-S0 = S1 + ARC
-_T = (T_DRIVE - 1) / 30.0; _v0, _tA, _Tb = 6.0, 1.5, 2.7
-_vp = (S3 - 0.5 * _tA * _v0) / (_T - 0.5 * _tA - 0.6 * _Tb)
-_tB = _T - _Tb
-_dA = _tA * (_v0 + _vp) / 2; _dB = _dA + _vp * (_tB - _tA)
-def drive_dist(t):
-    if t <= 0: return _v0 * t
-    if t <= _tA:
-        x = t / _tA; return _v0 * t + (_vp - _v0) * _tA * (x ** 3 - x ** 4 / 2)
-    if t <= _tB: return _dA + _vp * (t - _tA)
-    u = min(1.0, (t - _tB) / _Tb); return _dB + 0.4 * _vp * _Tb * (1 - (1 - u) ** 2.5)
-def drive_speed(t):
-    if t <= 0: return _v0
-    if t <= _tA:
-        x = t / _tA; return _v0 + (_vp - _v0) * (3 * x * x - 2 * x ** 3)
-    if t <= _tB: return _vp
-    u = min(1.0, (t - _tB) / _Tb); return _vp * (1 - u) ** 1.5
-print("van drive: v0 %.1f vp %.2f m/s, dist %.2f / %.2f" % (_v0, _vp, drive_dist(_T), S3))
-VAN_POS = {}; VAN_H = {}; VAN_PITCH = {}; VAN_SPEED = {}
+# v4: shot 1 (frames 1..129) - the van drives along the street, slows down, turns right into the yard through the gate;
+#     shot 2 (frames 130..185, after a hard cut = time ellipsis) - the van is already on the drive near the plot and brakes to a stop.
+def _ss(x): x = min(1.0, max(0.0, x)); return x * x * (3 - 2 * x)
+def _ssi(x): x = min(1.0, max(0.0, x)); return x ** 3 - x ** 4 / 2          # integral of smoothstep
+SH1_S0, SH1_V0, SH1_VT, SH1_TA, SH1_V2 = 2.2, 8.5, 4.6, 1.5, 6.0          # start, entry speed, turn speed, slow-down time, exit speed
+_tArc = SH1_TA + ARC / SH1_VT
+def sh1(t):          # -> (path distance, speed) for shot 1
+    if t <= SH1_TA:
+        return SH1_S0 + SH1_V0 * t + (SH1_VT - SH1_V0) * SH1_TA * _ssi(t / SH1_TA), SH1_V0 + (SH1_VT - SH1_V0) * _ss(t / SH1_TA)
+    d1 = SH1_S0 + SH1_TA * (SH1_V0 + SH1_VT) / 2
+    if t <= _tArc: return d1 + SH1_VT * (t - SH1_TA), SH1_VT
+    T2 = 1.0; x = (t - _tArc) / T2
+    return d1 + ARC + SH1_VT * (t - _tArc) + (SH1_V2 - SH1_VT) * T2 * _ssi(x), SH1_VT + (SH1_V2 - SH1_VT) * _ss(x)
+SH2_V, SH2_T = 5.5, (T_DRIVE - 130) / 30.0
+def sh2(t):          # t from the cut (frame 130); brake to a stop exactly at T_DRIVE
+    u = min(1.0, max(0.0, t / SH2_T)); rem = 0.4 * SH2_V * SH2_T
+    return TOTAL - rem + rem * (1 - (1 - u) ** 2.5), SH2_V * (1 - u) ** 1.5
+VAN_POS = {}; VAN_H = {}; VAN_PITCH = {}; VAN_SPEED = {}; _S = {}; _ROLL = {}
 for f in range(1, T_DRIVE + 1):
-    t_ = (f - 1) / 30.0; s = S0 + drive_dist(t_)
-    acc = (drive_speed(t_ + 0.05) - drive_speed(t_ - 0.05)) / 0.1 if f < T_DRIVE else 0.0
-    pit = max(-0.012, min(0.014, -0.003 * acc))             # nose dips when braking, rises when accelerating (<=0.8 deg)
-    p, h = van_pose(s); key(VAN, f, loc=p, euler=(0, pit, h)); VAN_POS[f] = p; VAN_H[f] = h; VAN_PITCH[f] = pit; VAN_SPEED[f] = drive_speed(t_)
-    for w in WH: key(w, f, euler=(0, s / 0.37, 0))
+    s, v = sh1((f - 1) / 30.0) if f < 130 else sh2((f - 130) / 30.0)
+    _S[f] = s; VAN_SPEED[f] = v
+    _ROLL[f] = -0.004 * v * v / R if S1 < s < S1 + ARC else 0.0        # body leans out of the right-hand turn (<= 0.8 deg)
+def _acc(f):
+    a, b = max(1, f - 1), min(T_DRIVE, f + 1)
+    if (a < 130) != (b < 130): a, b = (f, b) if f >= 130 else (a, f)
+    return (VAN_SPEED[b] - VAN_SPEED[a]) * 30.0 / max(1, b - a)
+def _smooth(d, lo, hi, n=5):
+    out = {}
+    for f in range(lo, hi + 1):
+        w = [d[g] for g in range(max(lo, f - n), min(hi, f + n) + 1)]; out[f] = sum(w) / len(w)
+    return out
+_PIT = {f: max(-0.012, min(0.014, -0.003 * _acc(f))) for f in range(1, T_DRIVE + 1)}; _PIT[T_DRIVE] = 0.0
+_PIT = {**_smooth(_PIT, 1, 129), **_smooth(_PIT, 130, T_DRIVE, 3)}; _PIT[T_DRIVE] = 0.0
+_ROLL = {**_smooth(_ROLL, 1, 129, 6), **_smooth(_ROLL, 130, T_DRIVE)}
+for f in range(1, T_DRIVE + 1):
+    p, h = van_pose(_S[f]); VAN_POS[f] = p; VAN_H[f] = h; VAN_PITCH[f] = (_ROLL[f], _PIT[f])
+    key(VAN, f, loc=p, euler=(_ROLL[f], _PIT[f], h))
+    for w in WH: key(w, f, euler=(0, _S[f] / 0.37, 0))
+for _fc in _fcurves(VAN.animation_data.action):
+    for _k in _fc.keyframe_points:
+        if round(_k.co[0]) == 129: _k.interpolation = 'CONSTANT'
+print("van shot1 ends at y=%.2f v=%.2f ; shot2 starts y=%.2f" % (VAN_POS[129].y, VAN_SPEED[129], VAN_POS[130].y))
 key(VAN, T_DRIVE + 1, loc=van_pose(TOTAL)[0], euler=(0, 0, -math.pi / 2)); key(VAN, NF, loc=van_pose(TOTAL)[0], euler=(0, 0, -math.pi / 2))
 for w in WH: key(w, T_DRIVE + 1, euler=(0, TOTAL / 0.37, 0)); key(w, NF, euler=(0, TOTAL / 0.37, 0))
 # front wheels steer during the turn is skipped (they are hidden in the arches).  Doors open
@@ -409,7 +424,7 @@ VAN_M = Matrix.Translation(STOP) @ Matrix.Rotation(-math.pi / 2, 4, 'Z')   # wor
 
 def van_to_world(p): return VAN_M @ Vector(p)
 def van_M_at(f):
-    f = max(1, min(f, T_DRIVE)); return Matrix.Translation(VAN_POS[f]) @ Euler((0, VAN_PITCH[f], VAN_H[f]), 'XYZ').to_matrix().to_4x4()
+    f = max(1, min(f, T_DRIVE)); return Matrix.Translation(VAN_POS[f]) @ Euler((VAN_PITCH[f][0], VAN_PITCH[f][1], VAN_H[f]), 'XYZ').to_matrix().to_4x4()
 
 # ============================================================== GAZEBO PLAN ==============================================
 AX, AY = -5.1, 0.6
@@ -684,7 +699,8 @@ SHOTS = [  # frame, cam xyz, target xyz   (None target = follow the van)
     (780, (6.5, -3.2, 4.3),   (-3.1, 2.6, 1.4)),
     (900, (6.5, -3.2, 4.3),   (-3.1, 2.6, 1.4)),
 ]
-cd_.lens = 24; cd_.keyframe_insert('lens', frame=1); cd_.keyframe_insert('lens', frame=230)
+cd_.lens = 38; cd_.keyframe_insert('lens', frame=1); cd_.keyframe_insert('lens', frame=129)
+cd_.lens = 24; cd_.keyframe_insert('lens', frame=130); cd_.keyframe_insert('lens', frame=230)
 cd_.lens = 30; cd_.keyframe_insert('lens', frame=231); cd_.keyframe_insert('lens', frame=268)
 cd_.lens = 26; cd_.keyframe_insert('lens', frame=269); cd_.keyframe_insert('lens', frame=343)
 cd_.lens = 24; cd_.keyframe_insert('lens', frame=344); cd_.keyframe_insert('lens', frame=NF)
@@ -705,7 +721,7 @@ def _sun_rot(az_deg, el_deg):
     src = Vector((math.cos(e) * math.cos(a), math.cos(e) * math.sin(a), math.sin(e)))     # direction TO the sun
     return (-src).to_track_quat('-Z', 'Y').to_euler()
 LIGHT_PLAN = {   # first blender frame of the shot: (sun azimuth deg [0=+x, 90=+y], elevation deg, view exposure)
-    1:   (28.0, 27.0, 0.35),     # chase shot, van arrives (sun from the east, camera left)
+    1:   (28.0, 27.0, 0.60),     # street shot, van arrives (sun from the east, camera left)
     130: (18.0, 27.0, 0.35),     # van at the plot
     231: (28.0, 27.0, -0.20),    # behind the van, cartons fly out
     269: (232.0, 27.0, 0.95),    # gazebo plot (sun from the south-west, camera left-behind)
@@ -722,19 +738,23 @@ for _ob in (_sun, sc):
     for _fc in _fcurves(_ob.animation_data.action):
         for _k in _fc.keyframe_points: _k.interpolation = 'CONSTANT'
 for f in range(1, 193):
-    if f in VAN_POS: key(tgt, f, loc=VAN_POS[f] + Vector((0, 0, 1.1 if f >= 130 else 1.15)))
+    if f in VAN_POS and f >= 130: key(tgt, f, loc=VAN_POS[f] + Vector((0, 0, 1.1)))
 # frames 232..300: the camera target rides with the carton that is currently flying out of the van (smoothed)
 _CART = [it for it in ITEMS if it.o.name.startswith("carton")]
 def _cart_pos(f):
     act = [it for it in _CART if it.f0 <= f <= it.f0 + it.dur]
     it = max(act, key=lambda i: i.f0) if act else _CART[0]
     return it.pose(f)[0]
-# shot 1 (frames 1..129): smooth chase camera, a few metres behind the van on the left, riding the same path (lagging a little)
-CHASE_GAP, CHASE_LAT, CHASE_LAG = 6.8, 0.45, 0.40
+# shot 1 (frames 1..129): camera on the far pavement, east of the gate; it pans smoothly (zero-phase low-passed target) after the van
+CAM1 = Vector((23.5, 45.0, 3.6))
+_raw = [VAN_POS[f] + Vector((0, 0, 1.3)) for f in range(1, 130)]
+_al = 0.10; _fw = [_raw[0]]
+for p_ in _raw[1:]: _fw.append(_fw[-1].lerp(p_, _al))
+_bw = [_fw[-1]]
+for p_ in reversed(_fw[:-1]): _bw.append(_bw[-1].lerp(p_, _al))
+_bw.reverse()
 for f in range(1, 130):
-    t_ = (f - 1) / 30.0; sc_ = S0 + drive_dist(t_ - CHASE_LAG) - CHASE_GAP
-    pc, hc = van_pose(sc_); nl = Vector((-math.sin(hc), math.cos(hc), 0))
-    key(cam, f, loc=pc + nl * CHASE_LAT + Vector((0, 0, 1.30 + 0.35 * f / 129.0)))
+    key(cam, f, loc=CAM1); key(tgt, f, loc=_bw[f - 1])
 for f, c_, t_ in SHOTS:
     key(cam, f, loc=c_)
     if t_ is not None: key(tgt, f, loc=t_)
