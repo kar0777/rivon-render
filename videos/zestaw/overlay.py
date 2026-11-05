@@ -81,12 +81,12 @@ def overlay(img, f):
     if f < END0:
         _logo(base, w * 0.86, h * 0.055, w * 0.15, 0.85)
     a, b, (t1, t2) = HOOK
-    al = fade(f, a - 10, b, 6)
+    al = fade(f, a - 10, b, 6) if TEXT else 0
     if al > 0:
         base = _pill_text(base, w / 2, h * 0.17,
                           [(t1, font("Jost.ttf", w * 0.078), (255, 255, 255)), (t2, font("Inter-Medium.otf", w * 0.05), (238, 206, 150))],
                           al, w)
-    for a, b, t, s in CAPS:
+    for a, b, t, s in (CAPS if TEXT else []):
         al = fade(f, a, b)
         if al > 0:
             ls = [(t, font("Jost.ttf", w * 0.058), (255, 255, 255))]
