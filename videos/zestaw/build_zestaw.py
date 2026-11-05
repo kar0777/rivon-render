@@ -20,6 +20,7 @@ FPS, NF = 30, 1125
 END_SRC = 990                       # end card (f >= 1005) re-uses this render, dimmed + blurred in post
 LIFT, JOIN = 0.25, 0.8
 MBLUR = True
+SUN_AZ, SUN_EL = 40.0, 30.0
 ROOF_Z = 2.598
 ROOF_X, ROOF_Y = 1.86, 3.16
 PAD_TOP, FLOOR_Z = -0.10, -0.25
@@ -38,9 +39,9 @@ SHOTS = [
     ("s01_kit_drop", 0, 66, [(0, (6.6, -5.6, 4.6), (3.7, -0.9, -0.25), 30, None), (1, (5.6, -4.6, 2.6), (3.7, -1.2, -0.25), 30, None)]),
     ("s03_bases_low", 66, 90, [(0, (3.62, -3.95, -0.16), (3.10, -2.85, -0.17), 30, 2.8), (1, (3.50, -4.15, -0.14), (3.10, -2.65, -0.17), 28, 2.8)]),
     ("s03b_kit_wide", 90, 98, [(0, (2.0, -5.6, 1.2), (3.6, -1.8, -0.2), 26, None), (1, (1.8, -5.2, 0.9), (3.4, -1.8, -0.2), 26, None)]),
-    ("s04_skim", 98, 132, [(0, (-0.3, -2.0, -0.04), (3.4, -1.6, -0.12), 26, None), (1, (-2.50, -3.30, 0.40), (-1.72, -2.95, 0.03), 35, 5.6)]),
-    ("s05_stopa_nuts", 132, 172, [(0, (-2.50, -3.30, 0.40), (-1.72, -2.95, 0.04), 35, 5.6), (1, (-2.42, -3.46, 0.38), (-1.72, -2.95, 0.04), 35, 5.6)]),
-    ("s06_post_falls", 172, 206, [(0, (-2.42, -3.46, 0.38), (-1.72, -2.95, 0.10), 35, 5.6), (1, (-2.45, -3.56, 0.37), (-1.72, -2.95, 0.30), 32, 5.6)]),
+    ("s04_skim", 98, 132, [(0, (-0.3, -2.0, -0.04), (3.4, -1.6, -0.12), 26, None), (1, (-2.77, -3.52, 0.56), (-1.72, -2.95, 0.26), 45, 2.8)]),
+    ("s05_stopa_nuts", 132, 172, [(0, (-2.77, -3.52, 0.56), (-1.72, -2.95, 0.28), 45, 2.8), (1, (-2.73, -3.76, 0.55), (-1.72, -2.95, 0.28), 45, 2.8)]),
+    ("s06_post_falls", 172, 206, [(0, (-2.73, -3.76, 0.55), (-1.72, -2.95, 0.30), 45, 2.8), (1, (-2.77, -3.86, 0.54), (-1.72, -2.95, 0.42), 40, 2.8)]),
     ("s07_macro", 206, 244, [(0, (-1.36, -2.60, 0.10), (-1.70, -2.95, 0.10), 40, 2.8), (1, (-1.30, -2.67, 0.14), (-1.70, -2.95, 0.12), 40, 2.8)]),
     ("s08_wide_low", 244, 258, [(0, (-0.9, -4.9, 0.25), (0.4, 0.0, 1.4), 22, None), (1, (-0.7, -4.7, 0.35), (0.4, 0.0, 1.6), 22, None)]),
     ("s09_up_post", 258, 288, [(0, (-1.46, -2.68, 1.85), (-1.70, -2.95, 3.10), 18, None), (1, (-1.48, -2.71, 1.95), (-1.70, -2.95, 3.10), 18, None)]),
@@ -130,14 +131,14 @@ def setup_world():
     sh = N.new("ShaderNodeValToRGB"); sh.color_ramp.elements[0].position = 0.48; sh.color_ramp.elements[1].position = 0.70
     sh.color_ramp.elements[0].color = (1.0, 1.0, 1.0, 1); sh.color_ramp.elements[1].color = (0.52, 0.57, 0.66, 1)
     L(n2.outputs["Fac"], sh.inputs[0])
-    hz = node(nt, "ShaderNodeMapRange"); hz.inputs["From Min"].default_value = 0.0; hz.inputs["From Max"].default_value = 0.16
+    hz = node(nt, "ShaderNodeMapRange"); hz.inputs["From Min"].default_value = 0.0; hz.inputs["From Max"].default_value = 0.05
     L(sep.outputs["Z"], hz.inputs["Value"])
     mm = N.new("ShaderNodeMath"); mm.operation = "MULTIPLY"; L(cov.outputs["Color"], mm.inputs[0]); L(hz.outputs["Result"], mm.inputs[1])
     mix = N.new("ShaderNodeMix"); mix.data_type = "RGBA"
     L(mm.outputs[0], mix.inputs[0]); L(ramp.outputs["Color"], mix.inputs[6]); L(sh.outputs["Color"], mix.inputs[7])
-    L(mix.outputs[2], bg.inputs["Color"]); bg.inputs["Strength"].default_value = 1.0
+    L(mix.outputs[2], bg.inputs["Color"]); bg.inputs["Strength"].default_value = 0.8
     L(bg.outputs[0], out.inputs[0])
-    sd = bpy.data.lights.new("sun", "SUN"); sd.energy = 5.5; sd.angle = math.radians(1.5); sd.color = (1.0, 0.95, 0.86)
+    sd = bpy.data.lights.new("sun", "SUN"); sd.energy = 7.0; sd.angle = math.radians(2.0); sd.color = (1.0, 0.95, 0.86)
     so = bpy.data.objects.new("sun", sd); so.rotation_euler = (math.radians(48), 0, math.radians(-30))
     sc.collection.objects.link(so)
 
@@ -165,8 +166,8 @@ def mat_pavers():
     nt = m.node_tree; N = nt.nodes; L = nt.links.new; b = N["Principled BSDF"]
     tc = N.new("ShaderNodeTexCoord")
     br = node(nt, "ShaderNodeTexBrick", Scale=1.0, **{"Mortar Size": 0.006, "Mortar Smooth": 0.5, "Bias": 0.0,
-                                                      "Brick Width": 0.30, "Row Height": 0.30})
-    br.inputs["Color1"].default_value = (0.25, 0.20, 0.16, 1); br.inputs["Color2"].default_value = (0.42, 0.35, 0.29, 1)
+                                                      "Brick Width": 0.40, "Row Height": 0.40})
+    br.inputs["Color1"].default_value = (0.13, 0.105, 0.09, 1); br.inputs["Color2"].default_value = (0.24, 0.20, 0.17, 1)
     br.inputs["Mortar"].default_value = (0.10, 0.085, 0.07, 1); br.offset = 0.5
     L(tc.outputs["Object"], br.inputs["Vector"])
     nz = node(nt, "ShaderNodeTexNoise", Scale=40.0, Detail=10.0); L(tc.outputs["Object"], nz.inputs["Vector"])
@@ -191,8 +192,8 @@ def mat_footing():
     tc = N.new("ShaderNodeTexCoord")
     vo = node(nt, "ShaderNodeTexVoronoi", Scale=260.0); L(tc.outputs["Object"], vo.inputs["Vector"])
     rp = N.new("ShaderNodeValToRGB"); E = rp.color_ramp.elements
-    E[0].position = 0.0; E[0].color = (0.14, 0.11, 0.09, 1); E[1].position = 1.0; E[1].color = (0.58, 0.52, 0.46, 1)
-    for p, c in ((0.3, (0.36, 0.27, 0.21, 1)), (0.55, (0.44, 0.40, 0.36, 1)), (0.8, (0.27, 0.24, 0.22, 1))):
+    E[0].position = 0.0; E[0].color = (0.06, 0.045, 0.035, 1); E[1].position = 1.0; E[1].color = (0.42, 0.34, 0.27, 1)
+    for p, c in ((0.3, (0.24, 0.16, 0.11, 1)), (0.55, (0.30, 0.26, 0.22, 1)), (0.8, (0.16, 0.13, 0.11, 1))):
         x = rp.color_ramp.elements.new(p); x.color = c
     rp.color_ramp.interpolation = "CONSTANT"
     L(vo.outputs["Color"], rp.inputs[0]); L(rp.outputs["Color"], b.inputs["Base Color"])
@@ -205,11 +206,12 @@ def mat_steel():
     """RAL 9005 powder coat, satin with a clear-ish sheen that picks up the sky like the reference."""
     m = bpy.data.materials["RIVON_black_powder_coat"]; nt = m.node_tree; N = nt.nodes; L = nt.links.new
     b = N["Principled BSDF"]; bump = [n for n in N if n.type == "BUMP"][0]
-    b.inputs["Base Color"].default_value = (0.004, 0.004, 0.005, 1)
+    b.inputs["Base Color"].default_value = (0.018, 0.018, 0.02, 1)
+    b.inputs["Metallic"].default_value = 0.55
     for n in N:
         if n.type == "MAP_RANGE":
-            n.inputs["To Min"].default_value = 0.26; n.inputs["To Max"].default_value = 0.36
-    b.inputs["Coat Weight"].default_value = 0.6; b.inputs["Coat Roughness"].default_value = 0.12
+            n.inputs["To Min"].default_value = 0.20; n.inputs["To Max"].default_value = 0.30
+    b.inputs["Coat Weight"].default_value = 1.0; b.inputs["Coat Roughness"].default_value = 0.06
     bv = N.new("ShaderNodeBevel"); bv.inputs["Radius"].default_value = 0.0015; bv.samples = 8
     L(bv.outputs["Normal"], bump.inputs["Normal"])
 
@@ -554,6 +556,11 @@ def _pose_all(S, f):
     a, b = [(x[1], x[2]) for x in SHOTS if x[0] == name][0]
     pose_items(S["items"], f); roof_state(S["roofs"], f)
     place_camera(S["cam"], keys, u, name, (b - a) / FPS, f / FPS)
+    l0, t0 = Vector(keys[0][1]), Vector(keys[0][2])
+    fw = (t0 - l0); fw.z = 0; fw = fw.normalized() if fw.length > 1e-6 else Vector((0, 1, 0))
+    src = Quaternion((0, 0, 1), math.radians(SUN_AZ)) @ fw        # where the sun is, relative to the view direction
+    d = -src; az = math.atan2(-d.x, d.y)
+    bpy.data.objects["sun"].rotation_euler = (math.radians(90 - SUN_EL), 0, az)
     return name
 
 
@@ -597,7 +604,7 @@ def build(w, h, spp):
     sc.cycles.samples = spp; sc.cycles.use_denoising = True
     sc.cycles.max_bounces = 8; sc.cycles.transmission_bounces = 8
     sc.render.resolution_x, sc.render.resolution_y = w, h; sc.render.fps = FPS
-    sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - Punchy"; sc.view_settings.exposure = 0.45
+    sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - Punchy"; sc.view_settings.exposure = 0.25
     sc.render.image_settings.file_format = "PNG"
     bpy.context.preferences.edit.keyframe_new_interpolation_type = "LINEAR"
     sc.render.use_motion_blur = MBLUR; sc.render.motion_blur_shutter = 0.5
