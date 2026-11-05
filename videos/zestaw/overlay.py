@@ -62,6 +62,8 @@ def _film(base, f):
     a = np.asarray(base.convert("RGB")).astype(np.float32) / 255.0
     h, w = a.shape[:2]
     yy, xx = np.mgrid[0:h, 0:w]; r = np.hypot((xx - w / 2) / (w / 2), (yy - h / 2) / (h / 2))
+    lum = (a @ np.array([0.2126, 0.7152, 0.0722], np.float32))[..., None]
+    a = np.clip(lum + (a - lum) * 1.18, 0, 1)                 # +18 % saturation
     a *= (1 - 0.16 * np.clip(r - 0.35, 0, None) ** 1.6)[..., None]
     g = np.random.default_rng(f).normal(0, 0.012, (h, w, 1)).astype(np.float32)
     a = np.clip(a + g, 0, 1)
