@@ -6,8 +6,8 @@ from PIL import Image, ImageFilter
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 import overlay as O
 
-CUTS = [66, 90, 98, 132, 244, 258, 288, 326, 348, 394, 432, 560, 618, 642, 680, 746, 810, 845]
-NF, END0, END_SRC = 1125, 1005, 990
+CUTS = []                      # clean cuts (no whip blur)
+NF, END0, END_SRC = 1070, 950, 949
 
 
 def whip(im, k):
@@ -27,8 +27,6 @@ def frame(src, f):
     if f >= END0:
         im = im.filter(ImageFilter.GaussianBlur(radius=im.width * 0.012 * min(1, (f - END0) / 10)))
     k = max([max(0.0, 1 - abs(f - c + 0.5) / 3.0) for c in CUTS] + [0.0])
-    if f >= END0 - 3 and f < END0 + 3:
-        k = max(k, 1 - abs(f - END0 + 0.5) / 3.0)
     im = whip(im, k)
     return O.overlay(im, f)
 

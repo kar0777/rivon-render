@@ -16,8 +16,8 @@ import bpy, mathutils
 from mathutils import Matrix, Vector, Quaternion
 import film_lib as FL
 
-FPS, NF = 30, 1125
-END_SRC = 990                       # end card (f >= 1005) re-uses this render, dimmed + blurred in post
+FPS, NF = 30, 1070
+END0, END_SRC = 950, 949            # end card (f >= END0) re-uses frame END_SRC, dimmed + blurred in post
 LIFT, JOIN = 0.25, 0.8
 MBLUR = True
 SUN_AZ, SUN_EL = 40.0, 30.0
@@ -35,62 +35,50 @@ def e_out(u): u = clamp01(u); return 1 - (1 - u) ** 3
 
 # ------------------------------------------------------------------------------------------------ shots (camera keys)
 # name, f0, f1, [(u, loc, target, lens, fstop|None)]   u in 0..1 inside the shot
+# Polished cut (v6): 14 long, smooth shots, every shot has action.  (name, new f0, f1, animation-clock old0, old1, camera keys, orbit deg)
+# The assembly clock ("old" frames, the schedule below) is re-timed per shot, so nothing idles on screen and nothing rushes.
 SHOTS = [
-    ("s01_kit_drop", 0, 66, [(0, (6.6, -5.6, 4.6), (3.7, -0.9, -0.25), 30, None), (1, (5.6, -4.6, 2.6), (3.7, -1.2, -0.25), 30, None)]),
-    ("s03_bases_low", 66, 90, [(0, (3.62, -3.95, -0.16), (3.10, -2.85, -0.17), 30, 2.8), (1, (3.50, -4.15, -0.14), (3.10, -2.65, -0.17), 28, 2.8)]),
-    ("s03b_kit_wide", 90, 98, [(0, (2.0, -5.6, 1.2), (3.6, -1.8, -0.2), 26, None), (1, (1.8, -5.2, 0.9), (3.4, -1.8, -0.2), 26, None)]),
-    ("s04_skim", 98, 132, [(0, (-0.3, -2.0, -0.04), (3.4, -1.6, -0.12), 26, None), (1, (-2.77, -3.52, 0.56), (-1.72, -2.95, 0.16), 70, 2.8)]),
-    ("s05_stopa_nuts", 132, 172, [(0, (-2.77, -3.52, 0.56), (-1.72, -2.95, 0.18), 70, 2.8), (1, (-2.73, -3.76, 0.55), (-1.72, -2.95, 0.18), 70, 2.8)]),
-    ("s06_post_falls", 172, 206, [(0, (-2.73, -3.76, 0.55), (-1.72, -2.95, 0.22), 70, 2.8), (1, (-2.77, -3.86, 0.54), (-1.72, -2.95, 0.36), 58, 2.8)]),
-    ("s07_macro", 206, 244, [(0, (-2.04, -3.30, 0.10), (-1.70, -2.95, 0.10), 40, 2.8), (1, (-2.10, -3.23, 0.14), (-1.70, -2.95, 0.12), 40, 2.8)]),
-    ("s08_wide_low", 244, 258, [(0, (-0.9, -4.9, 0.25), (0.4, 0.0, 1.4), 22, None), (1, (-0.7, -4.7, 0.35), (0.4, 0.0, 1.6), 22, None)]),
-    ("s09_up_post", 258, 288, [(0, (-1.46, -2.68, 1.85), (-1.70, -2.95, 3.10), 18, None), (1, (-1.48, -2.71, 1.95), (-1.70, -2.95, 3.10), 18, None)]),
-    ("s10_corner_orbit", 288, 326, [(0, (-1.20, -3.80, 2.98), (-1.70, -2.95, 2.45), 24, None), (1, (-0.98, -3.78, 2.95), (-1.70, -2.95, 2.45), 24, None)]),
-    ("s11_macro_arm", 326, 348, [(0, (-1.12, -3.22, 2.86), (-1.62, -2.95, 2.78), 35, 2.0), (1, (-1.10, -3.16, 2.89), (-1.62, -2.95, 2.78), 35, 2.0)]),
-    ("s12_beam_in", 348, 394, [(0, (-0.85, -3.95, 2.98), (-1.65, -2.95, 2.50), 24, None), (1, (-0.95, -4.00, 3.02), (-1.65, -2.95, 2.50), 24, None)]),
-    ("s13_corner_close", 394, 432, [(0, (-1.10, -3.62, 2.30), (-1.70, -2.95, 2.75), 30, 3.5), (1, (-1.16, -3.56, 2.42), (-1.70, -2.95, 2.62), 30, 3.5)]),
-    ("s15_top_mocow", 432, 560, [(0, (-0.35, -2.75, 4.75), (-1.62, -0.6, 2.55), 30, None), (1, (0.05, -2.35, 4.85), (-1.62, 0.3, 2.55), 30, None)]),
-    ("s16_up_inside", 560, 618, [(0, (0.6, -2.1, 0.35), (-0.7, 0.8, 2.9), 18, None), (1, (0.45, -1.6, 0.50), (-0.7, 1.2, 2.9), 18, None)]),
-    ("s17_hanger_close", 618, 642, [(0, (-0.95, -3.15, 3.25), (-1.65, -2.42, 2.56), 30, 4.0), (1, (-0.98, -3.05, 3.22), (-1.65, -2.40, 2.56), 30, 4.0)]),
-    ("s18_first_rafter", 642, 680, [(0, (-0.45, -4.45, 3.55), (-0.70, -2.30, 2.60), 24, None), (1, (-0.25, -4.25, 3.45), (-0.70, -2.10, 2.60), 24, None)]),
-    ("s19_rafters", 680, 746, [(0, (-2.10, -3.55, 2.98), (-0.6, -0.5, 2.45), 24, None), (1, (-1.98, -3.30, 2.95), (-0.6, -0.2, 2.45), 24, None)]),
-    ("s20_roll", 746, 810, [(0, (-2.80, -2.75, 3.12), (-1.2, -2.45, 2.72), 24, None), (1, (-2.75, -2.45, 3.10), (-1.2, -2.05, 2.72), 24, None)]),
-    ("s22_high_corner", 810, 845, [(0, (-3.3, -5.1, 4.7), (0.0, -0.6, 1.5), 22, None), (1, (-3.6, -5.6, 5.0), (0.0, -0.4, 1.4), 22, None)]),
-    ("s23_variants", 845, 1005, [(0, (5.6, -7.4, 5.6), (0.0, 0.0, 1.2), 30, None), (1, (5.0, -6.9, 5.1), (0.0, 0.0, 1.2), 30, None)]),
-    ("s24_end", 1005, 1125, [(0, (5.0, -6.9, 5.1), (0.0, 0.0, 1.2), 30, None), (1, (5.0, -6.9, 5.1), (0.0, 0.0, 1.2), 30, None)]),
+    ("kit", 0, 75, 0, 66, [(0, (6.9, -5.9, 4.9), (3.7, -0.9, -0.25), 30, None), (1, (5.7, -4.7, 3.0), (3.7, -1.2, -0.25), 30, None)], 6),
+    ("bases_low", 75, 125, 66, 118, [(0, (3.70, -3.90, -0.15), (3.10, -2.85, -0.17), 30, 2.8), (1, (3.45, -4.20, -0.13), (3.10, -2.55, -0.17), 30, 2.8)], 0),
+    ("footing", 125, 215, 118, 212, [(0, (-2.82, -3.46, 0.54), (-1.72, -2.95, 0.15), 70, 2.8), (1, (-2.70, -3.84, 0.56), (-1.72, -2.95, 0.30), 58, 2.8)], 4),
+    ("macro", 215, 265, 212, 244, [(0, (-2.02, -3.32, 0.10), (-1.70, -2.95, 0.10), 40, 2.8), (1, (-2.12, -3.22, 0.15), (-1.70, -2.95, 0.12), 40, 2.8)], 10),
+    ("up_post", 265, 300, 244, 288, [(0, (-1.46, -2.68, 1.85), (-1.70, -2.95, 3.10), 18, None), (1, (-1.48, -2.71, 1.98), (-1.70, -2.95, 3.10), 18, None)], 14),
+    ("corner", 300, 360, 288, 352, [(0, (-1.25, -3.82, 3.00), (-1.70, -2.95, 2.50), 24, None), (1, (-0.98, -3.80, 2.96), (-1.70, -2.95, 2.50), 24, None)], 6),
+    ("beam_in", 360, 395, 352, 386, [(0, (-0.85, -3.95, 2.98), (-1.65, -2.95, 2.50), 24, None), (1, (-0.98, -4.02, 3.04), (-1.65, -2.95, 2.50), 24, None)], 0),
+    ("lower", 395, 440, 394, 432, [(0, (-1.10, -3.62, 2.30), (-1.70, -2.95, 2.75), 30, 3.5), (1, (-1.18, -3.54, 2.44), (-1.70, -2.95, 2.62), 30, 3.5)], 6),
+    ("mocow_top", 440, 560, 432, 560, [(0, (-0.35, -2.75, 4.75), (-1.62, -0.6, 2.55), 30, None), (1, (0.05, -2.35, 4.85), (-1.62, 0.3, 2.55), 30, None)], 0),
+    ("rafter_first", 560, 640, 618, 680, [(0, (-0.45, -4.45, 3.55), (-0.70, -2.30, 2.60), 24, None), (1, (-0.20, -4.20, 3.45), (-0.70, -2.10, 2.60), 24, None)], 4),
+    ("rafters", 640, 700, 680, 746, [(0, (-2.10, -3.55, 2.98), (-0.6, -0.5, 2.45), 24, None), (1, (-1.95, -3.28, 2.95), (-0.6, -0.2, 2.45), 24, None)], 0),
+    ("roll", 700, 780, 746, 810, [(0, (-2.80, -2.75, 3.12), (-1.2, -2.45, 2.72), 24, None), (1, (-2.74, -2.40, 3.10), (-1.2, -2.00, 2.72), 24, None)], 0),
+    ("variants", 780, 950, 845, 1005, [(0, (5.6, -7.4, 5.6), (0.0, 0.0, 1.2), 30, None), (1, (5.6, -7.4, 5.6), (0.0, 0.0, 1.2), 30, None)], 16),
+    ("end", 950, 1070, 1005, 1005, [(0, (5.6, -7.4, 5.6), (0.0, 0.0, 1.2), 30, None), (1, (5.6, -7.4, 5.6), (0.0, 0.0, 1.2), 30, None)], 0),
 ]
 ROOF_TL = [(745, 845, "poly_roll"), (845, 880, "poly"), (880, 915, "blacha"), (915, 950, "lamele"), (950, 1125, "plotno")]
 
 
 def shot_of(f):
-    for n, a, b, keys in SHOTS:
-        if a <= f < b:
-            return n, (f - a) / (b - a), keys
-    n, a, b, keys = SHOTS[-1]; return n, 1.0, keys
+    for sh in SHOTS:
+        if sh[1] <= f < sh[2]:
+            return sh, (f - sh[1]) / (sh[2] - sh[1])
+    return SHOTS[-1], 1.0
 
 
-DRIFT = {"s04_skim": None, "s03b_kit_wide": 0.25, "s23_variants": 0.05, "s15_top_mocow": 0.08, "s24_end": 0.0, "s01_kit_drop": 0.14}
+def clock(f):
+    """new film frame -> assembly clock (old frame), linear inside each shot"""
+    sh, u = shot_of(f)
+    return sh[3] + (sh[4] - sh[3]) * u
 
 
-def place_camera(cam, keys, u, name="", dur=1.0, ft=0.0):
-    """Reference-like operator move: constant drift (~0.12 of the subject distance per second) that starts briskly
-    after the cut and settles, plus low-frequency handheld sway and a slight roll."""
-    k = 0.45 * u + 0.55 * e_out(u)
+def place_camera(cam, sh, u):
+    """One calm, continuous operator move per shot: gentle ease, slow orbit around the subject, level horizon, no shake."""
+    keys, orbit = sh[5], sh[6]
+    k = 0.5 * u + 0.5 * e_io(u)
     (_, l0, t0, z0, s0), (_, l1, t1, z1, s1) = keys[0], keys[-1]
-    l0, l1, t0, t1 = Vector(l0), Vector(l1), Vector(t0), Vector(t1)
-    rel = DRIFT.get(name, 0.12)
-    if rel is not None and (l1 - l0).length > 1e-6:
-        want = rel * (t0 - l0).length * dur
-        l1 = l0 + (l1 - l0).normalized() * want
-    loc = l0.lerp(l1, k); tgt = t0.lerp(t1, k)
-    d = (tgt - loc).length
-    h = sum(ord(c) for c in name) * 0.37
-    sw = lambda fr, ph: math.sin(2 * math.pi * fr * ft + ph + h)
-    shake = 0.0 if name == "s24_end" else 1.0
-    loc = loc + Vector((sw(0.31, 0.0) + 0.5 * sw(0.77, 1.3), sw(0.43, 2.1) + 0.5 * sw(0.91, 0.4), 0.6 * sw(0.37, 4.2))) * 0.0045 * d * shake
+    loc = Vector(l0).lerp(Vector(l1), k); tgt = Vector(t0).lerp(Vector(t1), k)
+    if orbit:
+        a = math.radians(orbit) * (k - 0.5); r = loc - tgt
+        r = Matrix.Rotation(a, 3, "Z") @ r; loc = tgt + r
     q = (tgt - loc).to_track_quat("-Z", "Y")
-    roll = math.radians(1.2 * math.sin(h) + 0.35 * sw(0.27, 0.9)) * shake
-    q = q @ Quaternion((0, 0, 1), roll)
     cam.location = loc; cam.rotation_euler = q.to_euler(); cam.rotation_quaternion = q
     cam.data.lens = z0 + (z1 - z0) * k
     cam.data.dof.use_dof = s0 is not None
@@ -429,9 +417,9 @@ def schedule(items):
     for k, t in ((2, 175), (3, 185), (4, 195)):
         go(f"STOPA_C{k}", t - 30, t - 8, t, (0, 0, -1), 0.4)
     # post C1 tumbles in from the sky (s06), others during s07
-    go("POST_C1", 158, 200, 212, (0, 0, -1), 0.75, tumble=2.6, arc=5.0)
+    go("POST_C1", 158, 200, 212, (0, 0, -1), 0.75, tumble=1.0, arc=4.0)
     for k, t in ((2, 228), (3, 236), (4, 244)):
-        go(f"POST_C{k}", t - 40, t - 10, t, (0, 0, -1), 0.7, tumble=1.5, arc=4.0)
+        go(f"POST_C{k}", t - 40, t - 10, t, (0, 0, -1), 0.7, tumble=0.8, arc=3.5)
     F = ("lift",); RG = ("lift", "join")
     go("BEAM_LONG_L", 232, 256, 256, (0, 0, 0), 0.0, F, arc=3.0)
     go("TROJAK_C1", 250, 272, 286, (0, 1, 0), 0.5, F, arc=3.0)        # s09: seen from below sliding onto the beam end
@@ -552,16 +540,15 @@ def pose_items(items, f):
 
 # ------------------------------------------------------------------------------------------------ frame
 def _pose_all(S, f):
-    name, u, keys = shot_of(f)
-    a, b = [(x[1], x[2]) for x in SHOTS if x[0] == name][0]
-    pose_items(S["items"], f); roof_state(S["roofs"], f)
-    place_camera(S["cam"], keys, u, name, (b - a) / FPS, f / FPS)
-    l0, t0 = Vector(keys[0][1]), Vector(keys[0][2])
+    sh, u = shot_of(f); fa = clock(f)
+    pose_items(S["items"], fa); roof_state(S["roofs"], fa)
+    place_camera(S["cam"], sh, u)
+    l0, t0 = Vector(sh[5][0][1]), Vector(sh[5][0][2])
     fw = (t0 - l0); fw.z = 0; fw = fw.normalized() if fw.length > 1e-6 else Vector((0, 1, 0))
-    src = Quaternion((0, 0, 1), math.radians(SUN_AZ)) @ fw        # where the sun is, relative to the view direction
+    src = Quaternion((0, 0, 1), math.radians(SUN_AZ)) @ fw
     d = -src; az = math.atan2(-d.x, d.y)
     bpy.data.objects["sun"].rotation_euler = (math.radians(90 - SUN_EL), 0, az)
-    return name
+    return sh[0]
 
 
 def _movers(S):
@@ -570,8 +557,8 @@ def _movers(S):
 
 
 def apply_frame(S, f):
-    fs = END_SRC if f >= 1005 else f
-    name = shot_of(fs)[0]
+    fs = END_SRC if f >= END0 else f
+    name = shot_of(fs)[0][0]
     obs = _movers(S)
     for o in obs:
         o.animation_data_clear(); o.rotation_mode = "QUATERNION"
@@ -579,7 +566,7 @@ def apply_frame(S, f):
     if MBLUR:
         prev = {}
         for t in (fs - 1, fs, fs + 1):
-            if shot_of(t)[0] != name:           # never blur across a cut
+            if shot_of(t)[0][0] != name:        # never blur across a cut
                 continue
             _pose_all(S, t); bpy.context.view_layer.update()
             for o in obs:
@@ -637,7 +624,7 @@ if __name__ == "__main__":
     Path(a.out).mkdir(parents=True, exist_ok=True)
     for f in [int(x) for x in a.frames.split(",")]:
         p = Path(a.out) / f"f{f:04d}.png"
-        if p.exists() or (f >= 1005 and f != END_SRC):
+        if p.exists() or f >= END0:
             continue
         n = apply_frame(S, f)
         bpy.context.scene.render.filepath = str(p)

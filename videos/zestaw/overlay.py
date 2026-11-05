@@ -23,7 +23,7 @@ CAPS = [
     (894, 958, "Dowolne pokrycie dachu", "Lamele drewniane"),
 ]
 HOOK = (0, 60, ("Pergola z drewna?", "Złóż ją na łącznikach RIVON"))
-END0 = 1005
+END0 = 950
 
 
 def font(name, px):
@@ -65,7 +65,7 @@ def _film(base, f):
     lum = (a @ np.array([0.2126, 0.7152, 0.0722], np.float32))[..., None]
     a = np.clip(lum + (a - lum) * 1.18, 0, 1)                 # +18 % saturation
     a *= (1 - 0.16 * np.clip(r - 0.35, 0, None) ** 1.6)[..., None]
-    g = np.random.default_rng(f).normal(0, 0.012, (h, w, 1)).astype(np.float32)
+    g = np.random.default_rng(f).normal(0, 0.006, (h, w, 1)).astype(np.float32)
     a = np.clip(a + g, 0, 1)
     return Image.fromarray((a * 255 + 0.5).astype(np.uint8)).convert("RGBA")
 
