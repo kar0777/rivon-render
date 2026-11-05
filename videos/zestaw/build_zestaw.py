@@ -19,6 +19,7 @@ import film_lib as FL
 FPS, NF = 30, 1125
 END_SRC = 990                       # end card (f >= 1005) re-uses this render, dimmed + blurred in post
 LIFT, JOIN = 0.25, 0.8
+MBLUR = True
 ROOF_Z = 2.598
 ROOF_X, ROOF_Y = 1.86, 3.16
 PAD_TOP, FLOOR_Z = -0.10, -0.25
@@ -37,9 +38,9 @@ SHOTS = [
     ("s01_kit_drop", 0, 66, [(0, (6.6, -5.6, 4.6), (3.7, -0.9, -0.25), 30, None), (1, (5.6, -4.6, 2.6), (3.7, -1.2, -0.25), 30, None)]),
     ("s03_bases_low", 66, 90, [(0, (3.62, -3.95, -0.16), (3.10, -2.85, -0.17), 30, 2.8), (1, (3.50, -4.15, -0.14), (3.10, -2.65, -0.17), 28, 2.8)]),
     ("s03b_kit_wide", 90, 98, [(0, (2.0, -5.6, 1.2), (3.6, -1.8, -0.2), 26, None), (1, (1.8, -5.2, 0.9), (3.4, -1.8, -0.2), 26, None)]),
-    ("s04_skim", 98, 132, [(0, (0.9, 0.2, -0.02), (-1.70, -2.95, -0.05), 26, None), (1, (-1.12, -2.28, 0.34), (-1.70, -2.95, 0.02), 30, 5.6)]),
-    ("s05_stopa_nuts", 132, 172, [(0, (-1.10, -2.24, 0.36), (-1.70, -2.95, 0.06), 34, 4.0), (1, (-1.02, -2.40, 0.33), (-1.70, -2.95, 0.07), 34, 4.0)]),
-    ("s06_post_falls", 172, 206, [(0, (-1.02, -2.40, 0.33), (-1.70, -2.95, 0.12), 34, 4.0), (1, (-1.00, -2.46, 0.30), (-1.70, -2.95, 0.30), 32, 4.0)]),
+    ("s04_skim", 98, 132, [(0, (-0.3, -2.0, -0.04), (3.4, -1.6, -0.12), 26, None), (1, (-2.27, -3.10, 0.30), (-1.70, -2.95, 0.08), 30, 5.6)]),
+    ("s05_stopa_nuts", 132, 172, [(0, (-2.27, -3.10, 0.30), (-1.70, -2.95, 0.09), 30, 4.0), (1, (-2.22, -3.26, 0.29), (-1.70, -2.95, 0.09), 30, 4.0)]),
+    ("s06_post_falls", 172, 206, [(0, (-2.22, -3.26, 0.29), (-1.70, -2.95, 0.14), 30, 4.0), (1, (-2.24, -3.34, 0.28), (-1.70, -2.95, 0.32), 28, 4.0)]),
     ("s07_macro", 206, 244, [(0, (-1.36, -2.60, 0.10), (-1.70, -2.95, 0.10), 40, 2.8), (1, (-1.30, -2.67, 0.14), (-1.70, -2.95, 0.12), 40, 2.8)]),
     ("s08_wide_low", 244, 258, [(0, (-0.9, -4.9, 0.25), (0.4, 0.0, 1.4), 22, None), (1, (-0.7, -4.7, 0.35), (0.4, 0.0, 1.6), 22, None)]),
     ("s09_up_post", 258, 288, [(0, (-1.46, -2.68, 1.85), (-1.70, -2.95, 3.10), 18, None), (1, (-1.48, -2.71, 1.95), (-1.70, -2.95, 3.10), 18, None)]),
@@ -67,11 +68,29 @@ def shot_of(f):
     n, a, b, keys = SHOTS[-1]; return n, 1.0, keys
 
 
-def place_camera(cam, keys, u):
-    k = e_io(u) * 0.7 + u * 0.3
+DRIFT = {"s04_skim": None, "s03b_kit_wide": 0.25, "s23_variants": 0.05, "s15_top_mocow": 0.08, "s24_end": 0.0, "s01_kit_drop": 0.14}
+
+
+def place_camera(cam, keys, u, name="", dur=1.0, ft=0.0):
+    """Reference-like operator move: constant drift (~0.12 of the subject distance per second) that starts briskly
+    after the cut and settles, plus low-frequency handheld sway and a slight roll."""
+    k = 0.45 * u + 0.55 * e_out(u)
     (_, l0, t0, z0, s0), (_, l1, t1, z1, s1) = keys[0], keys[-1]
-    loc = Vector(l0).lerp(Vector(l1), k); tgt = Vector(t0).lerp(Vector(t1), k)
-    cam.location = loc; cam.rotation_euler = (tgt - loc).to_track_quat("-Z", "Y").to_euler()
+    l0, l1, t0, t1 = Vector(l0), Vector(l1), Vector(t0), Vector(t1)
+    rel = DRIFT.get(name, 0.12)
+    if rel is not None and (l1 - l0).length > 1e-6:
+        want = rel * (t0 - l0).length * dur
+        l1 = l0 + (l1 - l0).normalized() * want
+    loc = l0.lerp(l1, k); tgt = t0.lerp(t1, k)
+    d = (tgt - loc).length
+    h = sum(ord(c) for c in name) * 0.37
+    sw = lambda fr, ph: math.sin(2 * math.pi * fr * ft + ph + h)
+    shake = 0.0 if name == "s24_end" else 1.0
+    loc = loc + Vector((sw(0.31, 0.0) + 0.5 * sw(0.77, 1.3), sw(0.43, 2.1) + 0.5 * sw(0.91, 0.4), 0.6 * sw(0.37, 4.2))) * 0.0045 * d * shake
+    q = (tgt - loc).to_track_quat("-Z", "Y")
+    roll = math.radians(1.2 * math.sin(h) + 0.35 * sw(0.27, 0.9)) * shake
+    q = q @ Quaternion((0, 0, 1), roll)
+    cam.location = loc; cam.rotation_euler = q.to_euler(); cam.rotation_quaternion = q
     cam.data.lens = z0 + (z1 - z0) * k
     cam.data.dof.use_dof = s0 is not None
     if s0:
@@ -238,10 +257,10 @@ def build_anchors(items, L, zinc):
     """Threaded studs embedded in each footing through the real O10 anchor holes of the Stopa plate; washer + nut each."""
     coll = FL.collection("ANCHORS")
     import bmesh
-    bm = bmesh.new(); bmesh.ops.create_cone(bm, cap_ends=True, segments=16, radius1=0.004, radius2=0.004, depth=0.045)
+    bm = bmesh.new(); bmesh.ops.create_cone(bm, cap_ends=True, segments=16, radius1=0.004, radius2=0.004, depth=0.040)
     sme = bpy.data.meshes.new("STUD"); bm.to_mesh(sme); bm.free(); sme.materials.append(zinc)
     for p in sme.polygons: p.use_smooth = True
-    bm = bmesh.new(); bmesh.ops.create_cone(bm, cap_ends=True, segments=24, radius1=0.008, radius2=0.008, depth=0.0016)
+    bm = bmesh.new(); bmesh.ops.create_cone(bm, cap_ends=True, segments=24, radius1=0.0115, radius2=0.0115, depth=0.002)
     wme = bpy.data.meshes.new("WASHER"); bm.to_mesh(wme); bm.free(); wme.materials.append(zinc)
     nme = hex_prism("NUT", 0.0065, 0.0065, zinc)
     for i, fz in enumerate(L["fasteners"]):
@@ -250,11 +269,11 @@ def build_anchors(items, L, zinc):
         sc = bpy.data.objects[f"SCREW_{i:03d}"]; sc.hide_render = sc.hide_viewport = True
         items.pop(f"SCREW_{i:03d}", None)
         x, y, _ = np.array(fz["pos_mm"]) * 0.001
-        st = bpy.data.objects.new(f"STUD_{i:03d}", sme); st.location = (x, y, 0.0275 - 0.045 / 2 + 0.0)  # top at +27.5 mm
+        st = bpy.data.objects.new(f"STUD_{i:03d}", sme); st.location = (x, y, 0.0)  # top at +20 mm (washer + nut + a few threads)
         coll.objects.link(st)
-        for kind, me, z in (("WASH", wme, 0.0028), ("NUT", nme, 0.0036)):
+        for kind, me, z in (("WASH", wme, 0.003), ("NUT", nme, 0.004)):
             ob = bpy.data.objects.new(f"{kind}_{i:03d}", me); ob.location = (x, y, z); coll.objects.link(ob)
-            it = Item(ob, [ob], ob.matrix_world.copy()); it.part = fz["part"]; it.spin = kind == "NUT"; it.anchor = kind
+            it = Item(ob, [ob], Matrix.Translation((x, y, z))); it.part = fz["part"]; it.spin = kind == "NUT"; it.anchor = kind
             items[f"{kind}_{i:03d}"] = it
 
 
@@ -330,6 +349,7 @@ def roof_state(R, f):
         rm = R["roll_rmax"]; r = rm * math.sqrt(max(0.15, 1 - q))
         R["roll"].scale = (1, r / rm, r / rm); R["roll"].location = (0, -ROOF_Y + s, ROOF_Z + r)
         R["roll"].rotation_euler = (s / max(r, 0.03), 0, 0)
+        R["roll"].rotation_quaternion = R["roll"].rotation_euler.to_quaternion()
         _show([R["roll"]], q < 0.995)
     elif kind == "poly":
         R["poly"].location = (0, -ROOF_Y, ROOF_Z); R["poly"].scale = (1, 2 * ROOF_Y, 1)
@@ -403,7 +423,7 @@ def schedule(items):
         it = items[pid]; it.leave, it.arrive, it.seat = leave, arrive, seat
         it.dir = Vector(d); it.L = Ln; it.groups = groups; it.tumble = tumble; it.arc = arc
     # Stopa C1 seen falling onto the studs (s05); others seated off camera
-    go("STOPA_C1", 118, 140, 150, (0, 0, -1), 0.45, arc=2.0)
+    go("STOPA_C1", 124, 135, 140, (0, 0, -1), 0.14, arc=0.5)
     for k, t in ((2, 175), (3, 185), (4, 195)):
         go(f"STOPA_C{k}", t - 30, t - 8, t, (0, 0, -1), 0.4)
     # post C1 tumbles in from the sky (s06), others during s07
@@ -450,10 +470,16 @@ def schedule(items):
     for k, it in items.items():
         if getattr(it, "anchor", None):
             c1 = it.part == "STOPA_C1"; idx = int(k.split("_")[1]) % 4
-            base = (152 if c1 else {"STOPA_C2": 178, "STOPA_C3": 188, "STOPA_C4": 198}[it.part])
-            s = base + idx * 3 + (6 if it.anchor == "NUT" else 0) + (8 if c1 else 0)
-            it.seat = s; it.arrive = it.leave = s - (12 if it.anchor == "NUT" else 9)
-            it.dir = Vector((0, 0, -1)); it.L = 0.22
+            rng = np.random.default_rng(int(k.split("_")[1]) * 7 + (1 if it.anchor == "NUT" else 0))
+            if c1:      # reference 5.0-5.7 s: washers drop, then nuts arc in from above and spin down
+                s = (146 + idx * 2) if it.anchor == "WASH" else (156 + idx * 4)
+            else:
+                base = {"STOPA_C2": 186, "STOPA_C3": 196, "STOPA_C4": 206}[it.part]
+                s = base + idx * 2 + (5 if it.anchor == "NUT" else 0)
+            fly = 9 if it.anchor == "WASH" else 11; screw = 0 if it.anchor == "WASH" else 7
+            it.seat = s + screw; it.arrive = s; it.leave = s - fly
+            it.dir = Vector((0, 0, -1)); it.L = 0.012 if it.anchor == "NUT" else 0.0
+            it.fly_from = Vector((rng.uniform(-0.5, 0.2), rng.uniform(-0.6, -0.2), rng.uniform(0.55, 0.85)))
 
 
 GROUP_T = {"join": (352, 386), "lift": (398, 420)}
@@ -498,6 +524,14 @@ def item_pose(it, f):
             q = q @ Quaternion(ax, it.tumble * (1 - e_out(u)) * math.pi)
         M = q.to_matrix().to_4x4(); M.translation = pos
         return M, True
+    ff = getattr(it, "fly_from", None)
+    if ff is not None and f < it.arrive:                # nut / washer: arc in from above, tumbling slightly
+        u = (f - it.leave) / max(1, it.arrive - it.leave); k = e_out(u)
+        p1 = appr.translation; p0 = p1 + ff; pc = p1 + Vector((ff.x * 0.2, ff.y * 0.2, ff.z * 0.9))
+        pos = (1 - k) ** 2 * p0 + 2 * (1 - k) * k * pc + k * k * p1
+        M = (Matrix.Rotation(3.0 * (1 - k), 4, Vector((1, 0.3, 0)).normalized()) @ Matrix.Rotation(9 * (1 - k), 4, "Z")).to_3x3().to_4x4()
+        M.translation = pos
+        return M, True
     if f < it.arrive:                                   # fasteners: fly in along the axis
         return appr, True
     u = (f - it.arrive) / max(1, it.seat - it.arrive)
@@ -515,13 +549,44 @@ def pose_items(items, f):
 
 
 # ------------------------------------------------------------------------------------------------ frame
+def _pose_all(S, f):
+    name, u, keys = shot_of(f)
+    a, b = [(x[1], x[2]) for x in SHOTS if x[0] == name][0]
+    pose_items(S["items"], f); roof_state(S["roofs"], f)
+    place_camera(S["cam"], keys, u, name, (b - a) / FPS, f / FPS)
+    return name
+
+
+def _movers(S):
+    obs = [it.ob for it in S["items"].values()] + [S["cam"], S["roofs"]["poly"], S["roofs"]["roll"]] + S["roofs"]["blacha"] + S["roofs"]["lamele"]
+    return obs
+
+
 def apply_frame(S, f):
     fs = END_SRC if f >= 1005 else f
-    name, u, keys = shot_of(f)
-    pose_items(S["items"], fs)
-    roof_state(S["roofs"], fs)
-    place_camera(S["cam"], keys, u)
-    bpy.context.scene.frame_set(fs)
+    name = shot_of(fs)[0]
+    obs = _movers(S)
+    for o in obs:
+        o.animation_data_clear(); o.rotation_mode = "QUATERNION"
+    sc = bpy.context.scene
+    if MBLUR:
+        prev = {}
+        for t in (fs - 1, fs, fs + 1):
+            if shot_of(t)[0] != name:           # never blur across a cut
+                continue
+            _pose_all(S, t); bpy.context.view_layer.update()
+            for o in obs:
+                q = o.matrix_world.to_quaternion()
+                if o.name in prev and prev[o.name].dot(q) < 0:
+                    q.negate()
+                prev[o.name] = q
+                o.location = o.matrix_world.translation; o.rotation_quaternion = q; o.scale = o.matrix_world.to_scale()
+                if o.parent is not None and o.parent.name != "PERGOLA_ROOT":
+                    continue
+                for path in ("location", "rotation_quaternion", "scale"):
+                    o.keyframe_insert(path, frame=t)
+    _pose_all(S, fs)
+    sc.frame_set(fs)
     return name
 
 
@@ -534,6 +599,8 @@ def build(w, h, spp):
     sc.render.resolution_x, sc.render.resolution_y = w, h; sc.render.fps = FPS
     sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - Punchy"; sc.view_settings.exposure = 0.45
     sc.render.image_settings.file_format = "PNG"
+    bpy.context.preferences.edit.keyframe_new_interpolation_type = "LINEAR"
+    sc.render.use_motion_blur = MBLUR; sc.render.motion_blur_shutter = 0.5
     setup_world()
     pad, zinc = setup_studio()
     items, L = build_pergola()
