@@ -1,0 +1,19 @@
+name: fetch-music
+# Downloads CC-BY / CC0 music candidates listed in tools/music_job.json and pushes them to branch music-out/<name>.
+on:
+  push:
+    branches: ['music/**']
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          NAME=$(jq -r .name tools/music_job.json); mkdir -p /tmp/out
+          jq -r '.urls[]' tools/music_job.json | while read -r U; do F=$(basename "$U" | sed 's/%20/_/g'); curl -sSL -f --retry 3 -A "Mozilla/5.0" -o "/tmp/out/$F" "$U" && echo "ok $F $(stat -c %s /tmp/out/$F)" || echo "FAIL $U"; done
+          ls -la /tmp/out
+          cd /tmp/out && git init -q -b music-out/$NAME && git config user.name ci && git config user.email ci@example.com && git add -A && git commit -q -m "music $NAME" --allow-empty
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" music-out/$NAME
