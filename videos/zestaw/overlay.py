@@ -8,6 +8,8 @@ POST = os.path.join(HERE, "..", "rivon_film", "post")
 FD = os.path.join(POST, "fonts")
 _m = Image.open(os.path.join(POST, "rivon_logo.png")).convert("L")
 LOGO = _m.crop(_m.point(lambda v: 255 if v > 40 else 0).getbbox())
+_ip = os.path.join(POST, "logo_icon.png")
+ICON = Image.open(_ip).convert("L") if os.path.exists(_ip) else None
 
 # frame ranges (30 fps) -> (title, subtitle)
 CAPS = [
@@ -23,7 +25,7 @@ CAPS = [
     (894, 958, "Dowolne pokrycie dachu", "Lamele drewniane"),
 ]
 HOOK = (0, 60, ("Pergola z drewna?", "Złóż ją na łącznikach RIVON"))
-END0 = 950
+END0 = 880
 
 
 def font(name, px):
@@ -54,6 +56,12 @@ def _logo(base, cx, cy, width, alpha, color=(255, 255, 255)):
     lg = LOGO.resize((int(width), int(width * LOGO.height / LOGO.width)), Image.LANCZOS)
     lay = Image.new("RGBA", lg.size, color + (0,)); lay.putalpha(lg.point(lambda v: int(v * alpha)))
     base.alpha_composite(lay, (int(cx - lg.width / 2), int(cy - lg.height / 2)))
+
+
+def _mask(base, m, cx, cy, width, alpha, color=(255, 255, 255)):
+    mm = m.resize((int(width), int(width * m.height / m.width)), Image.LANCZOS)
+    lay = Image.new("RGBA", mm.size, color + (0,)); lay.putalpha(mm.point(lambda v: int(v * alpha)))
+    base.alpha_composite(lay, (int(cx - mm.width / 2), int(cy - mm.height / 2)))
 
 
 def _film(base, f):
@@ -94,16 +102,31 @@ def overlay(img, f):
                 ls.append((s, font("Inter-Medium.otf", w * 0.036), (235, 235, 235)))
             base = _pill_text(base, w / 2, h * 0.80, ls, al, w)
     if f >= END0:
-        k = min(1.0, (f - END0) / 18)
-        dim = Image.new("RGBA", base.size, (10, 11, 13, int(200 * k)))
-        base = Image.alpha_composite(base, dim)
-        _logo(base, w / 2, h * 0.43, w * 0.56, min(1.0, (f - END0 - 6) / 14))
+        t = f - END0
+        e = lambda a, d=14: max(0.0, min(1.0, (t - a) / d))
+        k = e(0, 18)
+        base = Image.alpha_composite(base, Image.new("RGBA", base.size, (9, 10, 12, int(215 * k))))
+        # brand: icon + wordmark, gentle rise-in
+        if ICON is not None:
+            _mask(base, ICON, w / 2, h * 0.30 + (1 - e(6)) * h * 0.015, w * 0.20, e(6))
+        _logo(base, w / 2, h * 0.405 + (1 - e(10)) * h * 0.015, w * 0.64, e(10))
         d = ImageDraw.Draw(base)
-        for i, (txt, fn, col, y) in enumerate([
-                ("Łączniki do konstrukcji drewnianych", font("Inter-Light.otf", w * 0.045), (235, 235, 235), 0.53),
-                ("Zapytaj o zestaw – napisz do nas", font("Jost.ttf", w * 0.055), (238, 206, 150), 0.62)]):
-            al = max(0.0, min(1.0, (f - END0 - 16 - 8 * i) / 12))
-            if al > 0:
-                bb = d.textbbox((0, 0), txt, font=fn)
-                d.text(((w - (bb[2] - bb[0])) / 2 - bb[0], h * y), txt, font=fn, fill=col + (int(255 * al),))
+        def ctext(txt, fn, col, y, al):
+            if al <= 0: return
+            bb = d.textbbox((0, 0), txt, font=fn)
+            d.text(((w - (bb[2] - bb[0])) / 2 - bb[0], y - (bb[3] - bb[1]) / 2 - bb[1]), txt, font=fn, fill=col + (int(255 * al),))
+        ctext("Łączniki do konstrukcji drewnianych", font("Inter-Light.otf", w * 0.042), (225, 225, 225), h * 0.475, e(18))
+        ctext("Zbuduj własną pergolę", font("Jost.ttf", w * 0.072), (255, 255, 255), h * 0.585, e(30))
+        # call-to-action button
+        al = e(40)
+        if al > 0:
+            fn = font("Jost.ttf", w * 0.056); txt = "Zapytaj o zestaw"
+            bb = d.textbbox((0, 0), txt, font=fn); bw, bh = bb[2] - bb[0], bb[3] - bb[1]
+            px, py = w * 0.07, w * 0.035; cy = h * 0.675 + (1 - al) * h * 0.01
+            lay = Image.new("RGBA", base.size, (0, 0, 0, 0)); dl = ImageDraw.Draw(lay)
+            dl.rounded_rectangle((w / 2 - bw / 2 - px, cy - bh / 2 - py, w / 2 + bw / 2 + px, cy + bh / 2 + py), radius=int(bh / 2 + py),
+                                 fill=(222, 178, 104, int(255 * al)))
+            dl.text((w / 2 - bw / 2 - bb[0], cy - bh / 2 - bb[1]), txt, font=fn, fill=(18, 18, 20, int(255 * al)))
+            base = Image.alpha_composite(base, lay); d = ImageDraw.Draw(base)
+        ctext("Napisz do nas na Facebooku lub Instagramie", font("Inter-Light.otf", w * 0.034), (200, 200, 200), h * 0.745, e(50))
     return base.convert("RGB")

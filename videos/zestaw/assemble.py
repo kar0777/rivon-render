@@ -7,7 +7,7 @@ HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 import overlay as O
 
 CUTS = []                      # clean cuts (no whip blur)
-NF, END0, END_SRC = 1070, 950, 949
+NF, END0, END_SRC = 1000, 880, 879
 
 
 def whip(im, k):
