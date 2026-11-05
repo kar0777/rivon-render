@@ -364,7 +364,7 @@ STOP = Vector((9.25, -1.3, 0.0))          # centre of the parked van, heading -Y
 R = 6.65; S1 = 12.0; ARC = R * math.pi / 2; S3 = 33.95 - STOP.y
 TOTAL = S1 + ARC + S3
 def van_pose(s):
-    s = max(0.0, min(TOTAL, s))
+    s = min(TOTAL, s)                       # s < 0: further back along the street (straight)
     if s <= S1: return Vector((9.25 - R - S1 + s, 40.6, 0)), 0.0
     if s <= S1 + ARC:
         ph = (s - S1) / R; cxy = Vector((9.25 - R, 40.6 - R))
@@ -375,16 +375,19 @@ T_DRIVE = 185
 #     shot 2 (frames 130..185, after a hard cut = time ellipsis) - the van is already on the drive near the plot and brakes to a stop.
 def _ss(x): x = min(1.0, max(0.0, x)); return x * x * (3 - 2 * x)
 def _ssi(x): x = min(1.0, max(0.0, x)); return x ** 3 - x ** 4 / 2          # integral of smoothstep
-SH1_S0, SH1_V0, SH1_VT, SH1_TA, SH1_V2 = 2.2, 8.5, 4.6, 1.5, 6.0          # start, entry speed, turn speed, slow-down time, exit speed
-_tArc = SH1_TA + ARC / SH1_VT
+SH1_V0, SH1_TC, SH1_VT, SH1_TA, SH1_V2 = 13.0, 0.8, 6.5, 1.2, 8.5    # street speed ~47 km/h for 0.8 s, brake to ~23 km/h, turn, accelerate
+SH1_S0 = S1 - SH1_TA * (SH1_V0 + SH1_VT) / 2 - SH1_V0 * SH1_TC
+_tArc = SH1_TC + SH1_TA + ARC / SH1_VT
 def sh1(t):          # -> (path distance, speed) for shot 1
-    if t <= SH1_TA:
-        return SH1_S0 + SH1_V0 * t + (SH1_VT - SH1_V0) * SH1_TA * _ssi(t / SH1_TA), SH1_V0 + (SH1_VT - SH1_V0) * _ss(t / SH1_TA)
-    d1 = SH1_S0 + SH1_TA * (SH1_V0 + SH1_VT) / 2
-    if t <= _tArc: return d1 + SH1_VT * (t - SH1_TA), SH1_VT
+    if t <= SH1_TC: return SH1_S0 + SH1_V0 * t, SH1_V0
+    d0 = SH1_S0 + SH1_V0 * SH1_TC; tt = t - SH1_TC
+    if tt <= SH1_TA:
+        return d0 + SH1_V0 * tt + (SH1_VT - SH1_V0) * SH1_TA * _ssi(tt / SH1_TA), SH1_V0 + (SH1_VT - SH1_V0) * _ss(tt / SH1_TA)
+    d1 = d0 + SH1_TA * (SH1_V0 + SH1_VT) / 2
+    if t <= _tArc: return d1 + SH1_VT * (t - SH1_TC - SH1_TA), SH1_VT
     T2 = 1.0; x = (t - _tArc) / T2
     return d1 + ARC + SH1_VT * (t - _tArc) + (SH1_V2 - SH1_VT) * T2 * _ssi(x), SH1_VT + (SH1_V2 - SH1_VT) * _ss(x)
-SH2_V, SH2_T = 5.5, (T_DRIVE - 130) / 30.0
+SH2_V, SH2_T = 6.5, (T_DRIVE - 130) / 30.0
 def sh2(t):          # t from the cut (frame 130); brake to a stop exactly at T_DRIVE
     u = min(1.0, max(0.0, t / SH2_T)); rem = 0.4 * SH2_V * SH2_T
     return TOTAL - rem + rem * (1 - (1 - u) ** 2.5), SH2_V * (1 - u) ** 1.5
