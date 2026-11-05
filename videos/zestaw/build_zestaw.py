@@ -391,6 +391,10 @@ def place_camera(cam, name, u):
     cam.location = loc
     cam.rotation_euler = (tgt - loc).to_track_quat("-Z", "Y").to_euler()
     cam.data.lens = lens
+    fs = DOF.get(name)
+    cam.data.dof.use_dof = fs is not None
+    if fs:
+        cam.data.dof.aperture_fstop = fs; cam.data.dof.focus_distance = (tgt - loc).length
 
 
 # ------------------------------------------------------------------------------------------------ frame
@@ -419,6 +423,61 @@ def apply_frame(S, f):
     return name
 
 
+def realism():
+    """Material/light pass. Geometry of RIVON parts untouched: edge highlights come from the Bevel SHADER node only."""
+    st = bpy.data.materials["RIVON_black_powder_coat"]; nt = st.node_tree; N = nt.nodes
+    b = N["Principled BSDF"]; bump = [n for n in N if n.type == "BUMP"][0]
+    bv = N.new("ShaderNodeBevel"); bv.inputs["Radius"].default_value = 0.0015; bv.samples = 8
+    nt.links.new(bv.outputs["Normal"], bump.inputs["Normal"])
+    b.inputs["Base Color"].default_value = (0.012, 0.012, 0.013, 1)
+    b.inputs["Coat Weight"].default_value = 0.25; b.inputs["Coat Roughness"].default_value = 0.35
+    b.inputs["Sheen Weight"].default_value = 0.08
+    # timber: warmer oiled spruce, stronger pores, edge sheen from bevel shader
+    pine = bpy.data.materials["pine_planed"]; nt = pine.node_tree; N = nt.nodes; b = N["Principled BSDF"]
+    for n in N:
+        if n.type == "VALTORGB" and len(n.color_ramp.elements) == 2 and n.color_ramp.elements[0].position == 0.25:
+            n.color_ramp.elements[0].color = (0.62, 0.38, 0.17, 1); n.color_ramp.elements[1].color = (0.40, 0.21, 0.08, 1)
+    bump = [n for n in N if n.type == "BUMP"][0]; bump.inputs["Strength"].default_value = 0.35
+    bv = N.new("ShaderNodeBevel"); bv.inputs["Radius"].default_value = 0.002; bv.samples = 8
+    nt.links.new(bv.outputs["Normal"], bump.inputs["Normal"])
+    b.inputs["Roughness"].default_value = 0.55; b.inputs["Sheen Weight"].default_value = 0.15
+    b.inputs["Subsurface Weight"].default_value = 0.04; b.inputs["Subsurface Radius"].default_value = (0.02, 0.008, 0.004)
+    # pavers: stronger chamfer + dirt
+    pv = bpy.data.materials["kostka_brukowa"]; N = pv.node_tree.nodes
+    for n in N:
+        if n.type == "BUMP": n.inputs["Strength"].default_value = 0.9
+        if n.type == "TEX_BRICK":
+            n.inputs["Color1"].default_value = (0.27, 0.27, 0.26, 1); n.inputs["Color2"].default_value = (0.47, 0.46, 0.44, 1)
+            n.inputs["Mortar"].default_value = (0.10, 0.10, 0.095, 1); n.inputs["Mortar Size"].default_value = 0.016
+    # studio floor: slightly warm, not paper-white (keeps contrast), light: stronger low sun, softer fill
+    fl = bpy.data.materials["studio_white"].node_tree.nodes["Principled BSDF"]
+    fl.inputs["Base Color"].default_value = (0.74, 0.73, 0.72, 1)
+    for n in bpy.data.materials["studio_white"].node_tree.nodes:
+        if n.type == "EMISSION": n.inputs["Strength"].default_value = 1.0
+        if n.type == "MAP_RANGE": n.inputs["From Min"].default_value = 18.0; n.inputs["From Max"].default_value = 90.0
+    sun = bpy.data.lights["sun"]; sun.energy = 6.0; sun.angle = math.radians(1.2)
+    bpy.data.objects["sun"].rotation_euler = (math.radians(50), 0, math.radians(-32))
+    bpy.data.worlds["sky"].node_tree.nodes["Background"].inputs["Strength"].default_value = 1.0
+    sc = bpy.context.scene; sc.view_settings.look = "AgX - Punchy"; sc.view_settings.exposure = 0.65
+    fm = bpy.data.materials["studio_white"].node_tree; FN = fm.nodes; fb = FN["Principled BSDF"]
+    tc = FN.new("ShaderNodeTexCoord"); nz = FN.new("ShaderNodeTexNoise"); nz.inputs["Scale"].default_value = 0.35
+    nz.inputs["Detail"].default_value = 10.0; nz.inputs["Roughness"].default_value = 0.6
+    fm.links.new(tc.outputs["Object"], nz.inputs["Vector"])
+    rp = FN.new("ShaderNodeValToRGB"); rp.color_ramp.elements[0].color = (0.66, 0.65, 0.63, 1); rp.color_ramp.elements[1].color = (0.80, 0.79, 0.78, 1)
+    fm.links.new(nz.outputs["Fac"], rp.inputs[0]); fm.links.new(rp.outputs["Color"], fb.inputs["Base Color"])
+    g = FN.new("ShaderNodeTexNoise"); g.inputs["Scale"].default_value = 400.0; g.inputs["Detail"].default_value = 4.0
+    fm.links.new(tc.outputs["Object"], g.inputs["Vector"])
+    bp = FN.new("ShaderNodeBump"); bp.inputs["Strength"].default_value = 0.15; bp.inputs["Distance"].default_value = 0.001
+    fm.links.new(g.outputs["Fac"], bp.inputs["Height"]); fm.links.new(bp.outputs["Normal"], fb.inputs["Normal"])
+    wn = bpy.data.worlds["sky"].node_tree.nodes
+    for n in wn:
+        if n.type == "VALTORGB" and len(n.color_ramp.elements) == 3:
+            n.color_ramp.elements[-1].color = (0.20, 0.38, 0.72, 1)
+
+
+DOF = {"stopa": 2.8, "trojak": 3.5, "mocow": 3.5, "kit": 7.0}
+
+
 def build(w, h, spp):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     sc = bpy.context.scene
@@ -437,6 +496,7 @@ def build(w, h, spp):
     R = build_roofs()
     cd = bpy.data.cameras.new("cam"); cd.sensor_width = 36
     cam = bpy.data.objects.new("cam", cd); sc.collection.objects.link(cam); sc.camera = cam
+    realism()
     return dict(items=items, pad=pad, roofs=R, cam=cam)
 
 

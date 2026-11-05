@@ -56,8 +56,25 @@ def _logo(base, cx, cy, width, alpha, color=(255, 255, 255)):
     base.alpha_composite(lay, (int(cx - lg.width / 2), int(cy - lg.height / 2)))
 
 
+def _film(base, f):
+    """Photographic finish: gentle vignette + fine animated grain (no text)."""
+    import numpy as np
+    a = np.asarray(base.convert("RGB")).astype(np.float32) / 255.0
+    h, w = a.shape[:2]
+    yy, xx = np.mgrid[0:h, 0:w]; r = np.hypot((xx - w / 2) / (w / 2), (yy - h / 2) / (h / 2))
+    a *= (1 - 0.16 * np.clip(r - 0.35, 0, None) ** 1.6)[..., None]
+    g = np.random.default_rng(f).normal(0, 0.012, (h, w, 1)).astype(np.float32)
+    a = np.clip(a + g, 0, 1)
+    return Image.fromarray((a * 255 + 0.5).astype(np.uint8)).convert("RGBA")
+
+
+TEXT = False          # owner: no on-screen text except the end card
+
+
 def overlay(img, f):
-    base = img.convert("RGBA"); w, h = base.size
+    base = _film(img, f); w, h = base.size
+    if not TEXT and f < END0:
+        return base.convert("RGB")
     # small brand mark (top-right), like the reference watermark
     if f < END0:
         _logo(base, w * 0.86, h * 0.055, w * 0.15, 0.85)
