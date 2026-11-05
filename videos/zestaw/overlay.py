@@ -23,7 +23,7 @@ CAPS = [
     (894, 958, "Dowolne pokrycie dachu", "Lamele drewniane"),
 ]
 HOOK = (0, 60, ("Pergola z drewna?", "Złóż ją na łącznikach RIVON"))
-END0 = 990
+END0 = 1005
 
 
 def font(name, px):
