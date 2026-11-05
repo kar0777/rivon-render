@@ -1,6 +1,7 @@
 """RIVON film sound v3 - built from REAL recordings instead of synthesised noise (no hiss):
   impacts  : Kenney "Impact Sounds" (CC0)  - wood heavy/medium/plank for timber, metal/plate for the steel connectors
-  ambience : Moodist library (Pixabay Content License / CC0) - birds, wind in trees, road, campfire, river, wind chimes, cafe
+  ambience : Moodist library (Pixabay Content License / CC0) - birds, wind in trees, road, campfire, river, crowd, street
+  no musical / tonal sounds at all (no chimes, bells, bowls; cafe recordings with background music were dropped)
 The sound files are NOT stored in this public repo (third-party licences forbid standalone redistribution); pass their folder:
 usage: python3 sound_film3.py events.json out.wav --sfx /home/claude/sfx [--dur 30]"""
 import sys, os, json, wave, subprocess, argparse, numpy as np
@@ -24,11 +25,27 @@ def in_lab(t): return t < 6.95 or t > 23.0
 
 # ------------------------------------------------------------------------------------------------ one-shots (Kenney CC0)
 _cache = {}
+RPG = os.path.join(A.sfx, "rpg")
+# hand-picked, measured NON-tonal hits only (no ringing / no pitched "notes"): dull wood, dead metal clanks
+PICK = {
+    "wood_dull": ["impact_wood_heavy_000", "impact_wood_heavy_001", "impact_wood_heavy_002", "impact_wood_heavy_004"],
+    "plank":     ["impact_plank_medium_000", "impact_plank_medium_003", "impact_plank_medium_004"],
+    "metal":     ["impact_metal_heavy_002", "impact_metal_heavy_004", "impact_metal_medium_001", "impact_metal_medium_004"],
+    "metal_sm":  ["impact_plate_light_000", "impact_plate_light_001", "impact_plate_light_003"],
+    "click":     ["metal_latch", "metal_click"],
+    "thud":      ["impact_soft_heavy_003", "impact_soft_heavy_001"],
+    "soft":      ["impact_soft_medium_000", "impact_soft_medium_002"],
+    "chop":      ["chop", "knife_slice"],
+}
+def _find(name):
+    for root in (KEN, RPG):
+        for dp, _, fs in os.walk(root):
+            if name + ".ogg" in fs: return os.path.join(dp, name + ".ogg")
+    raise FileNotFoundError(name)
 def shot(kind):
-    fs = sorted(f for f in os.listdir(KEN) if f.startswith(kind) and f.endswith(".ogg"))
-    f = fs[rng.integers(len(fs))]
+    names = PICK[kind]; f = names[rng.integers(len(names))]
     if f not in _cache:
-        x = load(os.path.join(KEN, f)); x = x / (np.abs(x).max() + 1e-9); _cache[f] = x
+        x = load(_find(f)); x = x / (np.abs(x).max() + 1e-9); _cache[f] = x
     return _cache[f]
 def place(x, t, gain_db, pan=0.0, pitch=1.0, wet=0.2, space=None):
     if pitch != 1.0: x = resample(x, max(8, int(len(x) / pitch)), axis=0)
@@ -59,21 +76,20 @@ def lab_tone(a, b, lvl):
     w = np.clip(np.arange(n) / (0.5 * SR), 0, 1) * np.clip((n - np.arange(n)) / (0.5 * SR), 0, 1)
     MIX[int(a * SR):int(a * SR) + n] += y * w[:, None]
 lab_tone(0.0, 7.2, -40); lab_tone(22.8, 30.0, -40)
-bed("places/laboratory.mp3", 0.0, 7.0, -40, 2.0, highcut=2500); bed("places/laboratory.mp3", 23.0, 30.0, -42, 9.0, highcut=2500)
 # outdoor scenes
 bed("animals/birds.mp3", 7.0, 23.0, -33, 20.0, lowcut=600)                             # birds through all garden scenes
 bed("nature/wind-in-trees.mp3", 7.0, 13.4, -38, 8.0, highcut=3500)                   # carport + barbecue: leaves
 bed("urban/road.mp3", 7.0, 10.2, -39, 30.0, highcut=4000)                            # carport: distant street
 bed("nature/campfire.mp3", 10.2, 13.4, -30, 15.0, highcut=6000)                      # barbecue: crackling fire
 bed("nature/campfire.mp3", 13.4, 16.6, -40, 60.0, highcut=5000)                      # summer kitchen: grill embers
-bed("places/restaurant.mp3", 13.4, 16.6, -40, 40.0, highcut=5000)                    # summer kitchen: people around, low
+bed("urban/crowd.mp3", 13.4, 16.6, -42, 30.0, highcut=5000)                          # summer kitchen: people around, low
 bed("nature/river.mp3", 16.6, 19.8, -36, 12.0, highcut=4500)                         # lounge: pool water
-bed("things/wind-chimes.mp3", 16.6, 19.8, -38, 20.0)                                  # lounge: chimes
-bed("places/cafe.mp3", 19.8, 23.0, -29, 30.0, highcut=7000)                          # cafe terrace
-for tc in (10.9, 11.8, 12.6): hit("impact_glass_light", tc, -26, rng.uniform(-0.5, 0.5), 0.08, 0.3)          # glasses at the table
-for k, tc in enumerate((13.9, 14.05, 14.2, 14.35, 15.5, 15.65, 15.8)): hit("impact_wood_light", tc, -27, -0.35, 0.1, 0.2)   # knife on a board
-for tc in (14.6, 15.2, 16.1): hit("impact_soft_medium", tc, -28, 0.6, 0.1, 0.4)                                # ball, further away
-for tc in (20.3, 21.1, 22.0): hit("impact_plate_light", tc, -28, rng.uniform(-0.6, 0.6), 0.08, 0.3)            # cups / saucers
+bed("nature/wind-in-trees.mp3", 16.6, 19.8, -42, 30.0, highcut=3500)                # lounge: light breeze
+bed("urban/crowd.mp3", 19.8, 23.0, -30, 5.0, highcut=6000)                           # cafe terrace: people talking (no music)
+bed("urban/busy-street.mp3", 19.8, 23.0, -42, 10.0, highcut=3500)                    # town street behind
+for k, tc in enumerate((13.9, 14.05, 14.2, 14.35, 15.5, 15.65, 15.8)): hit("chop", tc, -30, -0.35, 0.06, 0.2)   # knife on a board
+for tc in (14.6, 15.2, 16.1): hit("soft", tc, -28, 0.6, 0.06, 0.4)                                # ball, further away
+for tc in (20.3, 21.1, 22.0): hit("metal_sm", tc, -34, rng.uniform(-0.6, 0.6), 0.04, 0.3)              # cutlery / saucers
 
 # ------------------------------------------------------------------------------------------------ assembly / disassembly foley
 def pan_of(n):
@@ -84,14 +100,13 @@ for e in ev:
     n, f1 = e["name"], e["f1"] / FPS; off = n.endswith("_off"); n = n.replace("_off", "")
     if n in ("cut", "hero", "cta"): continue
     p = pan_of(n); g = -3.0 if off else 0.0
-    if n.startswith("stopa"): hit("impact_metal_medium", f1, -15 + g, p, 0.05, 0.3); hit("impact_soft_heavy", f1, -20 + g, p, 0.05, 0.1)
-    elif n.startswith("post"): hit("impact_wood_heavy", f1, -10 + g, p, 0.06, 0.35)
-    elif n.startswith("trojak"): hit("impact_metal_heavy", f1, -14 + g, p, 0.05, 0.35); hit("impact_soft_medium", f1, -22 + g, p, 0.05, 0.1)
-    elif n.startswith("beam"): hit("impact_wood_heavy", f1, -8 + g, p, 0.08, 0.4); hit("impact_plank_medium", f1 + 0.07, -18 + g, p, 0.08, 0.3)
-    elif n.startswith("mb2"): hit("impact_metal_light", f1, -24 + g, p, 0.08, 0.3)
-    elif n.startswith("rafter"): hit("impact_plank_medium", f1, -15 + g, p, 0.08, 0.35)
-    if not off and n[:4] in ("stop", "troj", "beam", "mb2L", "mb2R"):           # screws: a short ratchet of small metal ticks (no motor whine)
-        for k in range(3 if n.startswith("mb2") else 5): hit("impact_metal_light", f1 + 0.12 + k * 0.055, -34 + g, p, 0.12, 0.2)
+    if n.startswith("stopa"): hit("metal", f1, -15 + g, p, 0.04, 0.3); hit("thud", f1, -18 + g, p, 0.04, 0.1)
+    elif n.startswith("post"): hit("wood_dull", f1, -9 + g, p, 0.05, 0.35)
+    elif n.startswith("trojak"): hit("metal", f1, -13 + g, p, 0.04, 0.35); hit("thud", f1, -19 + g, p, 0.04, 0.1)
+    elif n.startswith("beam"): hit("wood_dull", f1, -7 + g, p, 0.05, 0.4); hit("thud", f1 + 0.01, -16 + g, p, 0.04, 0.2)
+    elif n.startswith("mb2"): hit("metal_sm", f1, -26 + g, p, 0.04, 0.3)
+    elif n.startswith("rafter"): hit("plank", f1, -14 + g, p, 0.05, 0.35)
+    if not off and n[:4] in ("stop", "troj", "beam"): hit("click", f1 + 0.16, -30 + g, p, 0.03, 0.2)     # fastener seated: one dry click, no ringing
 
 # ------------------------------------------------------------------------------------------------ transitions: soft low air-whoosh + felt thump (no hiss)
 def air(d, rise=True):
@@ -105,13 +120,11 @@ for e in ev:
     if e["name"] != "cut": continue
     c = e["f1"] / FPS; tw = 8 / FPS
     place(air(tw + 0.08, True), c - tw - 0.05, -19, 0.0, 1.0, 0.25, "out"); place(air(tw + 0.15, False), c, -21, 0.0, 1.0, 0.25, "out")
-    hit("impact_soft_heavy", c, -17, 0.0, 0.03, 0.15)
+    hit("thud", c, -17, 0.0, 0.03, 0.15)
 # ------------------------------------------------------------------------------------------------ hero + end card
-hit("impact_metal_heavy", 798 / FPS, -16, 0.0, 0.02, 0.6)
-bowl = load(os.path.join(MOO, "things/singing-bowl.mp3"), 1.0, 4.5); bowl = lp(bowl, 4000) / (np.abs(bowl).max() + 1e-9)
-fade = np.clip(np.arange(len(bowl)) / (0.02 * SR), 0, 1) * np.clip((len(bowl) - np.arange(len(bowl))) / (1.5 * SR), 0, 1); bowl *= fade[:, None]
-place(bowl, 836 / FPS, -20, 0.0, 1.0, 0.3, "lab")                            # mark -> graphic: a soft natural ring
-hit("impact_soft_heavy", 866 / FPS, -16, 0.0, 0.0, 0.3)                      # CTA
+hit("metal", 798 / FPS, -16, 0.0, 0.02, 0.5)                                 # hero connector settles
+place(air(1.2, False), 826 / FPS, -22, 0.0, 1.0, 0.3, "lab")                  # darkening: low air falls away (no tones)
+hit("thud", 866 / FPS, -15, 0.0, 0.0, 0.3)                                   # CTA
 
 # ------------------------------------------------------------------------------------------------ reverb (dark, natural), master
 def ir(rt, cut):
