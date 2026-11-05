@@ -619,6 +619,7 @@ def build(w, h, spp):
     build_anchors(items, L, zinc)
     kit_layout(items); schedule(items)
     R = build_roofs()
+    bpy.context.view_layer.update()
     cd = bpy.data.cameras.new("cam"); cd.sensor_width = 36; cd.clip_start = 0.01
     cam = bpy.data.objects.new("cam", cd); sc.collection.objects.link(cam); sc.camera = cam
     return dict(items=items, pad=pad, roofs=R, cam=cam)
