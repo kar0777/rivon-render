@@ -1,5 +1,5 @@
 """RIVON post-production: cinematic grade + Polish captions + RIVON end card, then encode MP4 (H.264, 1080x1920, 30 fps).
-usage:  python3 finish.py <frames_dir> <out.mp4> [--crf 16] [--audio sound.wav]      (frames named f0000.png ... f0779.png)
+usage:  python3 finish.py <frames_dir> <out.mp4> [--crf 16] [--audio sound.wav]      (frames named f0000.png ... f0699.png, see remap.py)
         python3 finish.py --test <seconds> <frame.png> <out.png>   (check a single frame)
 needs:  pip3 install pillow numpy scipy   and   ffmpeg (brew install ffmpeg)"""
 import sys, os, argparse, subprocess, glob, io
@@ -7,10 +7,10 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 HERE = os.path.dirname(os.path.abspath(__file__))
 class F:
-    FPS = 30; NFRAMES = 780
+    FPS = 30; NFRAMES = 700
     RAIN = (-9.0, -8.0); SNOW = (-9.0, -8.0)
     TEXT_CUES = [
-        {'kind': 'endcard', 't0': 21.2, 't1': 26.0,
+        {'kind': 'endcard', 't0': 18.53, 't1': 23.34,
          'sub': 'Łączniki do konstrukcji drewnianych',
          'about': ['Stopy, trójaki i mocowania belek', 'do altan, wiat i tarasów'],
          'tag': 'Zbuduj swoją altanę.',

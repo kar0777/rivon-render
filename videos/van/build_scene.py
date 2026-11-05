@@ -375,7 +375,9 @@ T_DRIVE = 185
 #     shot 2 (frames 130..185, after a hard cut = time ellipsis) - the van is already on the drive near the plot and brakes to a stop.
 def _ss(x): x = min(1.0, max(0.0, x)); return x * x * (3 - 2 * x)
 def _ssi(x): x = min(1.0, max(0.0, x)); return x ** 3 - x ** 4 / 2          # integral of smoothstep
-SH1_V0, SH1_TC, SH1_VT, SH1_TA, SH1_V2 = 13.0, 0.8, 6.5, 1.2, 8.5    # street speed ~47 km/h for 0.8 s, brake to ~23 km/h, turn, accelerate
+# v5: the opening is cut to 3.5 s in post: only blender frames 55..129 (shot 1, 2.5 s) and 156..185 (shot 2, 1.0 s) are used
+SH1_F0, SH2_F0 = 55, 156
+SH1_V0, SH1_TC, SH1_VT, SH1_TA, SH1_V2 = 14.0, 0.25, 7.0, 0.7, 8.5    # street ~50 km/h, brake to ~25 km/h, turn into the gate
 SH1_S0 = S1 - SH1_TA * (SH1_V0 + SH1_VT) / 2 - SH1_V0 * SH1_TC
 _tArc = SH1_TC + SH1_TA + ARC / SH1_VT
 def sh1(t):          # -> (path distance, speed) for shot 1
@@ -387,15 +389,15 @@ def sh1(t):          # -> (path distance, speed) for shot 1
     if t <= _tArc: return d1 + SH1_VT * (t - SH1_TC - SH1_TA), SH1_VT
     T2 = 1.0; x = (t - _tArc) / T2
     return d1 + ARC + SH1_VT * (t - _tArc) + (SH1_V2 - SH1_VT) * T2 * _ssi(x), SH1_VT + (SH1_V2 - SH1_VT) * _ss(x)
-SH2_V, SH2_T = 6.5, (T_DRIVE - 130) / 30.0
+SH2_V, SH2_T = 3.5, (T_DRIVE - SH2_F0) / 30.0
 def sh2(t):          # t from the cut (frame 130); brake to a stop exactly at T_DRIVE
     u = min(1.0, max(0.0, t / SH2_T)); rem = 0.4 * SH2_V * SH2_T
     return TOTAL - rem + rem * (1 - (1 - u) ** 2.5), SH2_V * (1 - u) ** 1.5
 VAN_POS = {}; VAN_H = {}; VAN_PITCH = {}; VAN_SPEED = {}; _S = {}; _ROLL = {}
 for f in range(1, T_DRIVE + 1):
-    s, v = sh1((f - 1) / 30.0) if f < 130 else sh2((f - 130) / 30.0)
+    s, v = sh1((f - SH1_F0) / 30.0) if f < 130 else sh2((f - SH2_F0) / 30.0)
     _S[f] = s; VAN_SPEED[f] = v
-    _ROLL[f] = -0.004 * v * v / R if S1 < s < S1 + ARC else 0.0        # body leans out of the right-hand turn (<= 0.8 deg)
+    _ROLL[f] = max(-0.016, -0.003 * v * v / R) if S1 < s < S1 + ARC else 0.0        # body leans out of the right-hand turn (<= 0.9 deg)
 def _acc(f):
     a, b = max(1, f - 1), min(T_DRIVE, f + 1)
     if (a < 130) != (b < 130): a, b = (f, b) if f >= 130 else (a, f)
