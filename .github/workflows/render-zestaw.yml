@@ -1,0 +1,46 @@
+name: render-zestaw
+# RIVON "Zestaw pergoli" (MBD-style kit video). Starts only when a branch zestaw/<name> containing run.json is pushed.
+# run.json: {"name":"z1","parts":20,"w":1080,"h":1920,"spp":64,"frames":1080}
+on:
+  push:
+    branches: ['zestaw/**']
+permissions:
+  contents: write
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      parts: ${{ steps.p.outputs.parts }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: p
+        run: echo "parts=$(python3 -c "import json;print(json.dumps(list(range($(jq -r .parts run.json)))))")" >> $GITHUB_OUTPUT
+  render:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        part: ${{ fromJson(needs.plan.outputs.parts) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Blender (bpy 5.2.3)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq libxi6 libxfixes3 libxrender1 libgl1 libxkbcommon0 libsm6 libxxf86vm1 libegl1 libxext6 >/dev/null
+          pip install -q bpy==5.2.3 numpy pillow
+          git config --global user.name ci; git config --global user.email ci@example.com
+      - name: Render part (resumable, pushes every chunk)
+        env:
+          PART: ${{ matrix.part }}
+        run: |
+          NAME=$(jq -r .name run.json); NP=$(jq -r .parts run.json); NF=$(jq -r .frames run.json)
+          W=$(jq -r .w run.json); H=$(jq -r .h run.json); SPP=$(jq -r .spp run.json)
+          B=frames/zestaw-$NAME-$(printf %02d $PART); OUT=$GITHUB_WORKSPACE/out; mkdir -p $OUT
+          if git ls-remote --exit-code --heads origin $B >/dev/null 2>&1; then git fetch -q origin $B && git archive FETCH_HEAD | tar -x -C $OUT; fi
+          FR=$(python3 -c "print(','.join(str(f) for f in range($NF) if f % $NP == $PART))")
+          for CH in $(python3 -c "l='$FR'.split(',');print(' '.join(','.join(l[i:i+8]) for i in range(0,len(l),8)))"); do
+            python3 videos/zestaw/build_zestaw.py --frames $CH --out $OUT --w $W --h $H --spp $SPP
+            (cd $OUT && rm -rf .git && git init -q -b $B && git add -A && git commit -q -m "$B" && \
+             for t in 1 2 3; do git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" $B && break; sleep 10; done)
+          done
