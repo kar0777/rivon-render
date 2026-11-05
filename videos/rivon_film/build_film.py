@@ -182,12 +182,12 @@ def apply_frame(f):
     loc, tgt, lens = AN.camera_for_frame(f)
     cam = bpy.data.objects["film_cam"]; cam.location = loc; cam.data.lens = lens
     cam.rotation_euler = mathutils.Vector(np.array(tgt) - np.array(loc)).to_track_quat("-Z", "Y").to_euler()
-    hero = f >= 780
+    hero = f >= 766; hk = AN.e_io(AN.clamp01((f - 766) / 26.0))          # hero lights fade in (no pop)
     for nm, loc_, en, sz in (("hero_key", (1.3, -1.6, 2.3), 900.0, 1.4), ("hero_rim", (-1.6, 1.4, 1.9), 700.0, 1.0), ("hero_fill", (-1.2, -1.8, 0.9), 160.0, 2.0)):
         lo = bpy.data.objects.get(nm)
         if lo is None:
             ld = bpy.data.lights.new(nm, "AREA"); ld.energy = en; ld.size = sz; ld.color = (1.0, 1.0, 1.0); lo = bpy.data.objects.new(nm, ld); bpy.data.collections["LIGHTS"].objects.link(lo)
             lo.location = loc_; lo.rotation_euler = (mathutils.Vector((0, 0, 1.25)) - mathutils.Vector(loc_)).to_track_quat("-Z", "Y").to_euler()
-        lo.hide_render = not hero
-    d = cam.data.dof; d.use_dof = True; d.focus_distance = float(np.linalg.norm(np.array(tgt) - np.array(loc))) * (1.0 if hero else 1.02); d.aperture_fstop = 2.2 if hero else 4.0
+        lo.hide_render = not hero; lo.data.energy = en * hk
+    d = cam.data.dof; d.use_dof = True; d.focus_distance = float(np.linalg.norm(np.array(tgt) - np.array(loc))) * (1.02 - 0.02 * hk); d.aperture_fstop = 4.0 - 1.8 * hk
     bpy.context.view_layer.update()
