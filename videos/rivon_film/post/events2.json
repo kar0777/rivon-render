@@ -1,0 +1,3495 @@
+[
+{
+"kind": "SLOWMO",
+"id": "slow",
+"f": 0,
+"slow": false,
+"off": false,
+"windows": [
+[
+35.703472876833104,
+76.02344143294512
+],
+[
+120.81920793958416,
+165.17117335130695
+],
+[
+186.01687853560867,
+222.30485023611186
+]
+]
+},
+{
+"kind": "STOPA",
+"id": "STOPA_C1",
+"f": 25.28062028468221,
+"slow": false,
+"off": false
+},
+{
+"kind": "STOPA",
+"id": "STOPA_C2",
+"f": 27.276458728209754,
+"slow": false,
+"off": false
+},
+{
+"kind": "STOPA",
+"id": "STOPA_C3",
+"f": 29.272297171737296,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_000",
+"f": 29.937576652913144,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_001",
+"f": 30.548603868943825,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_002",
+"f": 31.232578680739504,
+"slow": false,
+"off": false
+},
+{
+"kind": "STOPA",
+"id": "STOPA_C4",
+"f": 31.402500820247937,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_003",
+"f": 32.07494211695149,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_018",
+"f": 32.410556033670794,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_019",
+"f": 33.65472017725813,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_016",
+"f": 44.372266116397135,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_017",
+"f": 46.1866647014222,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_032",
+"f": 46.791464229763875,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_033",
+"f": 48.605862814788935,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_048",
+"f": 49.21066234313063,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_034",
+"f": 50.42026139981399,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_049",
+"f": 51.02506092815568,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_035",
+"f": 52.234659984839055,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_050",
+"f": 52.839459513180735,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_051",
+"f": 54.65385809820579,
+"slow": true,
+"off": false
+},
+{
+"kind": "POST",
+"id": "POST_C1",
+"f": 63.927450866111634,
+"slow": true,
+"off": false
+},
+{
+"kind": "POST",
+"id": "POST_C2",
+"f": 74.00744300513954,
+"slow": true,
+"off": false
+},
+{
+"kind": "POST",
+"id": "POST_C3",
+"f": 81.10727511032775,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_004",
+"f": 81.52211390259477,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_005",
+"f": 82.12197739745304,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_006",
+"f": 82.7207289305113,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_007",
+"f": 83.31948046356955,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_020",
+"f": 83.65212020415748,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_021",
+"f": 84.25087173721575,
+"slow": false,
+"off": false
+},
+{
+"kind": "POST",
+"id": "POST_C4",
+"f": 84.4504555815685,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_022",
+"f": 84.84962327027401,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_023",
+"f": 85.44837480333234,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_036",
+"f": 85.78101454392034,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_037",
+"f": 86.37976607697874,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_038",
+"f": 86.97851761003713,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_039",
+"f": 87.57726914309553,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_054",
+"f": 89.10741194980034,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_055",
+"f": 89.70616348285873,
+"slow": false,
+"off": false
+},
+{
+"kind": "TROJAK",
+"id": "TROJAK_C1",
+"f": 93.09908883685632,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_052",
+"f": 93.29867268120911,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_053",
+"f": 93.89742421426753,
+"slow": false,
+"off": false
+},
+{
+"kind": "TROJAK",
+"id": "TROJAK_C4",
+"f": 94.42964779920833,
+"slow": false,
+"off": false
+},
+{
+"kind": "TROJAK",
+"id": "TROJAK_C2",
+"f": 95.76020676156033,
+"slow": false,
+"off": false
+},
+{
+"kind": "TROJAK",
+"id": "TROJAK_C3",
+"f": 97.09076572391233,
+"slow": false,
+"off": false
+},
+{
+"kind": "BEAM",
+"id": "BEAM_END_A",
+"f": 103.74356053567232,
+"slow": false,
+"off": false
+},
+{
+"kind": "BEAM",
+"id": "BEAM_END_B",
+"f": 105.0741194980243,
+"slow": false,
+"off": false
+},
+{
+"kind": "JOIN",
+"id": "join",
+"f": 114.38803223448829,
+"slow": false,
+"off": false
+},
+{
+"kind": "LOWER",
+"id": "lift",
+"f": 165.17117335130695,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_009",
+"f": 171.60234905640266,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_027",
+"f": 171.60234905640266,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_045",
+"f": 171.60234905640266,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_063",
+"f": 171.60234905640266,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_010",
+"f": 172.2011005894609,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_028",
+"f": 172.2011005894609,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_046",
+"f": 172.2011005894609,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_011",
+"f": 172.79985212251918,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_029",
+"f": 172.79985212251918,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_047",
+"f": 172.79985212251918,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_056",
+"f": 172.79985212251918,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_0",
+"f": 172.93290801875435,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_012",
+"f": 173.3986036555774,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_030",
+"f": 173.3986036555774,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_057",
+"f": 173.3986036555774,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_0",
+"f": 173.5316595518126,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_013",
+"f": 173.99735518863568,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_031",
+"f": 173.99735518863568,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_040",
+"f": 173.99735518863568,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_058",
+"f": 173.99735518863568,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_1",
+"f": 174.13041108487087,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_014",
+"f": 174.59610672169396,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_041",
+"f": 174.59610672169396,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_059",
+"f": 174.59610672169396,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_1",
+"f": 174.72916261792912,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_015",
+"f": 175.1948582547522,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_024",
+"f": 175.1948582547522,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_042",
+"f": 175.1948582547522,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_060",
+"f": 175.1948582547522,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_2",
+"f": 175.3279141509874,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_025",
+"f": 175.7936097878105,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_043",
+"f": 175.7936097878105,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_061",
+"f": 175.7936097878105,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_2",
+"f": 175.92666568404567,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_008",
+"f": 176.39236132086873,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_026",
+"f": 176.39236132086873,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_044",
+"f": 176.39236132086873,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_062",
+"f": 176.39236132086873,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_3",
+"f": 176.52541721710392,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_064",
+"f": 176.85805695769184,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_072",
+"f": 176.85805695769184,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_3",
+"f": 177.1241687501622,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_065",
+"f": 177.45680849075012,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_073",
+"f": 177.45680849075012,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_4",
+"f": 177.72292028322042,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_066",
+"f": 178.05556002380834,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_4",
+"f": 178.3216718162787,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_067",
+"f": 178.65431155686662,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_090",
+"f": 178.65431155686662,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_082",
+"f": 178.65431155686665,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_5",
+"f": 178.92042334933697,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_091",
+"f": 179.2530630899249,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_083",
+"f": 179.25306308992492,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_5",
+"f": 179.51917488239522,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_076",
+"f": 179.85181462298314,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_084",
+"f": 179.85181462298314,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_6",
+"f": 180.11792641545352,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_077",
+"f": 180.45104144613634,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_085",
+"f": 180.45104144613634,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_100",
+"f": 180.45104144613634,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_108",
+"f": 180.45104144613634,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_6",
+"f": 180.7225060172473,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_070",
+"f": 181.07818550850112,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_078",
+"f": 181.07818550850112,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_101",
+"f": 181.07818550850112,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_109",
+"f": 181.07818550850112,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_7",
+"f": 181.38373413072384,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_071",
+"f": 181.8040939385775,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_094",
+"f": 181.8040939385775,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_102",
+"f": 181.8040939385775,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_079",
+"f": 181.80409393857752,
+"slow": false,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_7",
+"f": 182.18195996369914,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_095",
+"f": 182.72396169244638,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_103",
+"f": 182.72396169244638,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_118",
+"f": 182.72396169244638,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_126",
+"f": 182.72396169244638,
+"slow": true,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_8",
+"f": 183.22853857016725,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_088",
+"f": 183.96812583603372,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_096",
+"f": 183.96812583603372,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_119",
+"f": 183.96812583603372,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_127",
+"f": 183.96812583603372,
+"slow": true,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_8",
+"f": 184.6548294576488,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_089",
+"f": 185.6149937322738,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_112",
+"f": 185.6149937322738,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_120",
+"f": 185.6149937322738,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_097",
+"f": 185.61499373227386,
+"slow": true,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_9",
+"f": 186.42007822116977,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_113",
+"f": 187.42807743507265,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_121",
+"f": 187.42807743507265,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_136",
+"f": 187.4280774350727,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_144",
+"f": 187.4280774350727,
+"slow": true,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_9",
+"f": 188.23447680619495,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_114",
+"f": 189.24247602009783,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_106",
+"f": 189.24247602009788,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_137",
+"f": 189.24247602009788,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_145",
+"f": 189.24247602009788,
+"slow": true,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_10",
+"f": 190.04887539122015,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_107",
+"f": 191.056874605123,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_115",
+"f": 191.056874605123,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_130",
+"f": 191.056874605123,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_138",
+"f": 191.056874605123,
+"slow": true,
+"off": false
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_10",
+"f": 191.8632739762453,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_131",
+"f": 192.87127319014817,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_139",
+"f": 192.87127319014817,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_154",
+"f": 192.87127319014817,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_162",
+"f": 192.87127319014817,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_124",
+"f": 194.68567177517335,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_132",
+"f": 194.68567177517335,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_155",
+"f": 194.68567177517335,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_163",
+"f": 194.68567177517335,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_125",
+"f": 196.50007036019844,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_148",
+"f": 196.50007036019844,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_156",
+"f": 196.50007036019844,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_133",
+"f": 196.5000703601985,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_149",
+"f": 198.3144689452236,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_157",
+"f": 198.3144689452236,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_172",
+"f": 198.3144689452236,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_180",
+"f": 198.3144689452236,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_150",
+"f": 200.1288675302488,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_173",
+"f": 200.1288675302488,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_181",
+"f": 200.1288675302488,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_142",
+"f": 200.12886753024887,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_174",
+"f": 201.9432661152739,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_143",
+"f": 201.94326611527396,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_151",
+"f": 201.94326611527396,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_166",
+"f": 201.94326611527396,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_175",
+"f": 203.75766470029907,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_167",
+"f": 203.75766470029913,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_190",
+"f": 203.75766470029913,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_160",
+"f": 205.5720632853243,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_168",
+"f": 205.5720632853243,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_191",
+"f": 205.5720632853243,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_161",
+"f": 207.3864618703494,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_184",
+"f": 207.3864618703494,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_192",
+"f": 207.3864618703494,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_169",
+"f": 207.38646187034945,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_185",
+"f": 209.2008604553746,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_193",
+"f": 209.2008604553746,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_178",
+"f": 211.01525904039977,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_186",
+"f": 211.01525904039977,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_179",
+"f": 212.82965762542486,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_187",
+"f": 212.82965762542491,
+"slow": true,
+"off": false
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_0",
+"f": 214.24085652488893,
+"slow": true,
+"off": false
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_1",
+"f": 220.2888518083061,
+"slow": true,
+"off": false
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_2",
+"f": 225.59776707927418,
+"slow": true,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_074",
+"f": 227.2435432632194,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_075",
+"f": 227.87068732558413,
+"slow": false,
+"off": false
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_3",
+"f": 228.07074646003178,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_081",
+"f": 228.07074646003178,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_068",
+"f": 229.06866568179555,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_069",
+"f": 229.6674172148538,
+"slow": false,
+"off": false
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_4",
+"f": 230.06658490355932,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_099",
+"f": 230.06658490355932,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_086",
+"f": 231.06450412532308,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_092",
+"f": 231.26408796967584,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_087",
+"f": 231.66325565838133,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_093",
+"f": 231.86283950273406,
+"slow": false,
+"off": false
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_5",
+"f": 232.06242334708685,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_080",
+"f": 232.86075872449786,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_110",
+"f": 233.2599264132034,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_111",
+"f": 233.85867794626162,
+"slow": false,
+"off": false
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_6",
+"f": 234.0582617906144,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_117",
+"f": 234.0582617906144,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_098",
+"f": 234.8565971680254,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_104",
+"f": 235.05618101237818,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_105",
+"f": 235.65493254543642,
+"slow": false,
+"off": false
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_7",
+"f": 236.05410023414194,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_135",
+"f": 236.05410023414194,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_122",
+"f": 237.0520194559057,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_128",
+"f": 237.2516033002585,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_123",
+"f": 237.65077098896396,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_129",
+"f": 237.8503548333167,
+"slow": false,
+"off": false
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_8",
+"f": 238.0499386776695,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_116",
+"f": 238.84827405508048,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_146",
+"f": 239.24744174378603,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_147",
+"f": 239.84619327684425,
+"slow": false,
+"off": false
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_9",
+"f": 240.04577712119703,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_153",
+"f": 240.04577712119703,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_134",
+"f": 240.844112498608,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_140",
+"f": 241.0436963429608,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_141",
+"f": 241.64244787601905,
+"slow": false,
+"off": false
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_10",
+"f": 242.04161556472457,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_171",
+"f": 242.04161556472457,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_158",
+"f": 243.03953478648836,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_164",
+"f": 243.23911863084112,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_159",
+"f": 243.6382863195466,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_165",
+"f": 243.83787016389934,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_152",
+"f": 244.8357893856631,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_182",
+"f": 245.23495707436865,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_183",
+"f": 245.83370860742687,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_189",
+"f": 246.03329245177966,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_170",
+"f": 246.83162782919064,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_176",
+"f": 247.03121167354342,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_177",
+"f": 247.62996320660167,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_194",
+"f": 249.02705011707098,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_195",
+"f": 249.62580165012923,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_188",
+"f": 250.82330471624573,
+"slow": false,
+"off": false
+},
+{
+"kind": "CUT",
+"id": "cut",
+"f": 270,
+"slow": false,
+"off": false
+},
+{
+"kind": "CUT",
+"id": "cut",
+"f": 354,
+"slow": false,
+"off": false
+},
+{
+"kind": "CUT",
+"id": "cut",
+"f": 438,
+"slow": false,
+"off": false
+},
+{
+"kind": "CUT",
+"id": "cut",
+"f": 522,
+"slow": false,
+"off": false
+},
+{
+"kind": "CUT",
+"id": "cut",
+"f": 606,
+"slow": false,
+"off": false
+},
+{
+"kind": "CUT",
+"id": "cut",
+"f": 690,
+"slow": false,
+"off": false
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_188",
+"f": 704.1000000000032,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_195",
+"f": 704.7000000000033,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_194",
+"f": 705.0000000000034,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_177",
+"f": 705.6000000000035,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_176",
+"f": 705.8000000000036,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_170",
+"f": 705.9000000000036,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_183",
+"f": 706.3000000000037,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_189",
+"f": 706.3000000000037,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_182",
+"f": 706.6000000000038,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_152",
+"f": 706.7000000000038,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_165",
+"f": 707.1000000000039,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_159",
+"f": 707.2000000000039,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_164",
+"f": 707.400000000004,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_158",
+"f": 707.500000000004,
+"slow": false,
+"off": true
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_10",
+"f": 707.800000000004,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_171",
+"f": 707.800000000004,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_141",
+"f": 708.0000000000041,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_140",
+"f": 708.2000000000041,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_134",
+"f": 708.3000000000042,
+"slow": false,
+"off": true
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_9",
+"f": 708.6000000000042,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_147",
+"f": 708.6000000000042,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_153",
+"f": 708.6000000000042,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_146",
+"f": 708.9000000000043,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_116",
+"f": 709.0000000000043,
+"slow": false,
+"off": true
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_8",
+"f": 709.3000000000044,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_123",
+"f": 709.4000000000044,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_129",
+"f": 709.4000000000044,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_122",
+"f": 709.6000000000045,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_128",
+"f": 709.6000000000045,
+"slow": false,
+"off": true
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_7",
+"f": 710.0000000000045,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_135",
+"f": 710.0000000000045,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_105",
+"f": 710.1000000000046,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_104",
+"f": 710.3000000000046,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_098",
+"f": 710.4000000000046,
+"slow": false,
+"off": true
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_6",
+"f": 710.7000000000047,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_111",
+"f": 710.7000000000047,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_117",
+"f": 710.7000000000047,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_110",
+"f": 710.9000000000048,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_080",
+"f": 711.1000000000048,
+"slow": false,
+"off": true
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_5",
+"f": 711.3000000000048,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_087",
+"f": 711.4000000000049,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_093",
+"f": 711.4000000000049,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_086",
+"f": 711.6000000000049,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_092",
+"f": 711.6000000000049,
+"slow": false,
+"off": true
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_4",
+"f": 712.000000000005,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_099",
+"f": 712.000000000005,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_069",
+"f": 712.100000000005,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_068",
+"f": 712.3000000000051,
+"slow": false,
+"off": true
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_3",
+"f": 712.6000000000051,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_075",
+"f": 712.6000000000051,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_081",
+"f": 712.6000000000051,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_074",
+"f": 712.8000000000052,
+"slow": false,
+"off": true
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_2",
+"f": 713.2000000000053,
+"slow": false,
+"off": true
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_1",
+"f": 713.8000000000054,
+"slow": false,
+"off": true
+},
+{
+"kind": "RAFTER",
+"id": "RAFTER_0",
+"f": 714.4000000000055,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_179",
+"f": 714.5000000000056,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_187",
+"f": 714.5000000000056,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_178",
+"f": 714.7000000000056,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_186",
+"f": 714.7000000000056,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_185",
+"f": 714.9000000000057,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_193",
+"f": 714.9000000000057,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_161",
+"f": 715.1000000000057,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_169",
+"f": 715.1000000000057,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_184",
+"f": 715.1000000000057,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_192",
+"f": 715.1000000000057,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_160",
+"f": 715.2000000000057,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_168",
+"f": 715.2000000000057,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_191",
+"f": 715.2000000000057,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_167",
+"f": 715.4000000000058,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_175",
+"f": 715.4000000000058,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_190",
+"f": 715.4000000000058,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_143",
+"f": 715.6000000000058,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_151",
+"f": 715.6000000000058,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_166",
+"f": 715.6000000000058,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_174",
+"f": 715.6000000000058,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_142",
+"f": 715.8000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_150",
+"f": 715.8000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_173",
+"f": 715.8000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_181",
+"f": 715.8000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_149",
+"f": 715.9000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_157",
+"f": 715.9000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_172",
+"f": 715.9000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_180",
+"f": 715.9000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_125",
+"f": 716.1000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_133",
+"f": 716.1000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_148",
+"f": 716.1000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_156",
+"f": 716.1000000000059,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_124",
+"f": 716.300000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_132",
+"f": 716.300000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_155",
+"f": 716.300000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_163",
+"f": 716.300000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_131",
+"f": 716.400000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_139",
+"f": 716.400000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_154",
+"f": 716.400000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_162",
+"f": 716.400000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_10",
+"f": 716.500000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_107",
+"f": 716.600000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_115",
+"f": 716.600000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_130",
+"f": 716.600000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_138",
+"f": 716.600000000006,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_10",
+"f": 716.7000000000061,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_106",
+"f": 716.8000000000061,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_114",
+"f": 716.8000000000061,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_137",
+"f": 716.8000000000061,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_145",
+"f": 716.8000000000061,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_9",
+"f": 716.9000000000061,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_113",
+"f": 716.9000000000061,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_121",
+"f": 716.9000000000061,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_136",
+"f": 716.9000000000061,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_144",
+"f": 716.9000000000061,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_9",
+"f": 717.0000000000061,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_089",
+"f": 717.1000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_097",
+"f": 717.1000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_112",
+"f": 717.1000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_120",
+"f": 717.1000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_8",
+"f": 717.2000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_088",
+"f": 717.3000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_096",
+"f": 717.3000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_119",
+"f": 717.3000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_127",
+"f": 717.3000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_8",
+"f": 717.4000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_095",
+"f": 717.4000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_103",
+"f": 717.4000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_118",
+"f": 717.4000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_126",
+"f": 717.4000000000062,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_7",
+"f": 717.5000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_071",
+"f": 717.6000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_079",
+"f": 717.6000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_094",
+"f": 717.6000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_102",
+"f": 717.6000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_7",
+"f": 717.7000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_070",
+"f": 717.8000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_078",
+"f": 717.8000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_101",
+"f": 717.8000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_109",
+"f": 717.8000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_6",
+"f": 717.9000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_077",
+"f": 717.9000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_085",
+"f": 717.9000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_100",
+"f": 717.9000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_108",
+"f": 717.9000000000063,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_6",
+"f": 718.0000000000064,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_076",
+"f": 718.1000000000064,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_084",
+"f": 718.1000000000064,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_5",
+"f": 718.2000000000064,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_5",
+"f": 718.3000000000064,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_083",
+"f": 718.3000000000064,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_091",
+"f": 718.3000000000064,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_067",
+"f": 718.4000000000065,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_082",
+"f": 718.4000000000065,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_090",
+"f": 718.4000000000065,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_4",
+"f": 718.5000000000065,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_066",
+"f": 718.6000000000065,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_4",
+"f": 718.7000000000065,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_065",
+"f": 718.7000000000065,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_073",
+"f": 718.7000000000065,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_3",
+"f": 718.8000000000065,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_064",
+"f": 718.9000000000066,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_MOCOW",
+"id": "SCREW_072",
+"f": 718.9000000000066,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_3",
+"f": 719.0000000000066,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_008",
+"f": 719.0000000000066,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_026",
+"f": 719.0000000000066,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_044",
+"f": 719.0000000000066,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_062",
+"f": 719.0000000000066,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_2",
+"f": 719.2000000000066,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_025",
+"f": 719.2000000000066,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_043",
+"f": 719.2000000000066,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_061",
+"f": 719.2000000000066,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_2",
+"f": 719.3000000000067,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_015",
+"f": 719.4000000000067,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_024",
+"f": 719.4000000000067,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_042",
+"f": 719.4000000000067,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_060",
+"f": 719.4000000000067,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_1",
+"f": 719.5000000000067,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_014",
+"f": 719.5000000000067,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_041",
+"f": 719.5000000000067,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_059",
+"f": 719.5000000000067,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_1",
+"f": 719.6000000000067,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_013",
+"f": 719.7000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_031",
+"f": 719.7000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_040",
+"f": 719.7000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_058",
+"f": 719.7000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_R_0",
+"f": 719.8000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_012",
+"f": 719.8000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_030",
+"f": 719.8000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_057",
+"f": 719.8000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "MOCOW",
+"id": "MOCOW_L_0",
+"f": 720.0000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_011",
+"f": 720.0000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_029",
+"f": 720.0000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_047",
+"f": 720.0000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_056",
+"f": 720.0000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_010",
+"f": 720.1000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_028",
+"f": 720.1000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_046",
+"f": 720.1000000000068,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_009",
+"f": 720.3000000000069,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_027",
+"f": 720.3000000000069,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_045",
+"f": 720.3000000000069,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_TROJAK",
+"id": "SCREW_063",
+"f": 720.3000000000069,
+"slow": false,
+"off": true
+},
+{
+"kind": "LOWER",
+"id": "lift",
+"f": 721.4000000000071,
+"slow": false,
+"off": true
+},
+{
+"kind": "JOIN",
+"id": "join",
+"f": 726.2000000000082,
+"slow": false,
+"off": true
+},
+{
+"kind": "BEAM",
+"id": "BEAM_END_B",
+"f": 728.6000000000088,
+"slow": false,
+"off": true
+},
+{
+"kind": "BEAM",
+"id": "BEAM_END_A",
+"f": 728.9000000000088,
+"slow": false,
+"off": true
+},
+{
+"kind": "TROJAK",
+"id": "TROJAK_C3",
+"f": 730.6000000000092,
+"slow": false,
+"off": true
+},
+{
+"kind": "TROJAK",
+"id": "TROJAK_C2",
+"f": 731.0000000000093,
+"slow": false,
+"off": true
+},
+{
+"kind": "TROJAK",
+"id": "TROJAK_C4",
+"f": 731.3000000000094,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_053",
+"f": 731.5000000000094,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_052",
+"f": 731.6000000000095,
+"slow": false,
+"off": true
+},
+{
+"kind": "TROJAK",
+"id": "TROJAK_C1",
+"f": 731.7000000000095,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_055",
+"f": 732.6000000000097,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_054",
+"f": 732.8000000000097,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_039",
+"f": 733.2000000000098,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_038",
+"f": 733.3000000000098,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_037",
+"f": 733.5000000000099,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_023",
+"f": 733.7000000000099,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_036",
+"f": 733.7000000000099,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_022",
+"f": 733.90000000001,
+"slow": false,
+"off": true
+},
+{
+"kind": "POST",
+"id": "POST_C4",
+"f": 734.00000000001,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_021",
+"f": 734.10000000001,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_020",
+"f": 734.20000000001,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_007",
+"f": 734.3000000000101,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_006",
+"f": 734.5000000000101,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_005",
+"f": 734.7000000000102,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_004",
+"f": 734.8000000000102,
+"slow": false,
+"off": true
+},
+{
+"kind": "POST",
+"id": "POST_C3",
+"f": 734.9000000000102,
+"slow": false,
+"off": true
+},
+{
+"kind": "POST",
+"id": "POST_C2",
+"f": 735.9000000000104,
+"slow": false,
+"off": true
+},
+{
+"kind": "POST",
+"id": "POST_C1",
+"f": 736.8000000000106,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_051",
+"f": 737.7000000000108,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_050",
+"f": 737.9000000000109,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_035",
+"f": 738.0000000000109,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_034",
+"f": 738.1000000000109,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_049",
+"f": 738.1000000000109,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_033",
+"f": 738.300000000011,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_048",
+"f": 738.300000000011,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_032",
+"f": 738.500000000011,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_017",
+"f": 738.600000000011,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_016",
+"f": 738.7000000000111,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_019",
+"f": 739.9000000000113,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_018",
+"f": 740.0000000000114,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_003",
+"f": 740.1000000000114,
+"slow": false,
+"off": true
+},
+{
+"kind": "STOPA",
+"id": "STOPA_C4",
+"f": 740.3000000000114,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_002",
+"f": 740.3000000000114,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_001",
+"f": 740.5000000000115,
+"slow": false,
+"off": true
+},
+{
+"kind": "SCREW_STOPA",
+"id": "SCREW_000",
+"f": 740.7000000000115,
+"slow": false,
+"off": true
+},
+{
+"kind": "STOPA",
+"id": "STOPA_C3",
+"f": 740.9000000000116,
+"slow": false,
+"off": true
+},
+{
+"kind": "STOPA",
+"id": "STOPA_C2",
+"f": 741.6000000000117,
+"slow": false,
+"off": true
+},
+{
+"kind": "STOPA",
+"id": "STOPA_C1",
+"f": 742.2000000000119,
+"slow": false,
+"off": true
+}
+]

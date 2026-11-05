@@ -8,7 +8,7 @@ import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont
 HERE = os.path.dirname(os.path.abspath(__file__)); FD = os.path.join(HERE, "fonts") + os.sep
-CUTS = (210, 306, 402, 498, 594, 690)
+CUTS = (270, 354, 438, 522, 606, 690)
 TN = 8                                                              # frames on each side of a cut used by the push-through transition
 CTA_LINES = ("Jedno rozwiązanie.", "Wiele możliwości.")           # exact copy: "Jedno rozwiązanie. Wiele możliwości."
 D0, D1 = 826, 842            # darkening
