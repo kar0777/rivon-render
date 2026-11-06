@@ -7,8 +7,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 im = Image.open(sys.argv[1]).convert("L"); W, H = im.size; a = np.asarray(im, np.float32)
 x0, x1, y0, y1 = int(0.33 * W), int(0.72 * W), int(0.40 * H), int(0.60 * H)
 reg = a[y0:y1, x0:x1]
-face = np.percentile(reg, 70)                                   # lit face level
-d = np.clip((face - reg - 0.04 * face) / (0.20 * face), 0, 1)   # engraved = darker than the face
+BRIGHT = "--bright" in sys.argv                                     # cut-through mark showing light timber behind a dark plate
+face = np.percentile(reg, 30 if BRIGHT else 70)                     # plate level
+d = np.clip(((reg - face) if BRIGHT else (face - reg - 0.04 * face)) / (max(face, 20) * (1.0 if BRIGHT else 0.20)), 0, 1)
 d = gaussian_filter(d, W / 1080.0 * 0.6)
 bin_ = d > 0.5; lab, n = label(bin_)
 if n > 1:                                                          # keep the large connected pieces only (drop specks)
