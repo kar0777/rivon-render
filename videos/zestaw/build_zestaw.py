@@ -48,7 +48,7 @@ SHOTS = [
     ("mocow_top", 420, 540, 432, 560, [(0, (-0.35, -2.75, 4.75), (-1.62, -0.6, 2.55), 30, None), (1, (0.05, -2.35, 4.85), (-1.62, 0.3, 2.55), 30, None)], 0),
     ("rafter_first", 540, 620, 618, 680, [(0, (-0.45, -4.45, 3.55), (-0.70, -2.30, 2.60), 24, None), (1, (-0.20, -4.20, 3.45), (-0.70, -2.10, 2.60), 24, None)], 4),
     ("rafters", 620, 680, 680, 746, [(0, (-2.10, -3.55, 2.98), (-0.6, -0.5, 2.45), 24, None), (1, (-1.95, -3.28, 2.95), (-0.6, -0.2, 2.45), 24, None)], 0),
-    ("roll", 680, 760, 746, 810, [(0, (-2.80, -2.75, 3.12), (-1.2, -2.45, 2.72), 24, None), (1, (-2.74, -2.40, 3.10), (-1.2, -2.00, 2.72), 24, None)], 0),
+    ("roll", 680, 760, 746, 810, [(0, (-1.60, -4.60, 3.18), (-1.15, -3.0, 2.72), 24, None), (1, (-1.20, -4.55, 3.15), (-0.65, -3.0, 2.72), 24, None)], 0),
     ("variants", 760, 880, 845, 950, [(0, (5.6, -7.4, 5.6), (0.0, 0.0, 1.2), 30, None), (1, (5.6, -7.4, 5.6), (0.0, 0.0, 1.2), 30, None)], 16),
     ("end", 880, 1000, 950, 950, [(0, (5.6, -7.4, 5.6), (0.0, 0.0, 1.2), 30, None), (1, (5.6, -7.4, 5.6), (0.0, 0.0, 1.2), 30, None)], 0),
 ]
@@ -268,49 +268,53 @@ def build_anchors(items, L, zinc):
 
 # ------------------------------------------------------------------------------------------------ roofs
 def _sheet_mesh(name, profile, length):
+    """profile: [(y, z)] across the ribs; extruded along +X (rib / drainage direction) from 0 to length."""
     verts, faces, n = [], [], len(profile)
-    for y in (0.0, length):
-        verts += [(x, y, z) for x, z in profile]
+    for x in (0.0, length):
+        verts += [(x, y, z) for y, z in profile]
     for i in range(n - 1):
-        faces.append((i, i + 1, n + i + 1, n + i))
+        faces.append((i, n + i, n + i + 1, i + 1))
     return FL.mesh_from_arrays(name, np.array(verts), faces, smooth=True)
 
 
 def build_roofs():
+    """Owner rule: on every covering all corrugations run ONE way - across the pergola, along X (parallel to the rafters),
+    so water/snow drain to one long side (that side will later be set slightly lower)."""
     coll = FL.collection("ROOFS"); R = {}
     poly = bpy.data.materials.new("poliweglan_grafit"); poly.use_nodes = True
     b = poly.node_tree.nodes["Principled BSDF"]
     b.inputs["Base Color"].default_value = (0.05, 0.055, 0.06, 1); b.inputs["Roughness"].default_value = 0.22
     b.inputs["Metallic"].default_value = 0.2; b.inputs["Coat Weight"].default_value = 0.5
-    xs = np.linspace(-ROOF_X, ROOF_X, 700)
-    prof = [(x, 0.012 * math.sin(2 * math.pi * (x + ROOF_X) / 0.076)) for x in xs]
+    ys = np.linspace(-ROOF_Y, ROOF_Y, 1400)
+    prof = [(y, 0.012 * math.sin(2 * math.pi * (y + ROOF_Y) / 0.076)) for y in ys]
     me = _sheet_mesh("POLY", prof, 1.0); me.materials.append(poly)
     ob = bpy.data.objects.new("ROOF_POLY", me); FL.link(ob, coll); ob.modifiers.new("t", "SOLIDIFY").thickness = 0.0012
     R["poly"] = ob
-    # roll: spiral of the same corrugated sheet (reads as a rolled sheet end-on, like the reference)
+    # roll: spiral of the same corrugated sheet, axis along Y, unrolls along the ribs (+X)
     turns, r0, gap = 7, 0.07, 0.038
     vs, fs = [], []; nseg = 360
-    for k, xx in enumerate((-ROOF_X, ROOF_X)):
-        for s in range(turns * nseg):
-            a = 2 * math.pi * s / nseg; r = r0 + gap * a / (2 * math.pi) + 0.008 * math.sin(a * 40)
-            vs.append((xx, r * math.cos(a), r * math.sin(a)))
+    for yy in (-ROOF_Y, ROOF_Y):
+        for k in range(turns * nseg):
+            a = 2 * math.pi * k / nseg; r = r0 + gap * a / (2 * math.pi) + 0.008 * math.sin(a * 40)
+            vs.append((r * math.cos(a), yy, r * math.sin(a)))
     n = turns * nseg
-    for s in range(n - 1):
-        fs.append((s, s + 1, n + s + 1, n + s))
+    for k in range(n - 1):
+        fs.append((k, n + k, n + k + 1, k + 1))
     rme = FL.mesh_from_arrays("ROLL", np.array(vs), fs, smooth=True); rme.materials.append(poly)
     roll = bpy.data.objects.new("ROOF_ROLL", rme); FL.link(roll, coll); roll.modifiers.new("t", "SOLIDIFY").thickness = 0.0015
     R["roll"] = roll; R["roll_rmax"] = r0 + gap * turns
+    # trapezoidal sheet: 6 sheets across Y, ribs along X
     bl = FL.simple("blacha_grafit", (0.03, 0.033, 0.037, 1), rough=0.34, metal=0.6, spec=0.5)
-    w = 2 * ROOF_X / 4; per = w / 5; prof = []
+    ns = 6; w = 2 * ROOF_Y / ns; per = w / 5; prof = []
     for k in range(5):
-        x0 = -w / 2 + k * per
-        prof += [(x0, 0.0), (x0 + per * 0.18, 0.0), (x0 + per * 0.32, 0.035), (x0 + per * 0.68, 0.035), (x0 + per * 0.82, 0.0)]
+        y0 = -w / 2 + k * per
+        prof += [(y0, 0.0), (y0 + per * 0.18, 0.0), (y0 + per * 0.32, 0.035), (y0 + per * 0.68, 0.035), (y0 + per * 0.82, 0.0)]
     prof.append((w / 2, 0.0))
-    meb = _sheet_mesh("BLACHA", prof, 2 * ROOF_Y); meb.materials.append(bl)
+    meb = _sheet_mesh("BLACHA", prof, 2 * ROOF_X); meb.materials.append(bl)
     R["blacha"] = []
-    for i in range(4):
+    for i in range(ns):
         o = bpy.data.objects.new(f"ROOF_BLACHA_{i}", meb); FL.link(o, coll); o.modifiers.new("t", "SOLIDIFY").thickness = 0.0006
-        o.location = (-ROOF_X + w / 2 + i * w, -ROOF_Y, ROOF_Z); R["blacha"].append(o)
+        o.location = (-ROOF_X, -ROOF_Y + w / 2 + i * w, ROOF_Z); R["blacha"].append(o)
     pine = bpy.data.materials["pine_planed"]; R["lamele"] = []
     for i, x in enumerate(np.arange(-ROOF_X + 0.07, ROOF_X - 0.06, 0.165)):
         R["lamele"].append(FL.box(f"ROOF_LAMELA_{i:02d}", (0.12, 2 * ROOF_Y, 0.028), (x, 0, ROOF_Z + 0.014), pine, coll, bevel=0.002))
@@ -333,15 +337,15 @@ def roof_state(R, f):
     _show([R["poly"]], kind in ("poly", "poly_roll")); _show([R["roll"]], kind == "poly_roll")
     _show(R["blacha"], kind == "blacha"); _show(R["lamele"], kind == "lamele"); _show(R["plotno"], kind == "plotno")
     if kind == "poly_roll":
-        Ly = 2 * ROOF_Y; q = e_io((f - 750) / 58.0); s = max(1e-4, q * Ly)
-        R["poly"].location = (0, -ROOF_Y, ROOF_Z); R["poly"].scale = (1, s, 1)
+        Lx = 2 * ROOF_X; q = e_io((f - 750) / 58.0); s = max(1e-4, q * Lx)
+        R["poly"].location = (-ROOF_X, 0, ROOF_Z); R["poly"].scale = (s, 1, 1)
         rm = R["roll_rmax"]; r = rm * math.sqrt(max(0.15, 1 - q))
-        R["roll"].scale = (1, r / rm, r / rm); R["roll"].location = (0, -ROOF_Y + s, ROOF_Z + r)
-        R["roll"].rotation_euler = (s / max(r, 0.03), 0, 0)
+        R["roll"].scale = (r / rm, 1, r / rm); R["roll"].location = (-ROOF_X + s, 0, ROOF_Z + r)
+        R["roll"].rotation_euler = (0, s / max(r, 0.03), 0)
         R["roll"].rotation_quaternion = R["roll"].rotation_euler.to_quaternion()
         _show([R["roll"]], q < 0.995)
     elif kind == "poly":
-        R["poly"].location = (0, -ROOF_Y, ROOF_Z); R["poly"].scale = (1, 2 * ROOF_Y, 1)
+        R["poly"].location = (-ROOF_X, 0, ROOF_Z); R["poly"].scale = (2 * ROOF_X, 1, 1)
 
 
 # ------------------------------------------------------------------------------------------------ pergola items
