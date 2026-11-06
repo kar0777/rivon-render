@@ -93,31 +93,41 @@ def mat_screw_zinc():
     return m
 
 
-def metal_screw_mesh(length, d=0.008, pitch=0.00125, af=0.013, hh=0.0053, seg=20):
-    """M8 hex-head machine screw: thread ridges as stacked rings (crest d, root 0.8 d), 30-deg chamfered tip."""
+def wood_screw_mesh(length, d=0.008, pitch=0.0035, af=0.013, hh=0.0055, seg=20):
+    """Hex-head wood screw (DIN 571 type): hex head on a washer face, smooth shank under the head, coarse sharp thread
+    (crest d, root 0.62 d) and a sharp gimlet point that tapers to a tip over the last ~1.6 d."""
     verts, faces = [], []
-    rc, rr = d / 2, d / 2 * 0.80
+    rc, rr = d / 2, d / 2 * 0.62
     ring = lambda z, rad: [[rad * np.cos(2 * np.pi * i / seg), rad * np.sin(2 * np.pi * i / seg), z] for i in range(seg)]
-    zs = []; z = 0.0
-    while z < length - 0.0015:
-        zs += [(z, rc), (z + pitch * 0.5, rr)]; z += pitch
-    zs += [(length - 0.0012, rc * 0.92), (length, rr * 0.75)]
-    for z, rad in zs:
-        verts += ring(z, rad)
+    tip_len = 1.6 * d; shank = 0.35 * length
+    zs = [(0.0, rc * 0.98), (shank, rc * 0.98)]
+    z = shank + pitch * 0.5
+    while z < length - tip_len:
+        zs += [(z, rr), (z + pitch * 0.35, rc), (z + pitch * 0.55, rc * 0.96), (z + pitch * 0.9, rr)]; z += pitch
+    z0 = zs[-1][0]
+    for k in range(1, 7):                                  # threaded taper into the point
+        t = k / 6.0; zz = z0 + (length - z0) * t
+        zs.append((zz, max(1e-4, (rc if k % 2 else rr) * (1 - t) ** 1.2)))
+    for zz, rad in zs:
+        verts += ring(zz, rad)
     nr = len(zs)
     for a in range(nr - 1):
         for i in range(seg):
             j = (i + 1) % seg; faces.append([a * seg + i, a * seg + j, (a + 1) * seg + j, (a + 1) * seg + i])
-    faces.append(list(range((nr - 1) * seg + seg - 1, (nr - 1) * seg - 1, -1)))
-    base = len(verts); rh = af / 2 / np.cos(np.pi / 6)
-    for z in (0.0, -hh):
-        verts += [[rh * np.cos(np.pi / 3 * i + np.pi / 6), rh * np.sin(np.pi / 3 * i + np.pi / 6), z] for i in range(6)]
+    base = len(verts); rh = af / 2 / np.cos(np.pi / 6); rw = af * 0.62
+    verts += ring(0.0, rw) + ring(-0.0012, rw)               # washer face
+    for i in range(seg):
+        j = (i + 1) % seg; faces.append([base + i, base + j, base + seg + j, base + seg + i])
+    faces.append([base + seg + i for i in range(seg - 1, -1, -1)])
+    b2 = len(verts)
+    for zz in (-0.0012, -0.0012 - hh):
+        verts += [[rh * np.cos(np.pi / 3 * i + np.pi / 6), rh * np.sin(np.pi / 3 * i + np.pi / 6), zz] for i in range(6)]
     for i in range(6):
-        j = (i + 1) % 6; faces.append([base + i, base + j, base + 6 + j, base + 6 + i])
-    faces.append([base + 11, base + 10, base + 9, base + 8, base + 7, base + 6]); faces.append([base + i for i in range(6)])
-    me = mesh_from_arrays("SCREW_M8_metal", np.array(verts), faces)
+        j = (i + 1) % 6; faces.append([b2 + i, b2 + j, b2 + 6 + j, b2 + 6 + i])
+    faces.append([b2 + 11, b2 + 10, b2 + 9, b2 + 8, b2 + 7, b2 + 6])
+    me = mesh_from_arrays("SCREW_wood_hex", np.array(verts), faces)
     for p in me.polygons:
-        p.use_smooth = len(p.vertices) == 4 and p.index < (nr - 1) * seg
+        p.use_smooth = p.index < (nr - 1) * seg
     return me
 
 
@@ -365,9 +375,9 @@ def build_pergola(coll_name="PERGOLA"):
         ob.matrix_world = mathutils.Matrix(np.block([[R, c[:, None]], [np.zeros((1, 3)), np.ones((1, 1))]]).tolist())
         bv = ob.modifiers.new("edge_break", "BEVEL"); bv.width = 0.0006; bv.segments = 2; bv.limit_method = "ANGLE"
         coll.objects.link(ob)
-    # metric machine screw for metal (owner rule): M8 hex head DIN 933, AF13 x 5.3 mm, full thread, chamfered tip,
-    # bright zinc.  Axis +Z points into the part; the head sits on the connector face.
-    sme = metal_screw_mesh(FD["length"] * MM); sme.materials.append(mat_screw_zinc())
+    # owner rule: hex-head WOOD screws with a sharp point (coarse thread, gimlet tip), bright zinc.
+    # Axis +Z points into the timber; the washer face sits on the connector.
+    sme = wood_screw_mesh(FD["length"] * MM); sme.materials.append(mat_screw_zinc())
     for i, f in enumerate(L["fasteners"]):
         ax = np.array(f["axis_to_timber"]); pos = np.array(f["pos_mm"]) * MM - ax / np.linalg.norm(ax) * 0.001
         ob = bpy.data.objects.new(f"SCREW_{i:03d}", sme); ob.parent = root

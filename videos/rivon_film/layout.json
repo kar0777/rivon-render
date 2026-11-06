@@ -1142,7 +1142,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C1",
@@ -1157,7 +1157,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C1",
@@ -1172,7 +1172,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C1",
@@ -1187,7 +1187,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C1",
@@ -1202,7 +1202,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C1",
@@ -1217,7 +1217,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C1",
@@ -1232,7 +1232,7 @@
     -1.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C1",
@@ -1247,7 +1247,7 @@
     -1.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C1",
@@ -1262,7 +1262,7 @@
     -1.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C1",
@@ -1277,7 +1277,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C1",
@@ -1292,7 +1292,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C1",
@@ -1307,7 +1307,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C2",
@@ -1382,7 +1382,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C2",
@@ -1397,7 +1397,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C2",
@@ -1412,7 +1412,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C2",
@@ -1427,7 +1427,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C2",
@@ -1442,7 +1442,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C2",
@@ -1457,7 +1457,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C2",
@@ -1472,7 +1472,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C2",
@@ -1487,7 +1487,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C2",
@@ -1502,7 +1502,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C2",
@@ -1517,7 +1517,7 @@
     -1.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C2",
@@ -1532,7 +1532,7 @@
     -1.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C2",
@@ -1547,7 +1547,7 @@
     -1.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C3",
@@ -1622,7 +1622,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C3",
@@ -1637,7 +1637,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C3",
@@ -1652,7 +1652,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C3",
@@ -1667,7 +1667,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C3",
@@ -1682,7 +1682,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C3",
@@ -1697,7 +1697,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C3",
@@ -1712,7 +1712,7 @@
     1.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C3",
@@ -1727,7 +1727,7 @@
     1.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C3",
@@ -1742,7 +1742,7 @@
     1.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C3",
@@ -1757,7 +1757,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C3",
@@ -1772,7 +1772,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C3",
@@ -1787,7 +1787,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C4",
@@ -1862,7 +1862,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C4",
@@ -1877,7 +1877,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C4",
@@ -1892,7 +1892,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "STOPA_C4",
@@ -1907,7 +1907,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C4",
@@ -1922,7 +1922,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C4",
@@ -1937,7 +1937,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C4",
@@ -1952,7 +1952,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C4",
@@ -1967,7 +1967,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C4",
@@ -1982,7 +1982,7 @@
     0.0,
     0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C4",
@@ -1997,7 +1997,7 @@
     1.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C4",
@@ -2012,7 +2012,7 @@
     1.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "TROJAK_C4",
@@ -2027,7 +2027,7 @@
     1.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_0",
@@ -2042,7 +2042,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_0",
@@ -2057,7 +2057,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_0",
@@ -2072,7 +2072,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_0",
@@ -2087,7 +2087,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_0",
@@ -2102,7 +2102,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_0",
@@ -2117,7 +2117,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_0",
@@ -2132,7 +2132,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_0",
@@ -2147,7 +2147,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_0",
@@ -2162,7 +2162,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_0",
@@ -2177,7 +2177,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_0",
@@ -2192,7 +2192,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_0",
@@ -2207,7 +2207,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_1",
@@ -2222,7 +2222,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_1",
@@ -2237,7 +2237,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_1",
@@ -2252,7 +2252,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_1",
@@ -2267,7 +2267,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_1",
@@ -2282,7 +2282,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_1",
@@ -2297,7 +2297,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_1",
@@ -2312,7 +2312,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_1",
@@ -2327,7 +2327,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_1",
@@ -2342,7 +2342,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_1",
@@ -2357,7 +2357,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_1",
@@ -2372,7 +2372,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_1",
@@ -2387,7 +2387,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_2",
@@ -2402,7 +2402,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_2",
@@ -2417,7 +2417,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_2",
@@ -2432,7 +2432,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_2",
@@ -2447,7 +2447,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_2",
@@ -2462,7 +2462,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_2",
@@ -2477,7 +2477,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_2",
@@ -2492,7 +2492,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_2",
@@ -2507,7 +2507,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_2",
@@ -2522,7 +2522,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_2",
@@ -2537,7 +2537,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_2",
@@ -2552,7 +2552,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_2",
@@ -2567,7 +2567,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_3",
@@ -2582,7 +2582,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_3",
@@ -2597,7 +2597,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_3",
@@ -2612,7 +2612,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_3",
@@ -2627,7 +2627,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_3",
@@ -2642,7 +2642,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_3",
@@ -2657,7 +2657,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_3",
@@ -2672,7 +2672,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_3",
@@ -2687,7 +2687,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_3",
@@ -2702,7 +2702,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_3",
@@ -2717,7 +2717,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_3",
@@ -2732,7 +2732,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_3",
@@ -2747,7 +2747,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_4",
@@ -2762,7 +2762,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_4",
@@ -2777,7 +2777,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_4",
@@ -2792,7 +2792,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_4",
@@ -2807,7 +2807,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_4",
@@ -2822,7 +2822,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_4",
@@ -2837,7 +2837,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_4",
@@ -2852,7 +2852,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_4",
@@ -2867,7 +2867,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_4",
@@ -2882,7 +2882,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_4",
@@ -2897,7 +2897,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_4",
@@ -2912,7 +2912,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_4",
@@ -2927,7 +2927,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_5",
@@ -2942,7 +2942,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_5",
@@ -2957,7 +2957,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_5",
@@ -2972,7 +2972,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_5",
@@ -2987,7 +2987,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_5",
@@ -3002,7 +3002,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_5",
@@ -3017,7 +3017,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_5",
@@ -3032,7 +3032,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_5",
@@ -3047,7 +3047,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_5",
@@ -3062,7 +3062,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_5",
@@ -3077,7 +3077,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_5",
@@ -3092,7 +3092,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_5",
@@ -3107,7 +3107,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_6",
@@ -3122,7 +3122,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_6",
@@ -3137,7 +3137,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_6",
@@ -3152,7 +3152,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_6",
@@ -3167,7 +3167,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_6",
@@ -3182,7 +3182,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_6",
@@ -3197,7 +3197,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_6",
@@ -3212,7 +3212,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_6",
@@ -3227,7 +3227,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_6",
@@ -3242,7 +3242,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_6",
@@ -3257,7 +3257,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_6",
@@ -3272,7 +3272,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_6",
@@ -3287,7 +3287,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_7",
@@ -3302,7 +3302,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_7",
@@ -3317,7 +3317,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_7",
@@ -3332,7 +3332,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_7",
@@ -3347,7 +3347,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_7",
@@ -3362,7 +3362,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_7",
@@ -3377,7 +3377,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_7",
@@ -3392,7 +3392,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_7",
@@ -3407,7 +3407,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_7",
@@ -3422,7 +3422,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_7",
@@ -3437,7 +3437,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_7",
@@ -3452,7 +3452,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_7",
@@ -3467,7 +3467,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_8",
@@ -3482,7 +3482,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_8",
@@ -3497,7 +3497,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_8",
@@ -3512,7 +3512,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_8",
@@ -3527,7 +3527,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_8",
@@ -3542,7 +3542,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_8",
@@ -3557,7 +3557,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_8",
@@ -3572,7 +3572,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_8",
@@ -3587,7 +3587,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_8",
@@ -3602,7 +3602,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_8",
@@ -3617,7 +3617,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_8",
@@ -3632,7 +3632,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_8",
@@ -3647,7 +3647,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_9",
@@ -3662,7 +3662,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_9",
@@ -3677,7 +3677,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_9",
@@ -3692,7 +3692,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_9",
@@ -3707,7 +3707,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_9",
@@ -3722,7 +3722,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_9",
@@ -3737,7 +3737,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_9",
@@ -3752,7 +3752,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_9",
@@ -3767,7 +3767,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_9",
@@ -3782,7 +3782,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_9",
@@ -3797,7 +3797,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_9",
@@ -3812,7 +3812,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_9",
@@ -3827,7 +3827,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_10",
@@ -3842,7 +3842,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_10",
@@ -3857,7 +3857,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_10",
@@ -3872,7 +3872,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_10",
@@ -3887,7 +3887,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_10",
@@ -3902,7 +3902,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_L_10",
@@ -3917,7 +3917,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_10",
@@ -3932,7 +3932,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_10",
@@ -3947,7 +3947,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_10",
@@ -3962,7 +3962,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_10",
@@ -3977,7 +3977,7 @@
     -0.0,
     -0.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_10",
@@ -3992,7 +3992,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   },
   {
    "part": "MOCOW_R_10",
@@ -4007,7 +4007,7 @@
     -0.0,
     1.0
    ],
-   "kind": "metal_screw"
+   "kind": "wood_screw"
   }
  ],
  "summary": {
