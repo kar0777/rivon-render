@@ -22,7 +22,7 @@ for pid, o in A.objs.items():
         if ob.type != "MESH": continue
         v2, f2 = shrunk_soup(ob, SHR); b = len(V); V += v2; F += [[b + t[0], b + t[1], b + t[2]] for t in f2]
     V = np.array(V); LOCAL[pid] = ((Minv[:3, :3] @ V.T).T + Minv[:3, 3], F)
-IDS = sorted(A.objs); FR = list(range(0, 270))
+IDS = sorted(A.objs); FR = list(range(0, AN.F_ASM_END + 2))
 
 def clock(f): return AN.clock_of_frame(min(f, AN.F_ASM_END))
 CACHE = {}
@@ -31,7 +31,7 @@ def build_cache():
         A.apply(f); bpy.context.view_layer.update()
         CACHE[f] = {p: np.array(A.objs[p].matrix_world) for p in IDS}
 def mat_of(pid, f):
-    a = clock(f); P, Q, k = A.pose(pid, a, a)
+    a = clock(f); P, Q, k = A.pose(pid, a)
     if A.S[pid].get("spin") and k > 0:
         from mathutils import Quaternion
         Q = Q @ Quaternion((0, 0, 1), A.S[pid]["spin"] * k)

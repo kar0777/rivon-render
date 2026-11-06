@@ -44,7 +44,7 @@ def part_mesh(name):
         v2, f2 = shrunk_soup(ob, SHRINK); b = len(V); V += v2; F += [[b + t[0], b + t[1], b + t[2]] for t in f2]
     return np.array(V), F
 
-PARTS = [p["id"] for p in L["parts"]] + [t["id"] for t in L["timber"]]
+PARTS = [p["id"] for p in L["parts"]] + [t["id"] for t in L["timber"]] + [o.name for o in bpy.data.objects if o.name.startswith(("WEDGE_", "SHEET_"))]
 OBJ = {pid: (f"INST_{pid}" if f"INST_{pid}" in bpy.data.objects else pid) for pid in PARTS}
 MESH = {pid: part_mesh(OBJ[pid]) for pid in PARTS}
 TREE = {pid: BVHTree.FromPolygons([tuple(x) for x in MESH[pid][0]], MESH[pid][1]) for pid in PARTS}
@@ -86,7 +86,8 @@ STEPS_A = (
      ("frame", ["BEAM_LONG_R", "TROJAK_C2", "TROJAK_C3", "BEAM_END_A", "BEAM_END_B"], "-x"),
      ("lower", FRAME, "-z")] +
     [("mocow", [f"MOCOW_{s}_{i}"], "-z") for i in range(11) for s in ("L", "R")] +
-    [("rafter", [f"RAFTER_{i}"], "-z") for i in range(11)])
+    [("rafter", [f"RAFTER_{i}"], "-z") for i in range(11)] +
+    [("roof", [f"WEDGE_{j:02d}"], "-z") for j in range(13)] + [("roof", [f"SHEET_{j}"], "-z") for j in range(6)])
 VEC = {"+z": (0, 0, 1), "-z": (0, 0, -1), "+x": (1, 0, 0), "-x": (-1, 0, 0), "+y": (0, 1, 0), "-y": (0, -1, 0)}
 placed = []; report = []; ok_all = True
 for stage, grp, dn in STEPS_A:

@@ -8,14 +8,14 @@ import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont
 HERE = os.path.dirname(os.path.abspath(__file__)); FD = os.path.join(HERE, "fonts") + os.sep
-CUTS = (270, 354, 438, 522, 606, 690)
+CUTS = ()                     # lab-only film: one continuous take, no cuts
 TN = 8                                                              # frames on each side of a cut used by the push-through transition
 CTA_LINES = ("Jedno rozwiązanie.", "Wiele możliwości.")           # exact copy: "Jedno rozwiązanie. Wiele możliwości."
-D0, D1 = 826, 842            # darkening
-G0, G1 = 828, 842            # engraved mark -> white graphic
-M0, M1 = 846, 864            # graphic glides to its final place
-W0, W1 = 858, 874            # wordmark
-C0 = 866                     # CTA lines (second one 6 frames later, 12-frame fades)
+D0, D1 = 830, 846            # darkening
+G0, G1 = 832, 846            # engraved mark -> white graphic
+M0, M1 = 848, 864            # graphic glides to its final place
+W0, W1 = 858, 872            # wordmark
+C0 = 864                     # CTA lines (second one 6 frames later, 12-frame fades)
 ICON_FINAL = (0.5, 0.42, 0.25)          # centre x, centre y (fraction of frame), width (fraction of frame width)
 WORD_Y, WORD_W = 0.525, 0.44
 CTA_Y = 0.65

@@ -17,12 +17,8 @@ for pid, S in A.S.items():
     if pid.startswith("SCREW"): kind = "SCREW_" + A.screw_part[pid].split("_")[0]
     if pid.startswith(("BEAM_LONG", "BEAM_END")) and S["dir"] is None: continue          # long beams just arrive, the trojaks clack on
     ev.append(dict(kind=kind, id=pid, f=AN.frame_of_clock(S["seat"]), slow=slow(S["seat"]), off=False))
-    ev.append(dict(kind=kind, id=pid, f=dis_frame(S["seat"]), slow=False, off=True))
 for nm, (t0, t1) in AN.GROUP_T.items():
     ev.append(dict(kind="JOIN" if nm == "join" else "LOWER", id=nm, f=AN.frame_of_clock(t1), slow=slow(t1), off=False))
-    ev.append(dict(kind="JOIN" if nm == "join" else "LOWER", id=nm, f=dis_frame(t1), slow=False, off=True))
-for _, s in AN.SCENES: ev.append(dict(kind="CUT", id="cut", f=s, slow=False, off=False))
-ev.append(dict(kind="CUT", id="cut", f=AN.LAB2[0], slow=False, off=False))
 ev.append(dict(kind="SLOWMO", id="slow", f=0, slow=False, off=False, windows=[[AN.frame_of_clock(a0), AN.frame_of_clock(a1)] for a0, a1 in AN.SLOWMO]))
 json.dump(sorted(ev, key=lambda e: e["f"]), open(HERE / "post" / "events2.json", "w"), indent=0)
 print(len(ev), "events")

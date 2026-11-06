@@ -76,11 +76,11 @@ def mat_steel():
 
 
 def mat_screw():
-    m = bpy.data.materials.new("fastener_dark_zinc")
+    m = bpy.data.materials.new("fastener_bright_zinc")                 # light galvanised wood screw
     nt, b = _principled(m)
-    b.inputs["Base Color"].default_value = (0.09, 0.09, 0.10, 1)
-    b.inputs["Metallic"].default_value = 0.85
-    b.inputs["Roughness"].default_value = 0.38
+    b.inputs["Base Color"].default_value = (0.66, 0.67, 0.66, 1)
+    b.inputs["Metallic"].default_value = 1.0
+    b.inputs["Roughness"].default_value = 0.30
     return m
 
 
@@ -328,23 +328,49 @@ def build_pergola(coll_name="PERGOLA"):
         ob.matrix_world = mathutils.Matrix(np.block([[R, c[:, None]], [np.zeros((1, 3)), np.ones((1, 1))]]).tolist())
         bv = ob.modifiers.new("edge_break", "BEVEL"); bv.width = 0.0006; bv.segments = 2; bv.limit_method = "ANGLE"
         coll.objects.link(ob)
-    # generic hex screw, axis +Z points into the timber
+    # WOOD SCREW (owner rule: wood screws with a sharp pointed tip, not blunt machine screws). Axis +Z points into the timber.
+    # hex head + washer flange, smooth shank under the head, coarse helical thread, thread runs out into a sharp point.
     r, hr, hh, ln = FD["shank_diameter"] / 2 * MM, FD["head_diameter"] / 2 * MM, FD["head_height"] * MM, FD["length"] * MM
-    n = 14; verts, faces = [], []
-    ring = lambda z, rad, cnt=n: [[rad * np.cos(2 * np.pi * i / cnt), rad * np.sin(2 * np.pi * i / cnt), z] for i in range(cnt)]
-    for rg in (ring(0.0, r), ring(ln - 0.001, r), ring(ln, r * 0.45)): verts += rg
-    for a in range(2):
-        for i in range(n):
-            j = (i + 1) % n; faces.append([a * n + i, a * n + j, (a + 1) * n + j, (a + 1) * n + i])
-    base = len(verts)
-    verts += [[hr * np.cos(np.pi / 3 * i), hr * np.sin(np.pi / 3 * i), z] for z in (0.0, -hh) for i in range(6)]
-    for i in range(6):
-        j = (i + 1) % 6; faces.append([base + i, base + j, base + 6 + j, base + 6 + i])
-    faces.append([base + 11, base + 10, base + 9, base + 8, base + 7, base + 6])
-    sme = mesh_from_arrays("SCREW_generic", np.array(verts), faces); sme.materials.append(screw)
+    verts, faces = [], []
+    nth = 24; pitch = 0.42 * 2 * r; core = 0.64 * r; z_thr = 0.38 * ln; z_tip = ln - 2.6 * r
+    def rad(z, th):
+        if z < z_thr - 0.6 * pitch: return r                                         # smooth shank
+        ph = (z / pitch - th / (2 * np.pi)) % 1.0; tooth = 1 - abs(2 * ph - 1)          # helical V-thread
+        rr = core + (r - core) * tooth ** 1.6
+        if z < z_thr: rr = r + (rr - r) * (z - (z_thr - 0.6 * pitch)) / (0.6 * pitch)
+        if z > z_tip: k = max(0.0, (ln - z) / (ln - z_tip)); rr = rr * k                # sharp tip
+        return rr
+    zs = list(np.linspace(0, z_thr - 0.6 * pitch, 4)) + list(np.arange(z_thr - 0.6 * pitch, ln, pitch / 8.0))[1:] + [ln]
+    for z in zs:
+        for i in range(nth):
+            th = 2 * np.pi * i / nth; rr = rad(z, th); verts.append([rr * np.cos(th), rr * np.sin(th), z])
+    nz = len(zs)
+    for a_ in range(nz - 1):
+        for i in range(nth):
+            j = (i + 1) % nth; faces.append([a_ * nth + i, a_ * nth + j, (a_ + 1) * nth + j, (a_ + 1) * nth + i])
+    tip = len(verts); verts.append([0, 0, ln + 0.0002])
+    for i in range(nth): faces.append([(nz - 1) * nth + i, (nz - 1) * nth + (i + 1) % nth, tip])
+    # washer flange (round) + hex head on top (z negative = outside the part)
+    fr, ft = hr * 1.18, 1.3 * MM
+    base = len(verts); nf = 28
+    for z in (0.0, -ft):
+        for i in range(nf): verts.append([fr * np.cos(2 * np.pi * i / nf), fr * np.sin(2 * np.pi * i / nf), z])
+    for i in range(nf): j = (i + 1) % nf; faces.append([base + i, base + j, base + nf + j, base + nf + i])
+    faces.append([base + i for i in range(nf)][::-1])
+    hb = len(verts)
+    for z in (-ft, -hh):
+        for i in range(6): verts.append([hr * np.cos(np.pi / 3 * i + np.pi / 6), hr * np.sin(np.pi / 3 * i + np.pi / 6), z])
+    for i in range(6): j = (i + 1) % 6; faces.append([hb + i, hb + j, hb + 6 + j, hb + 6 + i])
+    faces.append([hb + 6 + i for i in range(6)][::-1]); faces.append([base + nf + i for i in range(nf)])
+    sme = mesh_from_arrays("SCREW_wood", np.array(verts), faces, smooth=True); sme.materials.append(screw)
+    for pl in sme.polygons: pl.use_smooth = max(pl.vertices) <= tip and not (base <= min(pl.vertices))     # thread smooth, head/flange crisp
     for i, f in enumerate(L["fasteners"]):
         ax = np.array(f["axis_to_timber"]); pos = np.array(f["pos_mm"]) * MM - ax / np.linalg.norm(ax) * 0.001
         ob = bpy.data.objects.new(f"SCREW_{i:03d}", sme); ob.parent = root
         ob.matrix_world = mathutils.Matrix(np.block([[basis_from_z(ax), pos[:, None]], [np.zeros((1, 3)), np.ones((1, 1))]]).tolist())
         coll.objects.link(ob)
+    import film_roof                                                   # roof: firring wedges + profiled sheets (lab film)
+    ids = film_roof.build_roof(coll, pine); bpy.context.view_layer.update()
+    for nm in ids:
+        o = bpy.data.objects[nm]; mw = o.matrix_world.copy(); o.parent = root; o.matrix_world = mw
     return root

@@ -182,6 +182,28 @@ def apply_frame(f):
     loc, tgt, lens, fst = AN.camera_for_frame(f)
     cam = bpy.data.objects["film_cam"]; cam.location = loc; cam.data.lens = lens
     cam.rotation_euler = mathutils.Vector(np.array(tgt) - np.array(loc)).to_track_quat("-Z", "Y").to_euler()
+    for nm, loc_, tgt_, en, sz in AN.light_rig(f):
+        lo = bpy.data.objects.get(nm)
+        if lo is None:
+            ld = bpy.data.lights.new(nm, "AREA"); ld.color = (1.0, 0.98, 0.95); lo = bpy.data.objects.new(nm, ld); bpy.data.collections["LIGHTS"].objects.link(lo)
+        lo.data.size = sz; lo.data.energy = en; lo.location = loc_
+        lo.rotation_euler = (mathutils.Vector(tgt_) - mathutils.Vector(loc_)).to_track_quat("-Z", "Y").to_euler(); lo.hide_render = en <= 0.01
+    d = cam.data.dof; d.use_dof = True; d.focus_distance = float(np.linalg.norm(np.array(s["tgt"]) - np.array(s["loc"]))) * 1.02; d.aperture_fstop = 4.0
+    bpy.context.view_layer.update()
+
+
+# ---------------------------------------------------------------------------------------------- timeline mode
+_anim = {"obj": None}
+
+
+def apply_frame(f):
+    """Everything that depends on the film frame f (0..899): environment, pergola assembly state, hero connector, camera."""
+    if _anim["obj"] is None: _anim["obj"] = AN.Anim()
+    apply_env(AN.env_for_frame(f))
+    _anim["obj"].apply(f)
+    loc, tgt, lens, fst = AN.camera_for_frame(f)
+    cam = bpy.data.objects["film_cam"]; cam.location = loc; cam.data.lens = lens
+    cam.rotation_euler = mathutils.Vector(np.array(tgt) - np.array(loc)).to_track_quat("-Z", "Y").to_euler()
     hero = f >= 766; hk = AN.e_io(AN.clamp01((f - 766) / 26.0))          # hero lights fade in (no pop)
     for nm, loc_, en, sz in (("hero_key", (1.3, -1.6, 2.3), 900.0, 1.4), ("hero_rim", (-1.6, 1.4, 1.9), 700.0, 1.0), ("hero_fill", (-1.2, -1.8, 0.9), 160.0, 2.0)):
         lo = bpy.data.objects.get(nm)

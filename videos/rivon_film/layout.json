@@ -852,7 +852,7 @@
    ],
    "size_mm": [
     94.0,
-    5690.0,
+    5994.0,
     94.0
    ],
    "long_axis": "y"
@@ -867,7 +867,7 @@
    ],
    "size_mm": [
     94.0,
-    5690.0,
+    5994.0,
     94.0
    ],
    "long_axis": "y"
@@ -881,7 +881,7 @@
     2550.0
    ],
    "size_mm": [
-    3190.0,
+    3306.0,
     94.0,
     94.0
    ],
@@ -896,7 +896,7 @@
     2550.0
    ],
    "size_mm": [
-    3190.0,
+    3306.0,
     94.0,
     94.0
    ],
@@ -4022,5 +4022,8 @@
    6000
   ],
   "top_of_rafters_mm": 2597.0
- }
+ },
+ "notes": [
+  "Beams in Trojak 3D (owner rule): long beam runs to the corner wall (5994 mm, 1 mm short of the wall at |y|=2998), end beam butts against the long beam's inner face (3306 mm) - both fill the upper socket space, one goes deeper than the other."
+ ]
 }
