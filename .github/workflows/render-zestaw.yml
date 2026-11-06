@@ -41,10 +41,7 @@ jobs:
           W=$(jq -r .w run.json); H=$(jq -r .h run.json); SPP=$(jq -r .spp run.json)
           B=frames/zestaw-$NAME-$(printf %02d $PART); OUT=$GITHUB_WORKSPACE/out; mkdir -p $OUT
           if git ls-remote --exit-code --heads origin $B >/dev/null 2>&1; then git fetch -q origin $B && git archive FETCH_HEAD | tar -x -C $OUT; fi
-          FR=$(python3 -c "
-import json; j=json.load(open('run.json')); m=j.get('only_mod')
-fs=[f for f in range($NF) if (m is None or f % m[0] == m[1])]
-print(','.join(str(f) for i, f in enumerate(fs) if i % $NP == $PART))")
+          FR=$(python3 -c "import json; m=json.load(open('run.json')).get('only_mod'); fs=[f for f in range($NF) if (m is None or f % m[0] == m[1])]; print(','.join(str(f) for i, f in enumerate(fs) if i % $NP == $PART))")
           for CH in $(python3 -c "l='$FR'.split(',');print(' '.join(','.join(l[i:i+8]) for i in range(0,len(l),8)))"); do
             python3 videos/zestaw/build_zestaw.py --frames $CH --out $OUT --w $W --h $H --spp $SPP
             (cd $OUT && rm -rf .git && git init -q -b $B && git add -A && git commit -q -m "$B" && \
