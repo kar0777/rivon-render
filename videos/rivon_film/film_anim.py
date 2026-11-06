@@ -99,7 +99,8 @@ class Vortex:
                 spread = 0.5 + tries / 1500.0
                 ph = th_t - self.OMEGA * spin_of(P["leave"]) + rng.uniform(-0.75 * spread, 0.35 * spread)
                 z = rng.uniform(*P["zband"]); rr = r + rng.uniform(-0.15, 0.15) * (1 + tries / 2000.0)
-                if "lane" in P: z = P["lane"]                                # firring strips: one height lane each, never stacked close
+                if "lane" in P:                                              # firring strips: a neat vertical ladder in front, one lane each,
+                    z = P["lane"]; ph = -math.pi / 2 - self.OMEGA * spin_of(P["leave"]); rr = r + 0.6   # they peel off one by one
                 pts = self._pts(rr, ph, z, P["length"])
                 if all(np.min(np.linalg.norm(pts[:, None, :] - q[None, :, :], axis=2)) > P["size"] + rq + 0.06 for q, rq in placed): break
             placed.append((pts, P["size"])); self.slot[pid] = (ph, z, rr, rng.uniform(0, 1e3))
