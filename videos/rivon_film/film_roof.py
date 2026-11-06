@@ -93,4 +93,7 @@ def build_roof(coll, pine):
     mat = _mat_sheet(); y0 = -Y_HALF
     for k in range(N_SHEETS):
         yc = y0 + k * (SHEET_W + GAP) + SHEET_W / 2; nm = f"SHEET_{k}"; _sheet(nm, yc, mat, coll); ids.append(nm)
+    import bmesh
+    for nm in ids:                                                      # outward normals (shading + collision checks)
+        me = bpy.data.objects[nm].data; bm = bmesh.new(); bm.from_mesh(me); bmesh.ops.recalc_face_normals(bm, faces=bm.faces); bm.to_mesh(me); bm.free()
     return ids

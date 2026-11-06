@@ -351,7 +351,7 @@ def build_pergola(coll_name="PERGOLA"):
     tip = len(verts); verts.append([0, 0, ln + 0.0002])
     for i in range(nth): faces.append([(nz - 1) * nth + i, (nz - 1) * nth + (i + 1) % nth, tip])
     # washer flange (round) + hex head on top (z negative = outside the part)
-    fr, ft = hr * 1.18, 1.3 * MM
+    fr, ft = hr * 0.98, 1.3 * MM                                     # flange fits the flat land around the holes (checked on STEP)
     base = len(verts); nf = 28
     for z in (0.0, -ft):
         for i in range(nf): verts.append([fr * np.cos(2 * np.pi * i / nf), fr * np.sin(2 * np.pi * i / nf), z])
@@ -359,10 +359,12 @@ def build_pergola(coll_name="PERGOLA"):
     faces.append([base + i for i in range(nf)][::-1])
     hb = len(verts)
     for z in (-ft, -hh):
-        for i in range(6): verts.append([hr * np.cos(np.pi / 3 * i + np.pi / 6), hr * np.sin(np.pi / 3 * i + np.pi / 6), z])
+        for i in range(6): verts.append([0.9 * hr * np.cos(np.pi / 3 * i + np.pi / 6), 0.9 * hr * np.sin(np.pi / 3 * i + np.pi / 6), z])
     for i in range(6): j = (i + 1) % 6; faces.append([hb + i, hb + j, hb + 6 + j, hb + 6 + i])
     faces.append([hb + 6 + i for i in range(6)][::-1]); faces.append([base + nf + i for i in range(nf)])
     sme = mesh_from_arrays("SCREW_wood", np.array(verts), faces, smooth=True); sme.materials.append(screw)
+    import bmesh                                                           # consistent outward normals (shading + collision shrink)
+    bm = bmesh.new(); bm.from_mesh(sme); bmesh.ops.recalc_face_normals(bm, faces=bm.faces); bm.to_mesh(sme); bm.free()
     for pl in sme.polygons: pl.use_smooth = max(pl.vertices) <= tip and not (base <= min(pl.vertices))     # thread smooth, head/flange crisp
     for i, f in enumerate(L["fasteners"]):
         ax = np.array(f["axis_to_timber"]); pos = np.array(f["pos_mm"]) * MM - ax / np.linalg.norm(ax) * 0.001

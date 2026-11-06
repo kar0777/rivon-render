@@ -8,7 +8,6 @@ from mathutils import Matrix, Vector
 from mathutils.bvhtree import BVHTree
 import film_lib as FL, film_anim as AN
 RP = HERE / "assembly_routes.json"
-if RP.exists(): RP.unlink()
 for o in list(bpy.data.objects): bpy.data.objects.remove(o, do_unlink=True)
 FL.build_pergola("PERGOLA"); bpy.context.view_layer.update()
 A = AN.Anim(); SHR = 0.0006; CAM_CLEAR = 0.35
@@ -64,7 +63,7 @@ def violations(pid, frames=None):
 build_cache()
 VAR_S = [(k, dz, se, lat) for dz in (0.0, -0.5, 0.5, 1.0, -1.0) for k in (0.5, 0.9, 1.4) for lat in (0.0, 0.8, -0.8) for se in (0.85,)]
 VAR_O = [(0.5, dz, se, lat) for dz in (0.0, 0.6, 1.2, -0.4, 1.8) for se in (0.85, 0.6) for lat in (0.0, 1.0, -1.0, 2.0, -2.0)]
-routes = {}
+routes = {k: list(v) for k, v in A.route.items()}               # start from the previous solution
 for rnd in range(3):
     bad = [p for p in sorted(IDS, key=lambda q: A.S[q]["leave"]) if violations(p)]
     print("round", rnd, "parts with violations:", len(bad), bad[:20], flush=True)
