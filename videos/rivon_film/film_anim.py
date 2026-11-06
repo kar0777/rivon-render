@@ -68,7 +68,7 @@ def schedule():
             if (s, i) == ("L", 0): continue
             a = 520 + 3.0 * k; put(f"MOCOW_{s}_{i}", a, a + 14, D, 0.5); k += 1
     put("RAFTER_0", 590, 624, D, 0.9, fly=50)                                                        # macro 5
-    for i in range(1, 11): a = 598 + 7.0 * i; put(f"RAFTER_{i}", a, a + 16, D, 0.9, fly=48)
+    for i in range(1, 11): put(f"RAFTER_{i}", 646, 666, D, 0.9, fly=50)          # the other 10 rafters come down together into their hangers
     for j in range(13): put(f"WEDGE_{j:02d}", 690, 706, D, 0.5, fly=50)          # all 13 strips come down together as one rigid comb
     for j in range(6): a = 714 + 8.0 * j; put(f"SHEET_{j}", a, a + 18, D, 0.6, fly=52)
     return S
@@ -190,12 +190,13 @@ class Anim:
     def pose(self, pid, a, s=None):
         if s is None: s = spin_of(a)
         S = self.S[pid]; q0 = S["q0"]; c0 = self.center[pid]
-        if pid.startswith("WEDGE"):                       # rigid comb high above the lab, descends, then sets down straight
+        if pid.startswith("WEDGE") or (pid.startswith("RAFTER") and pid != "RAFTER_0"):   # rigid comb from high above, then sets down straight
             if a >= S["seat"]: return c0, q0, 0.0
             if a >= S["app"]:
                 u = (a - S["app"]) / (S["seat"] - S["app"]); return c0 + Vector((0, 0, S["L"] * (1 - e_seat(u)))), q0, 1.0
             u = clamp01((a - S["leave"]) / (S["app"] - S["leave"]))
-            return c0 + Vector((0, 0, S["L"] + 8.5 * (1 - e_io5(u)) ** 1.0)), q0, 1.0
+            park = 12.0 if pid.startswith("WEDGE") else 8.5                # the strip comb waits above the rafter comb
+            return c0 + Vector((0, 0, S["L"] + park * (1 - e_io5(u)))), q0, 1.0
         base = c0 + group_offset(S["groups"], a); d = S["dir"]; L = S["L"]
         if a >= S["seat"]: return base, q0, 0.0
         if d is not None and a >= S["app"]:
@@ -216,8 +217,10 @@ class Anim:
             up = Vector((0, 0, max(0.0, 3.4 - A.z) + 0.6)) if (abs(A.x) < 2.1 and abs(A.y) < 3.3 and not pid.startswith(("WEDGE", "SHEET"))) else Vector((0, 0, 0.3))
             up = up + Vector((0, 0, dz))
             P1 = P0 + v0 * (T / 3.0) + up * 0.6 + side * 0.6 + Vector((0, 0, 0.5))
-            if pid.startswith(("WEDGE", "SHEET", "RAFTER")):           # long pieces peel OUT of the ring first (no brushing past neighbours)
+            if pid.startswith(("WEDGE", "SHEET")):                     # thin long strips peel OUT of the ring first (no brushing past neighbours)
                 rad = Vector((P0.x, P0.y, 0.0)).normalized(); P1 = P1 + rad * 1.2 + Vector((0, 0, 0.6))
+            if pid.startswith("RAFTER"):                               # rafters slide straight out of their ring level, height comes later
+                rad = Vector((P0.x, P0.y, 0.0)).normalized(); P1 = P0 + v0 * (T / 3.0) + rad * 1.6 + side * 0.6
             P2 = A - app_v * (T / 3.0) + up + side
         P = _bezier(P0, P1, P2, A, e_io(u) * 0.5 + u * 0.5)
         Qv = self.V.rot(pid, s_l, q0, self.long[pid])
