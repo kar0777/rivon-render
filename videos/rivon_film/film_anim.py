@@ -69,7 +69,7 @@ def schedule():
             a = 520 + 3.0 * k; put(f"MOCOW_{s}_{i}", a, a + 14, D, 0.5); k += 1
     put("RAFTER_0", 590, 624, D, 0.9, fly=50)                                                        # macro 5
     for i in range(1, 11): a = 598 + 7.0 * i; put(f"RAFTER_{i}", a, a + 16, D, 0.9, fly=48)
-    for j in range(13): a = 678 + 3.0 * j; put(f"WEDGE_{j:02d}", a, a + 14, D, 0.5, fly=46)
+    for j in range(13): put(f"WEDGE_{j:02d}", 690, 706, D, 0.5, fly=50)          # all 13 strips come down together as one rigid comb
     for j in range(6): a = 714 + 8.0 * j; put(f"SHEET_{j}", a, a + 18, D, 0.6, fly=52)
     return S
 
@@ -172,7 +172,7 @@ class Anim:
             elif pid.startswith(("BEAM", "SHEET")): zb = (3.3, 4.4)
             else: zb = (0.45, 3.3)
             vp[pid] = dict(leave=S["leave"], target=self.center[pid], size=size, length=length, zband=zb)
-            if pid.startswith("WEDGE"): vp[pid]["lane"] = 0.55 + 0.30 * int(pid.split("_")[1])
+
         self.V = Vortex(vp)
         rp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assembly_routes.json")
         self.route = {k: tuple(v) for k, v in json.load(open(rp)).items()} if os.path.exists(rp) else {}
@@ -190,6 +190,12 @@ class Anim:
     def pose(self, pid, a, s=None):
         if s is None: s = spin_of(a)
         S = self.S[pid]; q0 = S["q0"]; c0 = self.center[pid]
+        if pid.startswith("WEDGE"):                       # rigid comb high above the lab, descends, then sets down straight
+            if a >= S["seat"]: return c0, q0, 0.0
+            if a >= S["app"]:
+                u = (a - S["app"]) / (S["seat"] - S["app"]); return c0 + Vector((0, 0, S["L"] * (1 - e_seat(u)))), q0, 1.0
+            u = clamp01((a - S["leave"]) / (S["app"] - S["leave"]))
+            return c0 + Vector((0, 0, S["L"] + 8.5 * (1 - e_io5(u)) ** 1.0)), q0, 1.0
         base = c0 + group_offset(S["groups"], a); d = S["dir"]; L = S["L"]
         if a >= S["seat"]: return base, q0, 0.0
         if d is not None and a >= S["app"]:
