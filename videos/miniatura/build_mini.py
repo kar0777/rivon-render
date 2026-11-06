@@ -335,6 +335,6 @@ def apply_frame(f, motion_blur=False):
             cam.data.keyframe_insert("lens", frame=fr); d.keyframe_insert("focus_distance", frame=fr); d.keyframe_insert("aperture_fstop", frame=fr)
     sc.render.use_motion_blur = motion_blur
     if motion_blur:
-        sc.render.motion_blur_shutter = 0.5; sc.cycles.motion_blur_position = "START"
+        sc.render.motion_blur_shutter = 0.5; sc.render.motion_blur_position = "START"
         sc.frame_set(f)
     bpy.context.view_layer.update()
