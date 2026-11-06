@@ -258,7 +258,7 @@ KEYS = [  # (frame, loc, target, lens, f-stop)  - smoothed afterwards; speeds ve
     (506, (-0.55, -4.15, 2.30), (-1.62, -2.92, 2.50), 70, 3.2),    # ...descending with the frame onto post C1
     (546, (-0.55, -3.30, 2.10), (-1.62, -2.42, 2.52), 75, 3.2),    # macro 4: Mocowanie belek 2 + wood screws into the beam side
     (592, (-0.70, -3.20, 2.20), (-1.62, -2.42, 2.55), 80, 3.2),
-    (626, (-0.85, -3.45, 2.95), (-1.62, -2.42, 2.62), 70, 3.2),    # macro 5: rafter drops into the Mocowanie
+    (626, (-0.75, -3.55, 2.25), (-1.62, -2.42, 2.60), 65, 3.2),    # macro 5: rafter drops into the Mocowanie (seen from below-front)
     (700, (0.9, -5.8, 3.7),    (0.0, -0.2, 2.7),     32, 5.0),     # roof: firring strips, sheets (grooves along rafters, one side high)
     (740, (0.9, -5.5, 3.3),    (-1.2, -2.4, 2.6),    34, 5.0),
     (768, (0.6, -4.4, 2.05),   (-1.65, -2.75, 2.5),  42, 4.0),     # glide in under the end beam...
