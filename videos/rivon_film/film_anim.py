@@ -99,6 +99,7 @@ class Vortex:
                 spread = 0.5 + tries / 1500.0
                 ph = th_t - self.OMEGA * spin_of(P["leave"]) + rng.uniform(-0.75 * spread, 0.35 * spread)
                 z = rng.uniform(*P["zband"]); rr = r + rng.uniform(-0.15, 0.15) * (1 + tries / 2000.0)
+                if "lane" in P: z = P["lane"]                                # firring strips: one height lane each, never stacked close
                 pts = self._pts(rr, ph, z, P["length"])
                 if all(np.min(np.linalg.norm(pts[:, None, :] - q[None, :, :], axis=2)) > P["size"] + rq + 0.06 for q, rq in placed): break
             placed.append((pts, P["size"])); self.slot[pid] = (ph, z, rr, rng.uniform(0, 1e3))
@@ -170,6 +171,7 @@ class Anim:
             elif pid.startswith(("BEAM", "SHEET")): zb = (3.3, 4.4)
             else: zb = (0.45, 3.3)
             vp[pid] = dict(leave=S["leave"], target=self.center[pid], size=size, length=length, zband=zb)
+            if pid.startswith("WEDGE"): vp[pid]["lane"] = 0.55 + 0.30 * int(pid.split("_")[1])
         self.V = Vortex(vp)
         rp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assembly_routes.json")
         self.route = {k: tuple(v) for k, v in json.load(open(rp)).items()} if os.path.exists(rp) else {}
