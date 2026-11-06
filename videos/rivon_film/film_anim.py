@@ -207,6 +207,8 @@ class Anim:
             up = Vector((0, 0, max(0.0, 3.4 - A.z) + 0.6)) if (abs(A.x) < 2.1 and abs(A.y) < 3.3 and not pid.startswith(("WEDGE", "SHEET"))) else Vector((0, 0, 0.3))
             up = up + Vector((0, 0, dz))
             P1 = P0 + v0 * (T / 3.0) + up * 0.6 + side * 0.6 + Vector((0, 0, 0.5))
+            if pid.startswith(("WEDGE", "SHEET")):                     # thin long strips peel OUT of the ring first (no brushing past neighbours)
+                rad = Vector((P0.x, P0.y, 0.0)).normalized(); P1 = P1 + rad * 1.2 + Vector((0, 0, 0.6))
             P2 = A - app_v * (T / 3.0) + up + side
         P = _bezier(P0, P1, P2, A, e_io(u) * 0.5 + u * 0.5)
         Qv = self.V.rot(pid, s_l, q0, self.long[pid])
